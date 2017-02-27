@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.taskManager.data.MngAppTaskBomMapper">
+
+
+<select id="getAppTaskBomList" parameterType="map" resultType="manager.taskManager.model.MngAppTaskBom">
+	select
+		t_app_task_bom.tb_id,
+		t_app_task_bom.t_id,
+		t_app_task_bom.order_no,
+		t_app_task_bom.material,
+		t_app_task_bom.consumption,
+		t_app_task_bom.unit,
+		t_app_task_bom.total_consumption
+	from
+		t_app_task_bom
+</select>
+<insert id="addAppTaskBom" parameterType="manager.taskManager.model.MngAppTaskBom" keyProperty="tb_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="tb_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task_bom
+	(
+	
+		t_id,
+		order_no,
+		material,
+		consumption,
+		unit,
+		total_consumption
+	)
+	values
+	(
+		#{t_id},
+		#{order_no},
+		#{material},
+		#{consumption},
+		#{unit},
+		#{total_consumption}
+	)
+</insert>
+<update id="updateAppTaskBom" parameterType="manager.taskManager.model.MngAppTaskBom">
+	update t_app_task_bom
+		set
+			t_id = #{t_id},
+			order_no = #{order_no},
+			material = #{material},
+			consumption = #{consumption},
+			unit = #{unit},
+			total_consumption = #{total_consumption}
+		where tb_id = #{tb_id}
+</update>
+<delete id="deleteAppTaskBom" parameterType="manager.taskManager.model.MngAppTaskBom">
+	delete from t_app_task_bom
+	where tb_id = #{tb_id}
+</delete>
+
+<!--自己编写的sql  -->
+<select id="getAppTaskBomListbg" parameterType="map" resultType="manager.taskManager.model.MngAppTaskBom">
+	select
+		t_app_task_bom.tb_id,
+		t_app_task_bom.t_id,
+		t_app_task_bom.order_no,
+		t_app_task_bom.material,
+		t_app_task_bom.consumption,
+		t_app_task_bom.unit,
+		t_app_task_bom.total_consumption
+	from
+		t_app_task_bom
+		where t_id = #{t_id}
+</select>
+</mapper>

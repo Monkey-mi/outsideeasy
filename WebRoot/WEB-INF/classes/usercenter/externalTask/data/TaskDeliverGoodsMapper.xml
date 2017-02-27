@@ -1,0 +1,846 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.TaskDeliverGoodsMapper">
+
+<select id="getTaskDeliverGoodsListvo" parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+	select
+		t_task_deliver_goods.deliver_id,
+		t_task_deliver_goods.deliver_state,
+		t_task_deliver_goods.deliver_number,		
+		t_task_deliver_goods.customer_id,
+		t_task_deliver_goods.customer_name,
+		t_task_deliver_goods.t_id,
+		t_task_deliver_goods.shipping_id,
+		t_task_deliver_goods.delivery_quantity,
+		t_task_deliver_goods.is_delete,
+		t_task_deliver_goods.create_time,
+		t_task_deliver_goods.confirm_dt,
+		t_task_deliver_goods.deliver_type,
+		t_task_deliver_goods.receipt_remark,
+		t_shipping_registration.shipping_number,
+		t_shipping_registration.start_date		
+	from
+		t_task_deliver_goods
+		left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id
+	where 1=1
+	    and t_shipping_registration.shipping_company_id = #{company_id}
+	    <if test="state != '' and state != null and state != 0">
+	    and t_task_deliver_goods.deliver_state = #{state}
+	    </if>
+	    <if test="shippingType != '' and shippingType != null">
+	     <if test="shippingType != 2">
+	      and t_task_deliver_goods.deliver_type = #{shippingType}
+	     </if>	     
+	    </if>
+	    <if test="end_date != '' and end_date != null">
+	    and t_task_deliver_goods.confirm_dt&lt;=#{end_date}
+	    </if>
+	    <if test="start_date != '' and start_date != null">
+	    and t_task_deliver_goods.confirm_dt&gt;=#{start_date}
+	    </if>
+	    <if test="shipping_num != '' and shipping_num != null">
+	    and t_task_deliver_goods.deliver_number like '%${shipping_num}%'
+	    </if>
+	     <if test="shipping_nummber != '' and shipping_nummber != null">
+	    and t_shipping_registration.shipping_number like '%${shipping_nummber}%'
+	    </if>
+	     <if test="shipping_end_date != '' and shipping_end_date != null">
+	    and t_shipping_registration.start_date&lt;=#{shipping_end_date}
+	    </if>
+	    <if test="shipping_start_date != '' and shipping_start_date != null">
+	    and t_shipping_registration.start_date&gt;=#{shipping_start_date}
+	    </if>
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+	    and t_task_deliver_goods.deliver_number = #{deliver_number}
+	    and t_task_deliver_goods.shipping_id is not null
+</select>
+<select id="getTaskDeliverGoodsList" parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+select
+	  DISTINCT t_task_deliver_goods.deliver_number	
+	from
+		t_task_deliver_goods
+		left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id
+		left join t_app_task on t_app_task.t_id = t_task_deliver_goods.t_id
+	where 1=1
+	    and t_shipping_registration.shipping_company_id = #{company_id}
+	    <if test="state != '' and state != null and state != 0">
+	    and t_task_deliver_goods.deliver_state = #{state}
+	    </if>
+	    <if test="shippingType != '' and shippingType != null">
+	     <if test="shippingType != 2">
+	      and t_task_deliver_goods.deliver_type = #{shippingType}
+	     </if>	     
+	    </if>
+	    <if test="end_date != '' and end_date != null">
+	    and t_task_deliver_goods.confirm_dt&lt;=#{end_date}
+	    </if>
+	    <if test="start_date != '' and start_date != null">
+	    and t_task_deliver_goods.confirm_dt&gt;=#{start_date}
+	    </if>
+	    <if test="shipping_num != '' and shipping_num != null">
+	    and t_task_deliver_goods.deliver_number like '%${shipping_num}%'
+	    </if>
+	     <if test="search_company != '' and search_company != null">
+	    and t_app_task.product_name like '%${search_company}%'
+	    </if>
+	     <if test="shipping_nummber != '' and shipping_nummber != null">
+	    and t_shipping_registration.shipping_number like '%${shipping_nummber}%'
+	    </if>
+	     <if test="shipping_end_date != '' and shipping_end_date != null">
+	    and t_shipping_registration.start_date&lt;=#{shipping_end_date}
+	    </if>
+	    <if test="shipping_start_date != '' and shipping_start_date != null">
+	    and t_shipping_registration.start_date&gt;=#{shipping_start_date}
+	    </if>
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+	    and t_task_deliver_goods.shipping_id is not null
+	    order by t_task_deliver_goods.create_time DESC	    
+</select>
+
+<select id="getTaskDeliverGoodsListForReceive" parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+select
+	  DISTINCT t_task_deliver_goods.deliver_number	
+	from
+		t_task_deliver_goods
+		left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id
+		left join t_app_task on t_app_task.t_id = t_task_deliver_goods.t_id
+	where 1=1
+	    <if test="state != '' and state != null and state != 0">
+	    and t_task_deliver_goods.deliver_state = #{state}
+	    </if>
+	    <if test="shippingType != '' and shippingType != null">
+	     <if test="shippingType != 2">
+	      and t_task_deliver_goods.deliver_type = #{shippingType}
+	     </if>	     
+	    </if>
+	    <if test="end_date != '' and end_date != null">
+	    and t_task_deliver_goods.confirm_dt&lt;=#{end_date}
+	    </if>
+	    <if test="start_date != '' and start_date != null">
+	    and t_task_deliver_goods.confirm_dt&gt;=#{start_date}
+	    </if>
+	    <if test="shipping_num != '' and shipping_num != null">
+	    and t_task_deliver_goods.deliver_number like '%${shipping_num}%'
+	    </if>
+	     <if test="search_company != '' and search_company != null">
+	    and t_app_task.product_name like '%${search_company}%'
+	    </if>
+	     <if test="shipping_nummber != '' and shipping_nummber != null">
+	    and t_shipping_registration.shipping_number like '%${shipping_nummber}%'
+	    </if>
+	     <if test="shipping_end_date != '' and shipping_end_date != null">
+	    and t_shipping_registration.start_date&lt;=#{shipping_end_date}
+	    </if>
+	    <if test="shipping_start_date != '' and shipping_start_date != null">
+	    and t_shipping_registration.start_date&gt;=#{shipping_start_date}
+	    </if>
+	    <if test="sa_id != null and sa_id != ''">	
+	    and EXISTS(
+	    select 
+        t_supplier_files.company_id
+        from t_supplier_files
+          left join t_subaccount_supplier_info on t_subaccount_supplier_info.supplier_id = t_supplier_files.supplier_id
+        where t_subaccount_supplier_info.sa_id = #{sa_id}
+          t_subaccount_supplier_info.is_delete = #{is_delete} 
+          t_shipping_registration.shipping_company_id =  t_supplier_files.company_id
+          )   
+	    </if>
+	    and t_task_deliver_goods.customer_id = #{company_id}
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+	    and t_task_deliver_goods.shipping_id is not null
+	    order by t_task_deliver_goods.create_time DESC
+</select>
+<select id="getTaskDeliverGoodsListvoForReceive" parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+	select
+		t_task_deliver_goods.deliver_id,
+		t_task_deliver_goods.deliver_state,
+		t_task_deliver_goods.deliver_number,		
+		t_task_deliver_goods.customer_id,
+		t_task_deliver_goods.customer_name,
+		t_task_deliver_goods.t_id,
+		t_task_deliver_goods.shipping_id,
+		t_task_deliver_goods.delivery_quantity,
+		t_task_deliver_goods.is_delete,
+		t_task_deliver_goods.create_time,
+		t_task_deliver_goods.confirm_dt,
+		t_task_deliver_goods.deliver_type,
+		t_task_deliver_goods.receipt_remark,
+		t_shipping_registration.shipping_number,
+		t_shipping_registration.start_date,
+		t_shipping_registration.driver,
+		t_shipping_registration.phone_number,
+		t_app_company_info.cpyname_cn as shipping_company
+	from
+		t_task_deliver_goods
+		left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id		 
+		left join t_app_company_info on t_shipping_registration.shipping_company_id = t_app_company_info.company_id	
+	where 1=1
+	    <if test="state != '' and state != null and state != 0">
+	    and t_task_deliver_goods.deliver_state = #{state}
+	    </if>
+	    <if test="shippingType != '' and shippingType != null">
+	     <if test="shippingType != 2">
+	      and t_task_deliver_goods.deliver_type = #{shippingType}
+	     </if>	     
+	    </if>
+	    <if test="end_date != '' and end_date != null">
+	    and t_task_deliver_goods.confirm_dt&lt;=#{end_date}
+	    </if>
+	    <if test="start_date != '' and start_date != null">
+	    and t_task_deliver_goods.confirm_dt&gt;=#{start_date}
+	    </if>
+	    <if test="shipping_num != '' and shipping_num != null">
+	    and t_task_deliver_goods.deliver_number like '%${shipping_num}%'
+	    </if>	
+	     <if test="shipping_nummber != '' and shipping_nummber != null">
+	    and t_shipping_registration.shipping_number like '%${shipping_nummber}%'
+	    </if>
+	     <if test="shipping_end_date != '' and shipping_end_date != null">
+	    and t_shipping_registration.start_date&lt;=#{shipping_end_date}
+	    </if>
+	    <if test="shipping_start_date != '' and shipping_start_date != null">
+	    and t_shipping_registration.start_date&gt;=#{shipping_start_date}
+	    </if>	  
+	    <if test="sa_id != null and sa_id != ''">	
+	    and EXISTS(
+	    select 
+        t_supplier_files.company_id
+        from t_supplier_files
+          left join t_subaccount_supplier_info on t_subaccount_supplier_info.supplier_id = t_supplier_files.supplier_id
+        where t_subaccount_supplier_info.sa_id = #{sa_id}
+          t_subaccount_supplier_info.is_delete = #{is_delete} 
+          t_shipping_registration.shipping_company_id =  t_supplier_files.company_id
+          )   
+	    </if>    	    
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+	    and t_task_deliver_goods.shipping_id is not null
+	    and t_task_deliver_goods.deliver_number = #{deliver_number}
+	    and t_task_deliver_goods.customer_id = #{company_id}
+</select>
+<select id="getTaskDeliverGoodsListForCount" parameterType="map" resultType="Integer">
+select
+      COUNT(DISTINCT  t_task_deliver_goods.deliver_number)	 
+	from
+		t_task_deliver_goods
+		left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id
+	    left join t_app_task on t_app_task.t_id = t_task_deliver_goods.t_id
+	where 1=1
+	   <if test="state != '' and state != null and state != 0">
+	    and t_task_deliver_goods.deliver_state = #{state}
+	    </if>
+	    <if test="shippingType != '' and shippingType != null">
+	     <if test="shippingType != 2">
+	      and t_task_deliver_goods.deliver_type = #{shippingType}
+	     </if>	     
+	    </if>
+	    <if test="end_date != '' and end_date != null">
+	    and t_task_deliver_goods.confirm_dt&lt;=#{end_date}
+	    </if>
+	    <if test="start_date != '' and start_date != null">
+	    and t_task_deliver_goods.confirm_dt&gt;=#{start_date}
+	    </if>
+	    <if test="shipping_num != '' and shipping_num != null">
+	    and t_task_deliver_goods.deliver_number like '%${shipping_num}%'
+	    </if>
+	     <if test="search_company != '' and search_company != null">
+	    and t_app_task.product_name like '%${search_company}%'
+	    </if>
+	     <if test="shipping_nummber != '' and shipping_nummber != null">
+	    and t_shipping_registration.shipping_number like '%${shipping_nummber}%'
+	    </if>
+	     <if test="shipping_end_date != '' and shipping_end_date != null">
+	    and t_shipping_registration.start_date&lt;=#{shipping_end_date}
+	    </if>
+	    <if test="shipping_start_date != '' and shipping_start_date != null">
+	    and t_shipping_registration.start_date&gt;=#{shipping_start_date}
+	    </if>
+	    and t_task_deliver_goods.shipping_id is not null
+	    and t_shipping_registration.shipping_company_id = #{company_id}	    
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+</select>
+
+<select id="getTaskDeliverGoodsListForCountForReceive" parameterType="map" resultType="Integer">
+select
+      COUNT(DISTINCT  t_task_deliver_goods.deliver_number)	 
+	from
+		t_task_deliver_goods
+		left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id
+	    left join t_app_task on t_app_task.t_id = t_task_deliver_goods.t_id
+	where 1=1
+	    <if test="state != '' and state != null and state != 0">
+	    and t_task_deliver_goods.deliver_state = #{state}
+	    </if>
+	    <if test="shippingType != '' and shippingType != null">
+	     <if test="shippingType != 2">
+	      and t_task_deliver_goods.deliver_type = #{shippingType}
+	     </if>	     
+	    </if>
+	    <if test="end_date != '' and end_date != null">
+	    and t_task_deliver_goods.confirm_dt&lt;=#{end_date}
+	    </if>
+	    <if test="start_date != '' and start_date != null">
+	    and t_task_deliver_goods.confirm_dt&gt;=#{start_date}
+	    </if>
+	    <if test="shipping_num != '' and shipping_num != null">
+	    and t_task_deliver_goods.deliver_number like '%${shipping_num}%'
+	    </if>
+	     <if test="shipping_nummber != '' and shipping_nummber != null">
+	    and t_shipping_registration.shipping_number like '%${shipping_nummber}%'
+	    </if>
+	     <if test="search_company != '' and search_company != null">
+	    and t_app_task.product_name like '%${search_company}%'
+	    </if>
+	     <if test="shipping_end_date != '' and shipping_end_date != null">
+	    and t_shipping_registration.start_date&lt;=#{shipping_end_date}
+	    </if>
+	    <if test="shipping_start_date != '' and shipping_start_date != null">
+	    and t_shipping_registration.start_date&gt;=#{shipping_start_date}
+	    </if>	  
+	    <if test="sa_id != null and sa_id != ''">	
+	    and EXISTS(
+	    select 
+        t_supplier_files.company_id
+        from t_supplier_files
+          left join t_subaccount_supplier_info on t_subaccount_supplier_info.supplier_id = t_supplier_files.supplier_id
+        where t_subaccount_supplier_info.sa_id = #{sa_id}
+          t_subaccount_supplier_info.is_delete = #{is_delete} 
+          t_shipping_registration.shipping_company_id =  t_supplier_files.company_id
+          )   
+	    </if>    	    
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+	    and t_task_deliver_goods.customer_id = #{company_id}
+</select>
+
+
+
+<insert id="addTaskDeliverGoods" parameterType="map" keyProperty="deliver_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="deliver_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_task_deliver_goods
+	(
+		deliver_state,
+		deliver_number,
+		t_id,
+		deliver_type,
+		is_delete,
+		customer_id,
+		customer_name,
+		operator,
+		delivery_quantity
+		)
+	values
+	(
+		#{deliver_state},
+		#{deliver_number},		
+		#{t_id},					
+		#{deliver_type},
+		#{is_delete},
+		#{customer_id},	
+		#{customer_name},
+		#{operator},
+		#{delivery_quantity}
+	)
+</insert>
+
+<select id="getTaskProductList" parameterType="map" resultType="usercenter.externalTask.model.Task">
+select
+		t_app_task.t_id
+		,t_app_task.product_name
+		,t_app_task.serial_no
+		,t_app_task.state
+		,t_app_task.send_company
+		,t_app_task.receive_company
+		,t_app_task.total_qty
+		,t_app_task.produced_qty
+		,t_app_task.confirmed_qty
+		,t_app_task.confirmed_qtyVo
+		,t_app_task.return_qtyVo
+		,t_app_task.qualified_qty
+		,t_app_task.return_send_qtyVo
+		,t_app_task.sendout_qty
+		,t_app_task.receive_time
+		,t_app_task.product_pic
+		,t_app_task.ddh
+		,t_app_task.scdh
+		,t_app_task.rwdh
+		,t_app_task.bzmc
+		,rc.cpyname_cn as receive_company_name
+		,sc.cpyname_cn as send_company_name
+	from
+		t_app_task
+	    left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	    left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	where 			
+	    t_app_task.t_id in
+	    <foreach collection="arrs" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+</select>
+<update id="updateTaskDeliverGoods" parameterType="usercenter.externalTask.model.TaskDeliverGoods">
+	update t_task_deliver_goods
+		set
+			deliver_id = #{deliver_id},
+			deliver_state = #{deliver_state},
+			deliver_number = #{deliver_number},
+			customer_id = #{customer_id},
+			customer_name = #{customer_name},
+			t_id = #{t_id},
+			shipping_id = #{shipping_id},
+			delivery_quantity = #{delivery_quantity},
+			is_delete = #{is_delete},
+			create_time = #{create_time},
+			confirm_dt = #{confirm_dt},
+			deliver_type = #{deliver_type},
+			receipt_remark = #{receipt_remark}
+		where deliver_id = #{deliver_id}
+</update>
+<update id="updateTaskDeliverGoodsFordel" parameterType="map">
+	update t_task_deliver_goods
+	set    is_delete = #{is_delete}
+	where 
+	       deliver_number = #{deliver_number}
+	       and t_id in
+	       <foreach collection="tarr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+           </foreach> 
+</update>
+<update id="updateDeliverGoodsForQuantity" parameterType="map">
+	update t_task_deliver_goods
+	set    delivery_quantity = #{delivery_quantity},
+	       shipping_id = #{shipping_id}
+	where 
+	       deliver_number = #{deliver_number}
+	       and t_id = #{t_id}
+</update>
+<select id="getTaskDeliverGoods" parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+	select 
+	    t_task_deliver_goods.deliver_id,
+	    t_task_deliver_goods.t_id,
+	    t_task_deliver_goods.customer_name,
+	    t_task_deliver_goods.customer_id
+	from t_task_deliver_goods
+	where 
+		deliver_number = #{deliver_number}
+		and is_delete = #{is_delete}	
+</select>
+<update id="updateDeliverForGoods" parameterType="map" >
+     update t_task_deliver_goods
+     set shipping_id = #{shipping_id}
+     where
+     deliver_number in
+	 <foreach collection="arrpro" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+    </foreach>  
+     and   deliver_state = #{deliver_state} 
+     and   is_delete = #{is_delete} 
+</update >
+<select id="getDeliverdetail"  parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+    select 
+	    t_task_deliver_goods.deliver_id,
+	    t_task_deliver_goods.t_id,
+	    t_task_deliver_goods.delivery_quantity,
+	    t_task_deliver_goods.deliver_type,
+	    t_task_deliver_goods.deliver_number
+	from t_task_deliver_goods
+	where 
+		 deliver_number in
+		 <foreach collection="arrpro" index="index" item="item" open="(" separator="," close=")">
+	            #{item}
+	    </foreach> 
+		and is_delete = #{is_delete}
+</select>
+<select id="getDeliverdetailSum" parameterType="map" resultType="double">
+    select 
+	     IFNULL(SUM(delivery_quantity),0)
+	from t_task_deliver_goods
+	where 
+		t_id = #{t_id}
+		<if test="deliver_number!= null and deliver_number != ''">
+		  and deliver_number != #{deliver_number}
+		</if>
+		and is_delete = #{is_delete}
+		and operator = #{operator}
+		and shipping_id is null
+		<if test="deliverTypes!= null and deliverTypes != ''">
+		  and deliver_type = #{deliverTypes}
+		</if>		
+</select>	
+<select id="getDeliverdetailSumVo" parameterType="map" resultType="double">
+    select 
+	     IFNULL(SUM(delivery_quantity),0)
+	from t_task_deliver_goods
+	where 
+		t_id = #{t_id}
+		<if test="deliver_number!= null and deliver_number != ''">
+		  and deliver_number not in (#{deliver_number})
+		</if>
+		and is_delete = #{is_delete}
+		and shipping_id is not null
+		and deliver_state = 5
+		and deliver_type = 0
+</select>
+<select id="getDeliverdetailReturnSumVo" parameterType="map" resultType="double">
+    select 
+	     IFNULL(SUM(delivery_quantity),0)
+	from t_task_deliver_goods
+	where 
+		t_id = #{t_id}
+		<if test="deliver_number!= null and deliver_number != ''">
+		  and deliver_number not in (#{deliver_number})
+		</if>
+		and is_delete = #{is_delete}
+		and shipping_id is not null
+		and deliver_state = 5
+		and deliver_type = 1
+</select>
+<select id="getDeliverdetailCount" parameterType="map" resultType="double">
+    select 
+	     IFNULL(SUM(delivery_quantity),0)
+	from t_task_deliver_goods
+	where 
+		t_id = #{t_id}
+		and deliver_number = #{deliver_number}
+		and is_delete = #{is_delete}
+		and shipping_id is not null
+</select>
+<select id="getDeliveryQtyForType" parameterType="map" resultType="double">
+select IFNULL(SUM(delivery_quantity),0)
+from t_task_deliver_goods
+where 
+        t_id = #{t_id}
+		and is_delete = #{is_delete}
+		and shipping_id is not null
+		and deliver_type = #{type}
+</select>
+
+<delete id="deletedeliverGoods" parameterType="map">
+     delete from t_task_deliver_goods
+     where  is_delete = #{is_delete}
+            and shipping_id is null
+            and operator = #{operator}
+</delete>
+<select id="getdeliverGoodsForNumber"  parameterType="map" resultType="usercenter.externalTask.TaskResponse.DeliverGoodsListVo">
+select
+		t_task_deliver_goods.deliver_id,
+		t_task_deliver_goods.deliver_state,
+		t_task_deliver_goods.deliver_number,
+		t_task_deliver_goods.customer_id,
+		t_task_deliver_goods.customer_name,
+		t_task_deliver_goods.t_id,
+		t_task_deliver_goods.shipping_id,
+		t_task_deliver_goods.delivery_quantity,
+		t_task_deliver_goods.is_delete,
+		t_task_deliver_goods.create_time,
+		t_task_deliver_goods.confirm_dt,
+		t_task_deliver_goods.deliver_type,
+		t_task_deliver_goods.receipt_remark
+		,t_app_task.product_name
+		,t_app_task.serial_no		
+		,t_app_task.product_pic
+		,t_app_task.ddh
+		,t_app_task.scdh
+		,t_app_task.rwdh
+		,t_app_task.bzmc
+		,t_receipt_detail.receive_no
+	from
+		t_task_deliver_goods 	
+		left join t_app_task on t_app_task.t_id = t_task_deliver_goods.t_id
+		left join t_receipt_detail on t_receipt_detail.deliver_id = t_task_deliver_goods.deliver_id
+	where 
+		t_task_deliver_goods.deliver_number = #{deliver_number}
+		and t_task_deliver_goods.is_delete = #{is_delete}
+</select>
+<select id="getdeliverGoodsForID"  parameterType="map" resultType="usercenter.externalTask.TaskResponse.DeliverGoodsListVo">
+select
+		t_task_deliver_goods.deliver_id,
+		t_task_deliver_goods.deliver_state,
+		t_task_deliver_goods.deliver_number,
+		t_task_deliver_goods.customer_id,
+		t_task_deliver_goods.customer_name,
+		t_task_deliver_goods.t_id,
+		t_task_deliver_goods.shipping_id,
+		t_task_deliver_goods.delivery_quantity,
+		t_task_deliver_goods.is_delete,
+		t_task_deliver_goods.create_time,
+		t_task_deliver_goods.confirm_dt,
+		t_task_deliver_goods.deliver_type,
+		t_task_deliver_goods.receipt_remark
+		,t_app_task.product_name
+		,t_app_task.serial_no		
+		,t_app_task.product_pic
+		,t_app_task.ddh
+		,t_app_task.scdh
+		,t_app_task.rwdh
+		,t_app_task.bzmc
+	from
+		t_task_deliver_goods 	
+		left join t_app_task on t_app_task.t_id = t_task_deliver_goods.t_id
+	where 
+		t_task_deliver_goods.shipping_id = #{shipping_id}
+		and t_task_deliver_goods.is_delete = #{is_delete}
+</select>
+<select id="getdeliverGoodsForIDCount"  parameterType="map" resultType="usercenter.externalTask.TaskResponse.StateCount">
+select
+		t_task_deliver_goods.deliver_number,
+		count(t_task_deliver_goods.deliver_number) as stateCount
+	from
+		t_task_deliver_goods 	
+		left join t_app_task on t_app_task.t_id = t_task_deliver_goods.t_id
+	where 
+		t_task_deliver_goods.shipping_id = #{shipping_id}
+		and t_task_deliver_goods.is_delete = #{is_delete}
+		GROUP BY t_task_deliver_goods.deliver_number
+</select>
+<update id="updateCancelDertail"  parameterType="map" >
+update t_task_deliver_goods
+set	   t_task_deliver_goods.deliver_state	= #{deliver_state}	
+where 
+		t_task_deliver_goods.deliver_number = #{deliver_number}
+		and t_task_deliver_goods.t_id = #{t_id}
+</update>
+<select id="getdelivergoodState" parameterType="map" resultType="usercenter.externalTask.TaskResponse.DeStatusVo">
+select t_task_deliver_goods.deliver_state,
+       t_task_deliver_goods.shipping_id,
+       t_task_deliver_goods.delivery_quantity,
+       t_task_deliver_goods.deliver_type    
+from   t_task_deliver_goods
+where 
+		t_task_deliver_goods.deliver_number = #{deliver_number}
+		and t_task_deliver_goods.t_id = #{t_id}
+        limit 1
+</select>
+<select id="getdelivergoodStateList" parameterType="map" resultType="usercenter.externalTask.TaskResponse.DeStatusVo">
+select t_task_deliver_goods.deliver_state,
+       t_task_deliver_goods.shipping_id,
+       t_task_deliver_goods.delivery_quantity,
+       t_task_deliver_goods.t_id,
+       t_task_deliver_goods.deliver_type
+from   t_task_deliver_goods
+where 
+		t_task_deliver_goods.deliver_number = #{deliver_number}
+</select>
+<select id="getNowShippingDetailCount" parameterType="map" resultType="Integer">
+select
+	    COUNT(0)	
+	from
+		t_task_deliver_goods
+		left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id
+	where 
+	    t_task_deliver_goods.shipping_id = #{shipping_id}
+	    and t_task_deliver_goods.deliver_state in (5,10)
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+</select> 
+<select id="getDeliverForID"  parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+select
+		t_task_deliver_goods.deliver_id,
+		t_task_deliver_goods.deliver_state,
+		t_task_deliver_goods.deliver_number,
+		t_task_deliver_goods.customer_id,
+		t_task_deliver_goods.customer_name,
+		t_task_deliver_goods.t_id,
+		t_task_deliver_goods.shipping_id,
+		t_task_deliver_goods.delivery_quantity,
+		t_task_deliver_goods.is_delete,
+		t_task_deliver_goods.create_time,
+		t_task_deliver_goods.confirm_dt,
+		t_task_deliver_goods.deliver_type
+	from
+		t_task_deliver_goods 	
+	where 
+		t_task_deliver_goods.deliver_id = #{deliver_id}
+</select>
+<update id="ReciveDeliverForID"  parameterType="map" >
+update t_task_deliver_goods
+set  deliver_state = #{deliver_state},	
+     confirm_dt = #{confirm_dt}	,
+     receipt_remark = #{receipt_remark}	
+where 
+     t_task_deliver_goods.deliver_id = #{deliver_id}
+</update>
+
+<select id="getTaskDeliverGoodsforOneTask" parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+	select
+		t_task_deliver_goods.deliver_id,
+		t_task_deliver_goods.deliver_state,
+		t_task_deliver_goods.deliver_number,		
+		t_task_deliver_goods.customer_id,
+		t_task_deliver_goods.customer_name,
+		t_task_deliver_goods.t_id,
+		t_task_deliver_goods.shipping_id,
+		t_task_deliver_goods.delivery_quantity,
+		t_task_deliver_goods.is_delete,
+		t_task_deliver_goods.create_time,
+		t_task_deliver_goods.confirm_dt,
+		t_task_deliver_goods.deliver_type,
+		t_task_deliver_goods.receipt_remark,
+		t_shipping_registration.shipping_number,
+		t_shipping_registration.start_date,
+		t_shipping_registration.driver,
+		t_shipping_registration.phone_number,
+		t_shipping_registration.licence_plate
+		,t_receipt_detail.receive_no
+	from
+		t_task_deliver_goods
+		left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id	
+		left join t_receipt_detail on t_receipt_detail.deliver_id = t_task_deliver_goods.deliver_id
+	where 1=1
+	    <if test="shippingType != '' and shippingType != null and shippingType != 2">
+	    and t_task_deliver_goods.deliver_type = #{shippingType}
+	    </if>
+	    <if test="state != '' and state != null and state != 0">
+	    and t_task_deliver_goods.deliver_state = #{state}
+	    </if>
+	   <if test="date_type != '' and date_type != null and date_type == 1">
+	      <if test="end_date != '' and end_date != null">
+	       and t_task_deliver_goods.confirm_dt&lt;=#{end_date}
+	       </if>
+	       <if test="start_date != '' and start_date != null">
+	       and t_task_deliver_goods.confirm_dt&gt;=#{start_date}
+	       </if>
+	   </if>
+	   <if test="date_type != '' and date_type != null and date_type == 0">
+	      <if test="end_date != '' and end_date != null">
+	       and t_shipping_registration.start_date&lt;=#{end_date}
+	       </if>
+	       <if test="start_date != '' and start_date != null">
+	       and t_shipping_registration.start_date&gt;=#{start_date}
+	       </if>
+	   </if>
+	    <if test="shipping_num != '' and shipping_num != null">
+	    and t_task_deliver_goods.deliver_number like '%${shipping_num}%'
+	    </if>	    
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+	    and t_task_deliver_goods.t_id = #{t_id}	  
+	    and t_shipping_registration.shipping_id is not null
+	    order by t_task_deliver_goods.create_time DESC
+</select>
+
+<select id="getDeliverGoodsCountOfState" parameterType="map" resultType="usercenter.externalTask.TaskResponse.StateCount">
+  	select deliver_number,deliver_state as state
+	from 
+	 t_task_deliver_goods	
+	 left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id   
+	where 1=1	 
+	 and t_shipping_registration.shipping_company_id = #{company_id}
+	 and t_task_deliver_goods.deliver_number = #{deliver_number}
+	 and t_task_deliver_goods.shipping_id is not null
+	 and t_task_deliver_goods.is_delete = #{is_delete} 
+</select>
+<select id="getTaskDeliverGoodsListDeliver" parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+select
+	  DISTINCT t_task_deliver_goods.deliver_number	
+	from
+	 t_task_deliver_goods	
+	 left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id   
+	where 1=1	 
+	 and t_shipping_registration.shipping_company_id = #{company_id}
+	 and t_task_deliver_goods.shipping_id is not null
+	 and t_task_deliver_goods.is_delete = #{is_delete} 
+</select>
+
+<select id="getDeliverGoodsCountOfStateForReceive" parameterType="map" resultType="usercenter.externalTask.TaskResponse.StateCount">
+  	select deliver_number,deliver_state as state
+	from 
+	 t_task_deliver_goods	
+	 left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id   
+	where 1=1	 
+	  <if test="sa_id != null and sa_id != ''">	
+	    and EXISTS(
+	    select 
+        t_supplier_files.company_id
+        from t_supplier_files
+          left join t_subaccount_supplier_info on t_subaccount_supplier_info.supplier_id = t_supplier_files.supplier_id
+        where t_subaccount_supplier_info.sa_id = #{sa_id}
+          t_subaccount_supplier_info.is_delete = #{is_delete} 
+          t_shipping_registration.shipping_company_id =  t_supplier_files.company_id
+          )   
+	    </if>
+	    and t_task_deliver_goods.customer_id = #{company_id}
+	    and t_task_deliver_goods.deliver_number = #{deliver_number}
+	     and t_task_deliver_goods.shipping_id is not null
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+</select>
+<select id="getTaskDeliverGoodsListDeliverForReceive" parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+select
+	  DISTINCT t_task_deliver_goods.deliver_number	
+	from
+	 t_task_deliver_goods	
+	 left join t_shipping_registration on t_shipping_registration.shipping_id = t_task_deliver_goods.shipping_id   
+	where 1=1	 
+	  <if test="sa_id != null and sa_id != ''">	
+	    and EXISTS(
+	    select 
+        t_supplier_files.company_id
+        from t_supplier_files
+          left join t_subaccount_supplier_info on t_subaccount_supplier_info.supplier_id = t_supplier_files.supplier_id
+        where t_subaccount_supplier_info.sa_id = #{sa_id}
+          t_subaccount_supplier_info.is_delete = #{is_delete} 
+          t_shipping_registration.shipping_company_id =  t_supplier_files.company_id
+          )   
+	    </if>
+	    and t_task_deliver_goods.customer_id = #{company_id}
+	    and t_task_deliver_goods.shipping_id is not null
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+</select>
+<delete id="deleteOutTime" parameterType="map">
+		delete from t_task_deliver_goods
+		where  
+		       shipping_id is null
+		       and create_time &lt; #{create_time}
+		</delete>
+
+<select id="getTaskDeliverGoodsStatus" parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+	select
+		t_task_deliver_goods.deliver_id,
+		t_task_deliver_goods.deliver_state			
+	from
+		t_task_deliver_goods
+	where 1=1	    	    
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+	    and t_task_deliver_goods.t_id = #{t_id}
+	    and t_task_deliver_goods.shipping_id is not null
+</select>
+<select id="getDeliverGoodsStatesInNumber" parameterType="map" resultType="usercenter.externalTask.model.TaskDeliverGoods">
+    select t_task_deliver_goods.deliver_state	
+    from
+		t_task_deliver_goods
+	where 1=1	    	    
+	    and t_task_deliver_goods.is_delete = #{is_delete}
+	    and t_task_deliver_goods.deliver_number = #{deliver_number}
+</select>
+<select id="getDeliverdetailSumDemo" parameterType="map" statementType="CALLABLE">
+      CALL getDeliverdetailSum(
+     #{operator,jdbcType=VARCHAR,mode=IN},
+     #{t_id,jdbcType=INTEGER,mode=IN},
+     #{confirmed_qtyVo,jdbcType=DECIMAL,mode=IN},
+     #{return_qtyVo,jdbcType=DECIMAL,mode=IN},
+     #{producted_qty,jdbcType=DECIMAL,mode=IN},
+     #{total_qty,jdbcType=DECIMAL,mode=IN},
+     #{deliver_number,jdbcType=VARCHAR,mode=IN},
+     #{deliver_type,jdbcType=INTEGER,mode=IN},
+     #{num_qty,jdbcType=DECIMAL,mode=OUT}    
+     )  
+</select>
+
+<insert id ="addPfPurchaseOrderOperating" parameterType="map" >
+             <selectKey resultType ="java.lang.Integer" keyProperty= "operating_id"
+                   order= "AFTER">
+                 SELECT LAST_INSERT_ID()
+              </selectKey >
+             insert into t_purchase_order_operating
+             (
+                 pur_order_id, 
+                 order_status
+              )
+             values
+             <foreach collection ="arrs" item="item" index= "index" separator =",">
+                 (
+                 #{item},
+                 #{order_status}        
+                 )
+             </foreach >
+      </insert >
+</mapper>

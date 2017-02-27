@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.materialConfirmation.data.MaterialCheckclassMapper">
+
+
+<select id="getMaterialCheckclassList" parameterType="map" resultType="manager.materialConfirmation.model.MaterialCheckclass">
+	select
+		t_app_material_checkclass.checkclass_id,
+		t_app_material_checkclass.checkclass_name
+	from
+		t_app_material_checkclass
+</select>
+<insert id="addMaterialCheckclass" parameterType="manager.materialConfirmation.model.MaterialCheckclass" keyProperty="checkclass_id" useGeneratedKeys="true">
+	<selectKey keyProperty="checkclass_id" resultType="int" order="BEFORE">
+		select  ifnull(max(checkclass_id)+1,1) from t_app_material_checkclass 		
+	</selectKey>
+	insert into t_app_material_checkclass
+	(
+		checkclass_id,
+		checkclass_name
+	)
+	values
+	(
+		#{checkclass_id},
+		#{checkclass_name}
+	)
+</insert>
+<update id="updateMaterialCheckclass" parameterType="manager.materialConfirmation.model.MaterialCheckclass">
+	update t_app_material_checkclass
+		set
+			checkclass_id = #{checkclass_id},
+			checkclass_name = #{checkclass_name}
+		where checkclass_id = #{checkclass_id}
+</update>
+<delete id="deleteMaterialCheckclass" parameterType="manager.materialConfirmation.model.MaterialCheckclass">
+	delete from t_app_material_checkclass
+	where checkclass_id = #{checkclass_id}
+</delete>
+</mapper>

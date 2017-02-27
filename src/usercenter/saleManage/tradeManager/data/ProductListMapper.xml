@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.tradeManager.data.ProductListMapper">
+
+
+<select id="getProductList" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.ProductList">
+	select
+		t_purchase_order_detail.order_detail_id,
+		t_purchase_order_detail.pur_order_id,
+		t_purchase_order_detail.product_name,
+		t_purchase_order_detail.product_size,
+		t_purchase_order_detail.unit_price,
+		t_purchase_order_detail.number,
+		t_purchase_order_detail.unit,
+		t_purchase_order_detail.money,
+		t_purchase_order_detail.delivery_date,
+		t_purchase_order_detail.no_delivery_num,
+		t_purchase_order_detail.delivery_num,	
+		t_purchase_order_detail.Storage_num,
+		t_purchase_order_detail.htmx,
+		t_purchase_order_detail.product_artno,
+		t_purchase_order_detail.remark
+	from
+		t_purchase_order_detail
+	where
+	    t_purchase_order_detail.pur_order_id = #{pur_order_id}
+	    order by product_name asc , delivery_date asc
+	    limit 0,10	
+</select>
+
+<select id="getProductCount" parameterType="map" resultType="Integer">
+	select
+		count(0)
+	from
+		t_purchase_order_detail
+	where
+	    t_purchase_order_detail.pur_order_id = #{pur_order_id}
+</select>
+<select id="getProductAllList" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.ProductList">
+	select
+		t_purchase_order_detail.order_detail_id,
+		t_purchase_order_detail.pur_order_id,
+		t_purchase_order_detail.product_name,
+		t_purchase_order_detail.product_size,
+		t_purchase_order_detail.unit_price,
+		t_purchase_order_detail.number,
+		t_purchase_order_detail.unit,
+		t_purchase_order_detail.money,
+		t_purchase_order_detail.delivery_date,
+		t_purchase_order_detail.no_delivery_num,
+		t_purchase_order_detail.delivery_num,	
+		t_purchase_order_detail.Storage_num,
+		t_purchase_order_detail.htmx,
+		t_purchase_order_detail.product_artno,
+		t_purchase_order_detail.remark,
+		t_purchase_order_detail.stay_back_num,
+		t_purchase_order_detail.stay_storage_num,
+		t_purchase_order_detail.stay_detail_num,
+		t_purchase_order_detail.retired_back_num
+	from
+		t_purchase_order_detail
+	where
+	    t_purchase_order_detail.pur_order_id = #{pur_order_id}
+	    order by product_name asc , delivery_date asc
+</select>
+<select id="getProductListListForSearch" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.ProductList">
+	select
+		t_purchase_order_detail.order_detail_id,
+		t_purchase_order_detail.pur_order_id	
+	from
+		t_purchase_order_detail
+	where
+	 <if test="search_text != null and search_text !='' ">
+	    t_purchase_order_detail.product_name like '%${search_text}%' 
+	 </if>  
+</select>
+</mapper>

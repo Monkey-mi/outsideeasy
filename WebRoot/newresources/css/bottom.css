@@ -1,0 +1,5 @@
+@charset "utf-8";
+.bottom_wrap{ width:100%; min-width:1024px; font-size:12px; height:64px; padding-top:16px; line-height:24px; text-align:center; background:#383838; color:#fff;}
+.bottom_wrap a{ color:#fff;}
+.bottom_wrap a:hover{ color:#ff9900; text-decoration:none;}
+

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.TaskRandomCheckMapper">
+
+
+<select id="getTaskRandomCheckList" parameterType="map" resultType="usercenter.externalTask.model.TaskRandomCheck">
+	select
+		t_task_random_check.id,
+		t_task_random_check.t_id,
+		t_task_random_check.file_name,
+		t_task_random_check.suffix_name,
+		t_task_random_check.mongodb_id,
+		t_task_random_check.create_dt,
+		t_task_random_check.is_delete,
+		t_task_random_check.source_type,
+		t_task_random_check.check_dt
+	from
+		t_task_random_check
+	where 1=1
+	<if test="t_id!=null and t_id!=''">
+		and t_task_random_check.t_id=#{t_id}
+	</if>
+</select>
+<insert id="addTaskRandomCheck" parameterType="usercenter.externalTask.model.TaskRandomCheck" keyProperty="id" useGeneratedKeys="true">
+	insert into t_task_random_check
+	(
+		id,
+		t_id,
+		file_name,
+		suffix_name,
+		mongodb_id,
+		create_dt,
+		is_delete,
+		source_type,
+		check_dt
+	)
+	values
+	(
+		#{id},
+		#{t_id},
+		#{file_name},
+		#{suffix_name},
+		#{mongodb_id},
+		#{create_dt},
+		#{is_delete},
+		#{source_type},
+		#{check_dt}
+	)
+</insert>
+<update id="updateTaskRandomCheck" parameterType="usercenter.externalTask.model.TaskRandomCheck">
+	update t_task_random_check
+		set
+			id = #{id},
+			t_id = #{t_id},
+			file_name = #{file_name},
+			suffix_name = #{suffix_name},
+			mongodb_id = #{mongodb_id},
+			create_dt = #{create_dt},
+			is_delete = #{is_delete},
+			source_type = #{source_type},
+			check_dt = #{check_dt}
+		where id = #{id}
+</update>
+<delete id="deleteTaskRandomCheck" parameterType="usercenter.externalTask.model.TaskRandomCheck">
+	delete from t_task_random_check
+	where id = #{id}
+</delete>
+</mapper>

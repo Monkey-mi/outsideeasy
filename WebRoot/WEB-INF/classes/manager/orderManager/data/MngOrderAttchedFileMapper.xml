@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.orderManager.data.MngOrderAttchedFileMapper">
+
+
+<select id="getMngOrderAttchedFileList" parameterType="map" resultType="manager.orderManager.model.MngOrderAttchedFile">
+	select
+		t_order_attched_file.order_attched_id,
+		t_order_attched_file.pur_order_id,
+		t_order_attched_file.order_bh,
+		t_order_attched_file.order_attched_name,
+		t_order_attched_file.ft_id,
+		t_base_file_type.type_name,
+		t_order_attched_file.suffix_name,
+		t_order_attched_file.order_attched_remark,
+		t_order_attched_file.mogodb_id,
+		t_order_attched_file.create_dt,
+		t_order_attched_file.source_type,
+		t_order_attched_file.creator_id,
+		t_order_attched_file.creator_name,
+		t_order_attched_file.status,
+		t_order_attched_file.is_look,
+		t_order_attched_file.view_no
+	from
+		t_order_attched_file
+		left join t_base_file_type on t_order_attched_file.ft_id=t_base_file_type.ft_id
+		where 1=1
+		<if test="pur_order_id!=null">
+			and t_order_attched_file.pur_order_id=#{pur_order_id}
+		</if>
+</select>
+<insert id="addMngOrderAttchedFile" parameterType="manager.orderManager.model.MngOrderAttchedFile" keyProperty="order_attched_id" useGeneratedKeys="true">
+	insert into t_order_attched_file
+	(
+		order_attched_id,
+		pur_order_id,
+		order_bh,
+		order_attched_name,
+		ft_id,
+		suffix_name,
+		order_attched_remark,
+		mogodb_id,
+		create_dt,
+		source_type,
+		creator_id,
+		creator_name,
+		status,
+		is_look,
+		view_no
+	)
+	values
+	(
+		#{order_attched_id},
+		#{pur_order_id},
+		#{order_bh},
+		#{order_attched_name},
+		#{ft_id},
+		#{suffix_name},
+		#{order_attched_remark},
+		#{mogodb_id},
+		#{create_dt},
+		#{source_type},
+		#{creator_id},
+		#{creator_name},
+		#{status},
+		#{is_look},
+		#{view_no}
+	)
+</insert>
+<update id="updateMngOrderAttchedFile" parameterType="manager.orderManager.model.MngOrderAttchedFile">
+	update t_order_attched_file
+		set
+			order_attched_id = #{order_attched_id},
+			pur_order_id = #{pur_order_id},
+			order_bh = #{order_bh},
+			order_attched_name = #{order_attched_name},
+			ft_id = #{ft_id},
+			suffix_name = #{suffix_name},
+			order_attched_remark = #{order_attched_remark},
+			mogodb_id = #{mogodb_id},
+			create_dt = #{create_dt},
+			source_type = #{source_type},
+			creator_id = #{creator_id},
+			creator_name = #{creator_name},
+			status = #{status},
+			is_look = #{is_look},
+			view_no = #{view_no}
+		where order_attched_id = #{order_attched_id}
+</update>
+<delete id="deleteMngOrderAttchedFile" parameterType="manager.orderManager.model.MngOrderAttchedFile">
+	delete from t_order_attched_file
+	where order_attched_id = #{order_attched_id}
+</delete>
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfBankAccountMapper">
+
+
+<select id="getBankAccountOutList" parameterType="map" resultType="com.outsideasy.ws.erp.supplier.vo.BankAccountOut">
+	select
+		t_app_bank_account.account_id,
+		t_app_bank_account.account_name,
+		t_app_bank_account.company_id,
+		case  when t_app_bank_account.default_id=1 then 'true' else 'false' END as default_id,
+		t_app_bank_account.account_code
+	from
+		t_app_bank_account
+		where 1=1
+	<if test="company_id!=null">
+		and t_app_bank_account.company_id=#{company_id}
+	</if>
+</select>
+
+<!-- 通过公司ID查询银行账户 -->
+<select id="getBankAccount" parameterType="java.lang.Integer" resultType="platform.company.model.PfBankAccount">
+	select
+		account_id,
+		account_name,
+		account_sts,
+		default_id,
+		account_code
+	from
+		t_app_bank_account
+	where
+		company_id = #{companyId}
+</select>
+
+<!-- 通过公司ID查询银行账户 -->
+<select id="getBankAccountMap" parameterType="map" resultType="map">
+	select
+		account_id,
+		account_name,
+		account_sts,
+		default_id,
+		account_code
+	from
+		t_app_bank_account
+	where
+		company_id = #{companyId}
+</select>
+
+<!-- 删除银行账户 -->
+<delete id="deleteBankAccount" parameterType="map">
+	delete from
+		t_app_bank_account
+	where
+		account_id = #{accountId}
+</delete>
+
+<!-- 更新银行账户 -->
+<update id="updateBankAccountByAccountId" parameterType="map">
+	update
+		t_app_bank_account
+	<set>
+		account_id = #{accountId}
+		<if test="accountName != null">
+			,account_name = #{accountName}
+		</if>
+		<if test="defaultId != null">
+			,default_id = #{defaultId}
+		</if>
+		<if test="accountCode != null">
+			,account_code = #{accountCode}
+		</if>
+		<if test="accountSts != null">
+			,account_sts = #{accountSts}
+		</if>
+	</set>
+	where
+		account_id = #{accountId}
+</update>
+
+<!-- 重置默认标记-->
+<update id="resetDefaultId" parameterType="map">
+	update
+		t_app_bank_account
+	<set>
+			default_id = 0
+	</set>
+	where
+		company_id = #{companyId}
+</update>
+
+<!-- 插入银行账户 -->
+<update id="addBankAccount" parameterType="map">
+	insert into 
+		t_app_bank_account(account_name,default_id,account_code,company_id,account_sts,create_dt)
+	values
+		(#{accountName},#{defaultId},#{accountCode},#{companyId},#{accountSts},now())
+</update>
+
+</mapper>

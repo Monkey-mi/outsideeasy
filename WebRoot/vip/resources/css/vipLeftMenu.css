@@ -1,0 +1,13 @@
+@CHARSET "UTF-8";
+‘/*========vip页面销售左侧菜单样式=========*/
+.vip_sale_left_menu{ width:180px; height:auto;background-color:#fff; overflow:hidden;}
+.vip_sale_left_block_title{ width:100%; height:40px; line-height:40px; color:#fff;}
+
+.vip_sale_left_menu .title{ height:40px; line-height:40px;background:#ededed;color:#999;padding-left:10px; font-size:14px;}
+
+.vip_sale_left_menu ul{ width:100%; height:auto; }
+.vip_sale_left_menu ul li{ width:100%; height:40px; text-align:center; line-height:40px;}
+.vip_sale_left_menu ul li a{ float:left; width:140px; height:40px; line-height:40px;margin-left:40px;text-align:left; color:#666;padding:0px;}
+.vip_sale_left_menu ul li a:hover{text-decoration:none;color:#365c88;}
+.vip_sale_left_menu ul .currVip{background:url(/vip/resources/images/current.png) no-repeat;}
+.vip_sale_left_menu ul .currVip a{color:#365c88;font-weight:bold;}

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.email.data.AppSendEmailinfoMapper">
+
+
+<select id="getAppSendEmailinfoList" parameterType="map" resultType="common.email.model.AppSendEmailinfo">
+	select
+		t_app_send_emailinfo.autoId,
+		t_app_send_emailinfo.UUID,
+		t_app_send_emailinfo.sendTime,
+		t_app_send_emailinfo.email,
+		t_app_send_emailinfo.is_valid,
+		t_app_send_emailinfo.ip_address
+	from
+		t_app_send_emailinfo
+	<where>
+	<if test="UUID != null">
+		UUID = #{UUID}
+	</if>
+	</where>	
+</select>
+<insert id="addAppSendEmailinfo" parameterType="common.email.model.AppSendEmailinfo" keyProperty="autoId" useGeneratedKeys="true">
+	insert into t_app_send_emailinfo
+	(
+		UUID,
+		sendTime,
+		email,
+		ip_address
+	)
+	values
+	(
+		#{UUID},
+		#{sendTime},
+		#{email},
+		#{ip_address}
+	)
+</insert>
+
+<update id="updateAppSendEmailinfo" parameterType="common.email.model.AppSendEmailinfo">
+	update t_app_send_emailinfo
+		set
+			autoId = #{autoId},
+			UUID = #{UUID},
+			sendTime = #{sendTime},
+			email = #{email},
+			ip_address = #{ip_address}
+		where autoId = #{autoId}
+</update>
+
+<delete id="deleteAppSendEmailinfo" parameterType="common.email.model.AppSendEmailinfo">
+	delete from t_app_send_emailinfo
+	where autoId = #{autoId}
+</delete>
+
+<!-- 更新验证邮件有效性 -->
+<update id="updateEmailValid" parameterType="map">
+	update 
+		t_app_send_emailinfo
+	set
+		is_valid = #{isValid}
+	where 1=1
+	<if test="UUID != null and UUID != ''">
+		and UUID = #{UUID}
+	</if>
+	<if test="email != null and email != ''">
+		and email = #{email}
+	</if>
+</update>
+</mapper>

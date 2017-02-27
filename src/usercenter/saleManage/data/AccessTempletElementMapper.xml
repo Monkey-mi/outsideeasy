@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AccessTempletElementMapper">
+
+
+<select id="getAccessTempletElementList" parameterType="map" resultType="usercenter.saleManage.model.AccessTempletElement">
+	select
+		t_access_templet_element.e_id,
+		t_access_templet_element.e_name,
+		t_access_templet_element.e_type_id,
+		t_access_templet_element.controller_type_id,
+		t_access_templet_element.validate_type,
+		t_access_templet_element.validate_text,
+		t_access_templet_element.e_length,
+		t_access_templet_element.e_decimal_length,
+		t_access_templet_element.create_dt,
+		t_access_templet_element.related_basis,
+		t_access_templet_element.templet_id
+	from
+		t_access_templet_element
+		where 1=1
+		<if test="templet_id!=null and templet_id!=''">
+			and t_access_templet_element.templet_id=#{templet_id}
+		</if>
+</select>
+<insert id="addAccessTempletElement" parameterType="usercenter.saleManage.model.AccessTempletElement" keyProperty="e_id" useGeneratedKeys="true">
+	insert into t_access_templet_element
+	(
+		e_id,
+		e_name,
+		e_type_id,
+		controller_type_id,
+		validate_type,
+		validate_text,
+		e_length,
+		e_decimal_length,
+		create_dt,
+		related_basis,
+		templet_id
+	)
+	values
+	(
+		#{e_id},
+		#{e_name},
+		#{e_type_id},
+		#{controller_type_id},
+		#{validate_type},
+		#{validate_text},
+		#{e_length},
+		#{e_decimal_length},
+		#{create_dt},
+		#{related_basis},
+		#{templet_id}
+	)
+</insert>
+<update id="updateAccessTempletElement" parameterType="usercenter.saleManage.model.AccessTempletElement">
+	update t_access_templet_element
+		set
+			e_id = #{e_id},
+			e_name = #{e_name},
+			e_type_id = #{e_type_id},
+			controller_type_id = #{controller_type_id},
+			validate_type = #{validate_type},
+			validate_text = #{validate_text},
+			e_length = #{e_length},
+			e_decimal_length = #{e_decimal_length},
+			create_dt = #{create_dt},
+			related_basis = #{related_basis},
+			templet_id = #{templet_id}
+		where e_id = #{e_id}
+</update>
+<delete id="deleteAccessTempletElement" parameterType="usercenter.saleManage.model.AccessTempletElement">
+	delete from t_access_templet_element
+	where e_id = #{e_id}
+</delete>
+</mapper>

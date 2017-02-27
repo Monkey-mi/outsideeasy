@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfCompanyInfoMapper">
+<!-- 获取供应商 信息 -->
+<select id="getPfCustomerFilesList" parameterType="map" resultType="usercenter.saleManage.model.CustomerFiles">
+	select
+		t_supplier_files.supplier_id,
+		t_supplier_files.company_id,
+		t_supplier_owner_info.company_id as owner_id,
+		t_supplier_owner_info.owner_cpyname,
+		t_supplier_files.record_id,
+		t_supplier_files.supplier_cpyname,
+		t_supplier_files.file_status,
+		t_supplier_files.create_dt
+	from
+		t_supplier_files
+		left join t_supplier_owner_info on t_supplier_files.supplier_id=t_supplier_owner_info.supplier_id
+		where 1=1
+		and t_supplier_files.file_status=0
+		<if test="company_id!='' and company_id!=null">
+			and t_supplier_files.company_id=#{company_id}
+		</if>
+		<if test="record_id!=null">
+			and t_supplier_files.record_id=#{record_id}
+		</if>
+</select>
+<!-- 新增准入审核 -->
+<insert id="addPfAdmittanceAudit" parameterType="map" keyProperty="audit_id" useGeneratedKeys="true">
+	insert into t_admittance_audit
+	(
+		audit_id,
+		record_id,
+		audit_status,
+		audit_opinion,
+		create_dt,
+		auditor_id,
+		auditor_name,
+		source_type
+	)
+	values
+	(
+		#{audit_id},
+		#{record_id},
+		#{audit_status},
+		#{audit_opinion},
+		now(),
+		#{auditor_id},
+		#{auditor_name},
+		#{source_type}
+	)
+</insert>
+<!-- 修改供应商档案表 -->
+<update id="updateSuppliersInfo" parameterType="map">
+	update t_supplier_files
+		<trim prefix="SET" suffixOverrides=",">  
+			<if test="access_status != null">
+				file_status =0,
+			</if>
+			<if test="auth_dt != null">
+				auth_dt = now(),
+			</if>
+		</trim>
+		where 
+			record_id in (${record_id})
+</update>
+<!-- 修改准入流水表记录 -->
+<update id="updateAccessApplicationRecord" parameterType="map">
+	update t_access_application_record
+		<trim prefix="SET" suffixOverrides=",">  
+			<if test="access_status != null">
+				access_status = #{access_status},
+			</if>
+			<if test="access_status != null">
+				access_status = #{access_status},
+			</if>
+		</trim>
+		where 
+			record_id in (${record_id})
+</update>
+
+<!-- 获取准入申请信息 -->
+<select id="getAccessApplicationRecord" parameterType="map" resultType="com.outsideasy.ws.erp.supplier.vo.SupplierFileOut">
+	select  
+		record_id as company_id,
+		t_access_application_record.access_status as apply_sts,
+		t_app_company_info.cpyname_cn,
+		t_app_company_info.class_id,
+		t_trade_class.class_name,
+		t_app_company_info.nature_id,
+		t_company_class.nature_name,
+		t_app_company_info.industry_id,
+		t_industry_class.industry_name,
+		corporation,
+		establish_dt,
+		reg_fund,
+		reg_addr,	
+		key_remark,
+	  	0 as is_chinese,
+		CONVERT(shiftdim(record_id,'taxman_id'),SIGNED) as taxman_id,
+		shiftdim(record_id,'inner_level') as inner_level,
+		shiftdim(record_id,'cpyname_cn1') as cpyname_cn1,
+		CONVERT(shiftdim(record_id,'reg_addr_code'),SIGNED) as reg_addr_code,
+		shiftdim(record_id,'reg_addr') as reg_addr,
+		CONVERT(shiftdim(record_id,'contact_addr_code'),SIGNED) as contact_addr_code,
+		shiftdim(record_id,'contact_addr') as contact_addr,
+		shiftdim(record_id,'f_phone') as f_phone,
+		shiftdim(record_id,'contacts') as contacts,
+		shiftdim(record_id,'m_phone') as m_phone,
+		shiftdim(record_id,'fax') as fax,
+		shiftdim(record_id,'email') as email,
+		shiftdim(record_id,'bus_license') as bus_license,
+		shiftdim(record_id,'tax_no') as tax_no,
+		CONVERT(shiftdim(record_id,'currency_id'),SIGNED) as currency_id,
+		CONVERT(shiftdim(record_id,'emplyees'),SIGNED) as emplyees,
+		CONVERT(shiftdim(record_id,'college_num'),SIGNED) as college_num,
+		CONVERT(shiftdim(record_id,'op_num'),SIGNED) as op_num,
+		CONVERT(shiftdim(record_id,'tech_num'),SIGNED) as tech_num,
+		CONVERT(shiftdim(record_id,'qc_num'),SIGNED) as qc_num,
+		CONVERT(shiftdim(record_id,'staff_num'),SIGNED) as staff_num,
+		CONVERT(shiftdim(record_id,'qe_num'),SIGNED) as qe_num,
+		CONVERT(shiftdim(record_id,'companyArea'),DECIMAL) as company_area,
+		CONVERT(shiftdim(record_id,'factoryArea'),DECIMAL) as factory_area,
+		shiftdim(record_id,'factory_owner') as factory_owner,
+		CONVERT(shiftdim(record_id,'use_begintime'),DATETIME) as use_begintime,
+		CONVERT(shiftdim(record_id,'use_endtime'),DATETIME) as use_endtime,
+		CONVERT(shiftdim(record_id,'turnover'),DECIMAL) as turnover,
+		CONVERT(shiftdim(record_id,'turnover_currency_id'),SIGNED) as turnover_currency_id,
+		shiftdim(record_id,'certification_system') as certification_system,
+		CONVERT(shiftdim(record_id,'create_dt'),DATETIME) as create_dt,
+		shiftdim(record_id,'ip_addr') as ip_addr,
+		CONVERT(shiftdim(record_id,'checked_date'),DATETIME) aschecked_date,
+		CONVERT(shiftdim(record_id,'version'),SIGNED) as version,
+		CONVERT(shiftdim(record_id,'mc_id_1'),SIGNED) as mc_id_1,
+		shiftdim(record_id,'mc_name_1') as mc_name_1,
+		shiftdim(record_id,'mc_id_2') as mc_id_2,
+		shiftdim(record_id,'mc_name_2') as mc_name_2,
+		shiftdim(record_id,'mc_id_3') as mc_id_3,
+		shiftdim(record_id,'mc_name_3') as mc_name_3
+	from t_access_application_record
+	LEFT OUTER JOIN t_app_company_info on t_app_company_info.company_id=t_access_application_record.submit_id
+	left join t_trade_class on t_trade_class.class_id=t_app_company_info.class_id
+	left join t_company_class on t_company_class.nature_id=t_app_company_info.nature_id
+	left join t_industry_class on t_industry_class.industry_id=t_app_company_info.industry_id
+	
+	<where>
+		1=1
+		<if test="cpyname_cn!=null">
+			and t_app_company_info.cpyname_cn like '%${cpyname_cn}%'
+		</if>
+		<if test="record_id!=null">
+			and t_access_application_record.record_id =#{record_id}
+		</if>
+		<if test="access_status!=null">
+			and t_access_application_record.access_status =#{access_status}
+		</if>
+		<if test="condition!=null">
+			and ${condition}
+		</if>
+	</where>
+</select>
+<select id="getSupplierFileOutList" parameterType="map" resultType="com.outsideasy.ws.erp.supplier.vo.SupplierFileOut">
+		select
+		t_app_company_info.*,
+		t_trade_class.class_name,
+		t_company_class.nature_name,
+		t_app_area_reg.mergerName as reg_addr_all,
+		t_app_area_contact.mergerName as contact_addr_all,
+		t_app_company_info.industry_id,
+		t_taxman_class.taxman_name,
+		t_currency.currency_name,
+		turnover_currency.currency_name as turnover_currency_name,
+		t_industry_class.industry_name
+	from
+		t_app_company_info
+	left join t_trade_class on t_trade_class.class_id=t_app_company_info.class_id
+	left join t_company_class on t_company_class.nature_id=t_app_company_info.nature_id
+	left join t_app_area as t_app_area_reg on t_app_area_reg.area_id=t_app_company_info.reg_addr_code
+	left join t_app_area as t_app_area_contact on t_app_area_contact.area_id=t_app_company_info.reg_addr_code
+	left join t_industry_class on t_industry_class.industry_id=t_app_company_info.industry_id
+	left join t_taxman_class on t_taxman_class.taxman_id=t_app_company_info.taxman_id
+	left join t_currency on t_currency.currency_id=t_app_company_info.currency_id
+	left join t_currency turnover_currency on turnover_currency.currency_id=t_app_company_info.currency_id
+	<if test="mc_id!=null and mc_id>0">
+	left outer join t_app_material_class on t_app_material_class.mc_id=#{mc_id}
+	</if>
+		<where>
+		1=1
+		 and t_app_company_info.apply_sts is NOT NULL
+		 and t_app_company_info.apply_sts>4
+		<if test="apply_sts!=null and apply_sts>4">
+			and t_app_company_info.apply_sts=#{apply_sts}
+		</if>
+		<if test="condition!=null and condition!=''">
+		  	and (cpyname_cn like '%${condition}%' or cpyname_en like '${condition}%' )
+		</if>
+		<if test="company_id!=null">
+			and t_app_company_info.company_id=#{company_id}
+		</if>
+		<!--准入评估、申请时获取的列表检索条件，其中apply_sts状态10：供应商已受理，20：不合格 -->
+		<if test="accessflag!=null and accessflag=='true'">
+			and (t_app_company_info.apply_sts=10 or t_app_company_info.apply_sts=20)
+		</if>
+		<!-- 左侧导航按分层等级 -->
+		<if test="level_id!=null and level_id>0">
+			<!--and t_app_company_info.company_id in(select company_id from t_app_material_confirmation where  
+ mc_id in(select mc_id from t_app_material_class where t_app_material_class.level_id=#{level_id}))
+ 			--> 
+ 			and t_app_company_info.company_id in (select company_id from t_app_supplier_material_sub1 where mc_id in
+(select mc_id from t_app_material_class where level_id=#{level_id})) 
+		</if>
+		<!-- 左侧导航按材料列表 -->
+		<if test="mc_id!=null and mc_id>0">
+			<!--and t_app_company_info.company_id in(select company_id from t_app_material_confirmation where mc_id=#{mc_id})-->
+			and ( (t_app_company_info.mc_id_1=#{mc_id} and t_app_material_class.level_id=1) or (t_app_company_info.mc_name_2 like CONCAT('%',t_app_material_class.mc_name,'%') and t_app_material_class.level_id=2 ) or (t_app_company_info.mc_name_3 like CONCAT('%',t_app_material_class.mc_name,'%') and t_app_material_class.level_id=3) )
+			<!--and ( t_app_company_info.company_id in (SELECT company_id from t_app_supplier_material_sub1 where mc_id =#{mc_id}) )-->
+		</if>
+		
+		<!-- 厂商类别 -->
+		<if test="mc_id_1!=null and mc_id_1!=''">
+			and t_app_company_info.mc_id_1=#{mc_id_1}
+		</if>
+		<if test="mc_id_2!=null and mc_id_2!=''">
+			and FIND_IN_SET(#{mc_id_2},t_app_company_info.mc_id_2)
+		</if>
+		<if test="mc_id_3!=null and mc_id_3!=''">
+			and FIND_IN_SET(#{mc_id_3},t_app_company_info.mc_id_3)
+		</if>
+		<!-- 查找同名的供应商是否存在 -->
+		<if test="cpyname_cn!=null and cpyname_cn!=''">
+			and trim(t_app_company_info.cpyname_cn)=#{cpyname_cn}
+		</if>
+		<if test="cpyname_en!=null and cpyname_en!=''">
+			and trim(t_app_company_info.cpyname_en)=#{cpyname_en}
+		</if>
+		<if test="moreCondition!=null  and moreCondition!=''">
+		and ${moreCondition}
+		</if>
+		<if test="multi_search_key1!=null and multi_search_key1!=''">
+			and (t_app_company_info.cpyname_cn like '%${multi_search_key1}%' or t_app_company_info.key_reark like '%${multi_search_key1}%')
+		</if>
+		<if test="multi_search_key2!=null and multi_search_key2!=''">
+			and (t_app_company_info.cpyname_cn like '%${multi_search_key2}%' or t_app_company_info.key_reark like '%${multi_search_key2}%')
+		</if>
+		<if test="multi_search_key3!=null and multi_search_key3!=''">
+			and (t_app_company_info.cpyname_cn like '%${multi_search_key3}%' or t_app_company_info.key_reark like '%${multi_search_key3}%')
+		</if>
+		</where>
+</select>
+<update id="updateSupplierFileStateByWS" parameterType="map">
+		update t_app_company_info  set  apply_sts =#{state}
+		where company_id in (${ids})
+</update>
+<update id="updateSupplierFileByWS" parameterType="com.outsideasy.ws.erp.supplier.vo.SupplierFileIn">
+	update t_app_company_info
+		set
+			manage_score = #{manage_score},
+			improve_score = #{improve_score},
+			area_score = #{area_score},
+			exploit_score = #{exploit_score},
+			storage_score = #{storage_score},
+			equ_score = #{equ_score},
+			tec_score = #{tec_score},
+			pro_file_score = #{pro_file_score},
+			research_score = #{research_score},
+			reject_score = #{reject_score},
+			quality_score = #{quality_score},
+			qc_score = #{qc_score},
+			version = IFNULL(1,version+1),
+			filesave_score = #{filesave_score},
+			head_audit=#{head_audit},
+			assess_dt=#{assess_dt}			
+		where company_id = #{company_id}
+</update>
+</mapper>

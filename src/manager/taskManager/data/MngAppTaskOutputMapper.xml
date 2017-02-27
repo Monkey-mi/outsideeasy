@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.taskManager.data.MngAppTaskOutputMapper">
+
+
+<select id="getAppTaskOutputList" parameterType="map" resultType="manager.taskManager.model.MngAppTaskOutput">
+	select
+		t_app_task_output.record_id,
+		t_app_task_output.t_id,
+		t_app_task_output.scrq,
+		t_app_task_output.worker_no,
+		t_app_task_output.work_time,
+		t_app_task_output.yield_qty
+	from
+		t_app_task_output
+</select>
+<insert id="addAppTaskOutput" parameterType="manager.taskManager.model.MngAppTaskOutput" keyProperty="record_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="record_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task_output
+	(
+		
+		t_id,
+		scrq,
+		worker_no,
+		work_time,
+		yield_qty,				
+	    sec_id,
+        create_dt,
+	    locked,
+	)
+	values
+	(
+		
+		#{t_id},
+		#{scrq},
+		#{worker_no},
+		#{work_time},
+		#{yield_qty},				
+	    #{sec_id},
+        #{create_dt}, 
+	    #{locked}
+	)
+</insert>
+<update id="updateAppTaskOutput" parameterType="manager.taskManager.model.MngAppTaskOutput">
+	update t_app_task_output
+		set
+			t_id = #{t_id},
+			scrq = #{scrq},
+			worker_no = #{worker_no},
+			work_time = #{work_time},
+			yield_qty = #{yield_qty}
+		where record_id = #{record_id}
+</update>
+<delete id="deleteAppTaskOutput" parameterType="manager.taskManager.model.MngAppTaskOutput">
+	delete from t_app_task_output
+	where record_id = #{record_id}
+</delete>
+
+<!--自己编写的sql  -->
+<select id="getAppTaskOutputListbg" parameterType="map" resultType="manager.taskManager.model.MngAppTaskOutput">
+	select
+		t_app_task_output.record_id,
+		t_app_task_output.t_id,
+		t_app_task_output.scrq,
+		t_app_task_output.worker_no,
+		t_app_task_output.work_time,
+		t_app_task_output.yield_qty,
+		t_app_task_output.sec_id,
+		t_app_process_section.section_name,
+        t_app_task_output.create_dt,
+	    t_app_task_output.locked
+	from
+		t_app_task_output
+		left join t_app_process_section on t_app_process_section.sec_id = t_app_task_output.sec_id
+		where t_app_task_output.t_id = #{t_id}
+</select>
+</mapper>

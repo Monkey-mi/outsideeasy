@@ -1,0 +1,122 @@
+@charset "utf-8";
+.headRg{ width:180px; float:right; overflow:hidden; margin-top:56px;}
+.headRg a{ display:block; float:left; width:60px; padding-left:28px; font-size:14px; color:#4d4d4d;}
+.headRg a:hover{ color:#aaa;}
+.headRg .a1{ background:url(../images/icon.png) no-repeat left center; margin-right:6px;}
+.headRg .a2{ background:url(../images/icon2.png) no-repeat left center; padding-left:24px;}
+
+
+.container {
+    margin: 0 auto;
+    position: relative;
+    width: 956px;
+}
+.header {
+    background: rgba(0, 0, 0, 0) url("../images/bg.jpg") no-repeat scroll center top;
+    height: 94px;
+}
+.header .logo {
+    float: left;
+    height: 94px;
+    width: 289px;
+}
+.header .feedback {
+    color: #fff;
+    cursor: pointer;
+    float: right;
+    margin: 65px 20px 0 0;
+}
+
+.footer {
+    background: #fff none repeat scroll 0 0;
+    color: #a6a6a6;
+    margin: 0 auto;
+    padding: 20px 0;
+    text-align: center;
+    width: 956px;
+}
+.footer span {
+    color: #a6a6a6;
+    font-family: Tahoma,Verdana,Arial,"宋体";
+}
+
+.tos-content {
+    border-bottom: 1px solid #dadada;
+    font-size: 12px;
+    line-height: 20px;
+}
+.tos-content .top {
+ 
+    padding: 10px 15px;
+    width: 926px;
+}
+.tos-content .bottom {
+   
+    padding: 10px 15px;
+    width: 926px;
+}
+.tos-content .title {
+   
+    font-size: 16px;
+    font-weight: 700;
+    height: 35px;
+    padding: 25px 15px 0;
+    width: 926px;
+}
+.tos-content p {
+    margin: 0;
+}
+.tos-content .first_title {
+    padding-bottom: 0;
+}
+.tos-content .indent {
+    text-indent: 24px;
+}
+.tos-content .p_title {
+    padding-bottom: 15px;
+}
+* {
+    font-family: Tahoma,Arial,Helvetica,sans-serif;
+}
+h1, h2, li, p {
+    font-size: 14px;
+}
+li, p, ul {
+    line-height: 24px;
+}
+ul {
+    margin-left: 6px;
+}
+h1 {
+    color: #000;
+    margin: 0 0 10px;
+}
+.content {
+    color: #666;
+    line-height: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    text-align: left;
+}
+.content-expand2 {
+    margin-bottom: 100px;
+    text-align: right;
+}
+h2 {
+    color: #000;
+    margin: 0 0 10px;
+}
+li, p {
+    margin-bottom: 10px;
+}
+ul {
+    margin-bottom: 20px;
+    padding-left: 22px;
+    padding-right: 22px;
+}
+.bold {
+    font-weight: 700;
+}
+
+.div_center { MARGIN-RIGHT: auto; MARGIN-LEFT: auto; width: 306px;}

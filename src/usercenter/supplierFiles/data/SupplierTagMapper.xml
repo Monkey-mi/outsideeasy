@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.supplierFiles.data.SupplierTagMapper">
+
+<select id="getSupplierTagList" parameterType="map" resultType="usercenter.supplierFiles.model.SupplierTag">
+	select
+		t_supplier_tag.tag_id,
+		t_supplier_tag.account_id,
+		t_supplier_tag.tag_name,
+		t_supplier_tag.tag_type,
+		t_supplier_tag.order_by,
+		t_supplier_tag.create_dt
+	from
+		t_supplier_tag
+</select>
+
+<!-- 增加标签记录 -->
+<insert id="addSupplierTag" parameterType="usercenter.supplierFiles.model.SupplierTag" keyProperty="tag_id" useGeneratedKeys="true">
+	insert into t_supplier_tag
+	(
+		account_id,
+		tag_name,
+		tag_type
+	)
+	values
+	(
+		#{account_id},
+		#{tag_name},
+		#{tag_type}
+	)
+</insert>
+
+<!-- 根据tagId更新tagName -->
+<update id="updateSupplierTag" parameterType="map">
+	update 
+		t_supplier_tag
+	set
+		tag_name = #{tagName}
+	where 
+		tag_id = #{tagId}
+</update>
+
+<!-- 删除标签  -->
+<delete id="deleteSupplierTag" parameterType="map">
+	delete from 
+		t_supplier_tag
+	where 
+		tag_id = #{tagId}
+</delete>
+
+<!-- 查找相应账号下的标签 -->
+<select id="getSupplierTagListForAccount" parameterType="map" resultType="map">
+	select
+		tst.tag_id,
+		tst.account_id,
+		tst.tag_name,
+		tst.tag_type,
+		tst.create_dt,
+		tst.order_by
+	from
+		t_supplier_tag tst
+	where
+			tst.account_id = #{accountId}
+		and
+			tst.tag_type = #{tagType}
+</select>
+</mapper>

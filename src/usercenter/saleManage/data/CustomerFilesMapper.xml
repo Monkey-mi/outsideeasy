@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.CustomerFilesMapper">
+
+<select id="getCustomerFilesList" parameterType="map" resultType="usercenter.saleManage.model.CustomerFiles">
+	select
+		t_supplier_files.supplier_id,
+		t_supplier_files.company_id,
+		t_supplier_owner_info.company_id as owner_id,
+		t_supplier_owner_info.owner_cpyname,
+		t_supplier_files.record_id,
+		t_supplier_files.supplier_cpyname,
+		t_supplier_files.file_status,
+		t_supplier_files.create_dt,
+		t_supplier_files.auth_dt
+	from
+		t_supplier_files
+		left join t_supplier_owner_info on t_supplier_files.supplier_id=t_supplier_owner_info.supplier_id
+		where 1=1
+		and t_supplier_files.file_status=0
+		<if test="company_id!='' and company_id!=null">
+			and t_supplier_files.company_id=#{company_id}
+		</if>
+		<if test="record_id!='' and record_id!=null">
+			and t_supplier_files.record_id=#{record_id}
+		</if>
+		<if test="supplier_id!='' and supplier_id!=null">
+			and t_supplier_files.supplier_id=#{supplier_id}
+		</if>
+</select>
+<select id="getCustomerFilesListByRegId" parameterType="map" resultType="usercenter.saleManage.model.CustomerFiles">
+	select
+		t_supplier_files.supplier_id,
+		t_supplier_files.company_id,
+		t_supplier_files.record_id,
+		t_supplier_files.supplier_cpyname,
+		t_app_company_info.cpyname_cn as owner_cpyname,
+		t_supplier_files.file_status,
+		t_supplier_files.create_dt
+	from
+		t_supplier_files
+		left join t_supplier_regaccount_info on t_supplier_regaccount_info.supplier_id=t_supplier_files.supplier_id
+		left join t_supplier_owner_info on t_supplier_files.supplier_id=t_supplier_owner_info.supplier_id
+		left join t_app_company_info on t_supplier_owner_info.company_id=t_app_company_info.company_id
+		where 1=1
+		<if test="company_id!='' and company_id!=null">
+			and t_supplier_files.company_id=#{company_id}
+		</if>
+		<if test="reg_id!='' and reg_id!=null">
+			and t_supplier_regaccount_info.reg_id=#{reg_id}
+		</if>
+</select>
+<insert id="addCustomerFiles" parameterType="usercenter.saleManage.model.CustomerFiles" keyProperty="supplier_id" useGeneratedKeys="true">
+	insert into t_supplier_files
+	(
+		supplier_id,
+		onwer_id,
+		onwer_cpyname,
+		company_id,
+		record_id,
+		supplier_cpyname,
+		file_status,
+		create_dt
+	)
+	values
+	(
+		#{supplier_id},
+		#{onwer_id},
+		#{onwer_cpyname},
+		#{company_id},
+		#{record_id},
+		#{supplier_cpyname},
+		#{file_status},
+		#{create_dt}
+	)
+</insert>
+<update id="updateCustomerFiles" parameterType="map">
+	update t_supplier_files
+		set
+			record_id = #{record_id}
+		where supplier_id = #{supplier_id}
+</update>
+<delete id="deleteCustomerFiles" parameterType="usercenter.saleManage.model.CustomerFiles">
+	delete from t_supplier_files
+	where supplier_id = #{supplier_id}
+</delete>
+<select id="checkFilesExit" parameterType="map" resultType="usercenter.saleManage.model.CustomerFiles">
+	select t_supplier_files.*,t_supplier_owner_info.company_id as owner_id
+	from t_supplier_files
+	left join t_supplier_owner_info on t_supplier_files.supplier_id=t_supplier_owner_info.supplier_id
+	 where t_supplier_files.company_id=#{company_id}
+		and t_supplier_owner_info.company_id in 
+	(select company_id from t_reg_accout_company_info where reg_id=
+	(select reg_id from t_reg_accout_company_info where company_id=#{owner_id} limit 1))
+	limit 1
+</select>
+<select id="getLastThreeCustomer" parameterType="map" resultType="usercenter.saleManage.model.CustomerFiles">
+	select
+		t_supplier_files.supplier_id,
+		t_supplier_files.company_id,
+		t_supplier_owner_info.company_id as owner_id,
+		t_supplier_owner_info.owner_cpyname,
+		t_supplier_files.record_id,
+		t_supplier_files.supplier_cpyname,
+		t_supplier_files.file_status,
+		t_supplier_files.create_dt
+	from
+		t_supplier_files
+		left join t_supplier_owner_info on t_supplier_files.supplier_id=t_supplier_owner_info.supplier_id
+		where 1=1
+		and t_supplier_files.file_status=0
+		and t_supplier_files.company_id=#{sup_company_id}
+		order by create_dt desc limit 3
+</select>
+<select id="getPassTime" parameterType="map" resultType="java.util.Date">
+	select
+		t_supplier_files.auth_dt
+	from
+		t_supplier_files
+		where 1=1
+		<if test="record_id!='' and record_id!=null">
+			and t_supplier_files.record_id=#{record_id}
+		</if>
+</select>
+</mapper>

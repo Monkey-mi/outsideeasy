@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplierAccess.data.SupplierAccessScoreSummaryMapper">
+<sql id="ScoreSumaryColumn">
+	select tt.company_id,tt.item_id tt.fitem_name,tt.weightValue, SUM(tt.assess_score)*tt.weightValue as realmum,COUNT(tt.fitem_name)*5*tt.weightValue as maxmum 
+	from 
+</sql>
+<select id="getSupplierAccessScoreSummaryList" parameterType="map" resultType="manager.supplierAccess.model.SupplierAccessScoreSummary">
+	select 
+		tt.company_id,
+		tt.fitem_name,
+		tt.fitem_id,
+		tt.weightValue, 
+		SUM(tt.assess_score)*tt.weightValue as realmum,
+		COUNT(tt.fitem_name)*5*tt.weightValue as maxmum 
+	from(
+		select 
+			t_score.company_id,
+			t_score.assess_score,
+			t1.item_name as fitem_name,
+			t1.item_id as fitem_id,
+			t1.weightValue
+		from 
+			t_app_supplier_access_score as t_score
+			left join 
+			t_app_supplier_access_basetable as t1
+			on t_score.item_fid=t1.item_id
+		)as tt
+	where 1=1
+	<if test="company_id!=null">
+		and tt.company_id=#{company_id}
+	</if>
+		group by tt.fitem_name
+		order by tt.fitem_id
+</select>
+</mapper>

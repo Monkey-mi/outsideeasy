@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.basicdata.area.data.AreaMapper">
+
+
+<select id="getAreaList" parameterType="map" resultType="manager.basicdata.area.model.Area">
+	select
+		t_app_area.area_id,
+		t_app_area.area_name,
+		t_app_area.f_id,
+		t_app_area.shortName,
+		t_app_area.levelType,
+		t_app_area.cityCode,
+		t_app_area.zipCode,
+		t_app_area.mergerName,
+		t_app_area.ing,
+		t_app_area.lat,
+		t_app_area.pinyin
+	from
+		t_app_area
+	where 1=1
+	<if test="node!=null">
+		and t_app_area.f_id=#{node}
+	</if>
+	<if test="nodeIdForGrid!=null">
+		and (t_app_area.f_id=#{nodeIdForGrid} or t_app_area.area_id=#{nodeIdForGrid})
+	</if>
+	<if test="area_name!=null">
+		and t_app_area.area_name=#{area_name}
+	</if>
+</select>
+<insert id="addArea" parameterType="manager.basicdata.area.model.Area" keyProperty="area_id" useGeneratedKeys="true">
+	insert into t_app_area
+	(
+		area_id,
+		area_name,
+		f_id,
+		shortName,
+		levelType,
+		cityCode,
+		zipCode,
+		mergerName,
+		ing,
+		lat,
+		pinyin
+	)
+	values
+	(
+		#{area_id},
+		#{area_name},
+		#{f_id},
+		#{shortName},
+		#{levelType},
+		#{cityCode},
+		#{zipCode},
+		#{mergerName},
+		#{ing},
+		#{lat},
+		#{pinyin}
+	)
+</insert>
+<update id="updateArea" parameterType="manager.basicdata.area.model.Area">
+	update t_app_area
+		set
+			area_id = #{area_id},
+			area_name = #{area_name},
+			f_id = #{f_id},
+			shortName = #{shortName},
+			levelType = #{levelType},
+			cityCode = #{cityCode},
+			zipCode = #{zipCode},
+			mergerName = #{mergerName},
+			ing = #{ing},
+			lat = #{lat},
+			pinyin = #{pinyin}
+		where area_id = #{area_id}
+</update>
+<delete id="deleteArea" parameterType="manager.basicdata.area.model.Area">
+	delete from t_app_area
+	where area_id = #{area_id}
+</delete>
+
+<select id="getCountForAdd" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_area where f_id =#{f_id} and area_name=#{area_name}
+</select>
+
+<select id="getCountForUpdate" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_area where f_id =#{f_id} and area_name=#{area_name} and area_id != #{area_id}
+</select>
+
+<select id="getXiajiCount" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_area where f_id =#{area_id}
+</select>
+
+</mapper>

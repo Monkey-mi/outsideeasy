@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AdmittanceInviteMapper">
+
+
+<select id="getAdmittanceInviteList" parameterType="map" resultType="usercenter.saleManage.model.AdmittanceInvite">
+select * from(
+	select
+		t_admittance_invite.invite_id,
+		t_admittance_invite.sender_id,
+		t_app_company_info.cpyname_cn as sender_name,
+		t_admittance_invite.accepter_id,
+		t_admittance_invite.invite_status,
+		t_admittance_invite.create_dt,
+		t_admittance_invite.supplier_id,
+		t_admittance_invite.is_fast,
+		-1 as record_id,
+		-1 as access_status,
+		-1 as receive_invite_id,
+		-1 as h_id
+	from
+		t_admittance_invite
+	left join t_app_company_info on t_app_company_info.company_id=t_admittance_invite.sender_id
+	where 1=1
+	and invite_status=0 
+	<if test="companyId!=null">
+	and	accepter_id=#{companyId}
+	</if>
+union ALL
+	select
+		t_admittance_invite.invite_id,
+		t_admittance_invite.sender_id,
+		t_app_company_info.cpyname_cn as sender_name,
+		t_admittance_invite.accepter_id,
+		t_admittance_invite.invite_status,
+		t_admittance_invite.create_dt,
+		t_admittance_invite.supplier_id,
+		t_admittance_invite.is_fast,
+		-1 as record_id,
+		-1 as access_status,
+		-1 as receive_invite_id,
+		-1 as h_id
+	from
+		t_admittance_invite
+	left join t_app_company_info on t_app_company_info.company_id=t_admittance_invite.sender_id
+	where 1=1
+	and invite_status=1 and is_fast=1 
+	<if test="companyId!=null">
+	and	accepter_id=#{companyId}
+	</if>
+union ALL
+
+select
+		-1 as invite_id,
+		t_access_application_record.receive_id,
+t_app_company_info.cpyname_cn as receive_name,
+	t_access_application_record.submit_id,
+-1 as invite_status,
+t_access_application_record.create_dt,
+-1 as supplier_id,
+-1 as is_fast,
+		t_access_application_record.record_id,	
+		t_access_application_record.access_status,
+		t_access_application_record.receive_invite_id,
+		t_access_application_record.h_id
+	from
+		t_access_application_record
+	left join t_app_company_info on t_app_company_info.company_id=t_access_application_record.receive_id
+	where 1=1
+	<if  test="companyId!=null" >
+		and submit_id=#{companyId}
+	</if>
+	) a order by a.create_dt desc
+</select>
+<insert id="addAdmittanceInvite" parameterType="map" keyProperty="invite_id" useGeneratedKeys="true">
+	insert into t_admittance_invite
+	(
+		sender_id,
+		accepter_id,
+		supplier_id,
+		is_fast,
+		invite_status
+	)
+	values
+	(
+		#{sender_id},
+		#{accepter_id},
+		#{supplier_id},
+		#{is_fast},
+		#{invite_status}
+	)
+</insert>
+<update id="updateAdmittanceInvite" parameterType="map">
+	update t_admittance_invite
+		set
+			invite_id = #{invite_id}
+			<if test="sender_id!=null and sender_id!=''">
+			,sender_id = #{sender_id}
+			</if>
+			<if test="accepter_id!=null and accepter_id!=''">
+			,accepter_id = #{accepter_id}
+			</if>
+			<if test="invite_status!=null and invite_status!=''">
+			,invite_status = #{invite_status}
+			</if>
+			<if test="accept_dt!=null and accept_dt!=''">
+			,accept_dt = #{accept_dt}
+			</if>
+		where invite_id = #{invite_id}
+</update>
+<delete id="deleteAdmittanceInvite" parameterType="map">
+	delete from t_admittance_invite
+	where invite_id = #{invite_id}
+</delete>
+
+<select id="getAdmittanceInvitebySupplierIdAndaccepterId" parameterType="map" resultType="usercenter.saleManage.model.AdmittanceInvite">
+	select
+		t_admittance_invite.invite_id,
+		t_admittance_invite.sender_id,
+		t_admittance_invite.accepter_id,
+		t_admittance_invite.invite_status,
+		t_admittance_invite.create_dt,
+		t_admittance_invite.supplier_id,
+		t_admittance_invite.is_fast,
+		t_admittance_invite.accept_dt
+	from
+		t_admittance_invite
+	where
+		supplier_id = #{supplierId}
+		and
+		accepter_id = #{accepterId}
+	order by create_dt desc
+	limit 1
+</select>
+
+<select id="getCountForToBeReceived" parameterType="map" resultType="java.lang.Integer">
+	select COUNT(0) from t_admittance_invite 
+where invite_status=0
+ <if test="sup_company_id!=null and sup_company_id!=''">
+and accepter_id=#{sup_company_id}
+</if>
+<if test="pur_company_id!=null and pur_company_id!=''">
+	and sender_id = #{pur_company_id}
+</if>
+and DATE_ADD(create_dt,INTERVAL 7 DAY)>NOW()
+</select>
+
+<select id="checkInviteExist" parameterType="map" resultType="usercenter.saleManage.model.AdmittanceInvite">
+	select
+		t_admittance_invite.invite_id,
+		t_admittance_invite.sender_id,
+		t_admittance_invite.accepter_id,
+		t_admittance_invite.invite_status,
+		t_admittance_invite.create_dt,
+		t_admittance_invite.supplier_id,
+		t_admittance_invite.is_fast
+	from
+		t_admittance_invite
+	where
+		sender_id in (select company_id from t_reg_accout_company_info 
+		where 1=1
+		<if test="reg_id!=null and reg_id!=''">
+			and reg_id=#{reg_id}
+		</if>
+		<if test="sa_id!=null and sa_id!=''">
+			and reg_id=(select reg_id from t_app_sub_account where sa_id=#{sa_id} limit 1)
+		</if>
+		)
+		and
+		accepter_id = #{accepter_id}
+		and 
+		invite_status=0
+		and 
+		DATE_ADD(t_admittance_invite.create_dt,INTERVAL 7 DAY)>NOW()
+	limit 1
+</select>
+<select id="checkBrotherInviteExist" parameterType="map" resultType="usercenter.saleManage.model.AdmittanceInvite">
+	select
+		t_admittance_invite.invite_id,
+		t_admittance_invite.sender_id,
+		t_admittance_invite.accepter_id,
+		t_admittance_invite.invite_status,
+		t_admittance_invite.create_dt,
+		t_admittance_invite.supplier_id,
+		t_admittance_invite.is_fast
+	from
+		t_admittance_invite
+	where
+		sender_id in (select company_id from t_reg_accout_company_info 
+		where reg_id=(select reg_id from t_reg_accout_company_info  where company_id=#{sender_id} limit 1)
+		)
+		and
+		accepter_id = #{accepter_id}
+		and 
+		invite_status=0
+		and 
+		DATE_ADD(t_admittance_invite.create_dt,INTERVAL 7 DAY)>NOW()
+	limit 1
+</select>
+<select id="getLastThreeAcceptInvite" parameterType="map" resultType="usercenter.saleManage.model.AdmittanceInvite">
+	select
+		t_admittance_invite.invite_id,
+		t_admittance_invite.sender_id,
+		t_app_company_info.cpyname_cn as accepter_name,
+		t_admittance_invite.accepter_id,
+		t_admittance_invite.invite_status,
+		t_admittance_invite.create_dt,
+		t_admittance_invite.supplier_id,
+		t_admittance_invite.is_fast
+	from
+		t_admittance_invite
+		left join t_app_company_info on t_app_company_info.company_id=t_admittance_invite.accepter_id
+		left join t_supplier_files on t_supplier_files.supplier_id=t_admittance_invite.supplier_id
+	where
+		t_admittance_invite.sender_id = #{pur_company_id}
+		and 
+		t_admittance_invite.invite_status=1
+		and 
+		t_supplier_files.file_status=1
+		and 
+		t_supplier_files.is_delete=0
+	order by create_dt desc
+	limit 3
+</select>
+<select id="getLastThreeExpiredInvite" parameterType="map" resultType="usercenter.saleManage.model.AdmittanceInvite">
+	select
+		a.invite_id,
+		a.sender_id,
+		t_app_company_info.cpyname_cn as accepter_name,
+		a.accepter_id,
+		a.invite_status,
+		a.create_dt,
+		a.supplier_id,
+		a.is_fast
+	from
+		t_admittance_invite a
+	left join t_app_company_info on t_app_company_info.company_id=a.accepter_id
+	left join t_supplier_files on t_supplier_files.supplier_id=a.supplier_id
+	where
+		a.sender_id = #{pur_company_id}
+		and 
+		a.invite_status=0
+		and
+		t_supplier_files.is_delete=0
+		and 
+		DATE_ADD(a.create_dt,INTERVAL 7 DAY)&lt;NOW()
+		and
+		not EXISTS(
+			select
+				b.*
+			from
+			t_admittance_invite b
+			where b.sender_id=a.sender_id
+			and  b.accepter_id=a.accepter_id
+			and ((b.invite_status=0 and	DATE_ADD(b.create_dt,INTERVAL 7 DAY)>NOW()) or b.invite_status=1)
+		)
+	order by create_dt desc
+	limit 3
+</select>
+</mapper>

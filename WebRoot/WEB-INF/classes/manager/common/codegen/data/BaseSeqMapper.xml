@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.common.codegen.data.BaseSeqMapper">
+
+
+<select id="getBaseSeqList" parameterType="map" resultType="manager.common.codegen.model.BaseSeq">
+	select
+		t_trn_base_seq.id,
+		t_trn_base_seq.cgr_id,
+		t_trn_base_seq.inst_code,
+		t_trn_base_seq.seed,
+		t_trn_base_seq.step,
+		t_trn_base_seq.value,
+		t_trn_base_seq.step_jmp,
+		t_trn_base_seq.min_value,
+		t_trn_base_seq.max_value,
+		t_trn_base_seq.jmp_value,
+		t_trn_base_seq.jmp_len,
+		t_trn_base_seq.reset_mode,
+		t_trn_base_seq.last_update
+	from
+		t_trn_base_seq
+	<where>
+		<if test="cgr_id!=null">
+			cgr_id=#{cgr_id}
+		</if>
+		<if test="inst_code!=null">
+			and inst_code=#{inst_code}
+		</if>
+	</where>	
+</select>
+<insert id="addBaseSeq" parameterType="manager.common.codegen.model.BaseSeq" keyProperty="id" useGeneratedKeys="true">
+	insert into t_trn_base_seq
+	(
+		id,
+		cgr_id,
+		inst_code,
+		seed,
+		step,
+		step_jmp,
+		value,
+		min_value,
+		max_value,
+		jmp_value,
+		jmp_len,
+		reset_mode,
+		last_update
+	)
+	values
+	(
+		#{id},
+		#{cgr_id},
+		#{inst_code},
+		#{seed},
+		#{step},
+		#{step_jmp},
+		#{value},
+		#{min_value},
+		#{max_value},
+		#{jmp_value},
+		#{jmp_len},
+		#{reset_mode},
+		#{last_update}
+	)
+</insert>
+<update id="updateBaseSeq" parameterType="manager.common.codegen.model.BaseSeq">
+	update t_trn_base_seq
+		set
+			id = #{id},
+			cgr_id = #{cgr_id},
+			inst_code = #{inst_code},
+			seed = #{seed},
+			step = #{step},
+			step_jmp = #{step_jmp},
+			min_value = #{min_value},
+			max_value = #{max_value},
+			jmp_value = #{jmp_value},
+			jmp_len = #{jmp_len},
+			reset_mode = #{reset_mode},
+			last_update = #{last_update}
+		where id = #{id}
+</update>
+<delete id="deleteBaseSeq" parameterType="manager.common.codegen.model.BaseSeq">
+	delete from t_trn_base_seq
+	where id = #{id}
+</delete>
+
+<!-- 根据定义参数自增(或减)Seq 
+算法：  value += seed + step_jmp*abs(step)/step + step  再排除一些字段为空时的状况
+-->
+<update id="incSeq" parameterType="map">
+<choose>
+    <when test="DB_TYPE=='MYSQL'">
+		<![CDATA[
+		    update t_trn_base_seq 
+		    set 
+		            jmp_value=
+    		              case when (reset_mode ='day' and last_update != current_date()) then
+    		                                (ifnull(null,ifnull(seed,0))+ifnull(step,1))
+    		                   when (reset_mode ='week' and week(last_update) != week(current_date())) then
+                                            (ifnull(null,ifnull(seed,0))+ifnull(step,1))
+                               when (reset_mode ='month' and month(last_update) != month(current_date())) then
+                                            (ifnull(null,ifnull(seed,0))+ifnull(step,1))             
+                               when (reset_mode ='year' and year(last_update) != year(current_date())) then
+                                            (ifnull(null,ifnull(seed,0))+ifnull(step,1))                                        
+    		                   else case when (ifnull(step,1)>=0) then
+    		                                                  case 
+    		                                                       when ((ifnull(value,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1)) >= ifnull(max_value,9999999999) ) then
+    		                                                                case when ((ifnull(value,ifnull(seed,0))+ifnull(step,1)) <=ifnull(max_value,9999999999)) 
+    		                                                                                then (ifnull(value,ifnull(seed,0))+ifnull(step,1))
+    		                                                                     else ifnull(seed,0)+ifnull(step,1)
+    		                                                                end
+    		                                                       else (ifnull(value,ifnull(seed,0))+ifnull(step,1)) 
+    		                                                  end    
+    		                              else
+    		                                                  case  
+    		                                                       when ((ifnull(value,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1)) <= ifnull(min_value,0)) then
+    		                                                                case when (ifnull(step,1)<0 and (ifnull(value,ifnull(seed,0))+ifnull(step,1)) >=ifnull(min_value,0))
+    		                                                                                then (ifnull(value,ifnull(seed,0))+ifnull(step,1))
+    		                                                                     else ifnull(seed,0)+ifnull(step,1)
+    		                                                                end
+    		                                                       else (ifnull(value,ifnull(seed,0))+ifnull(step,1)) 
+    		                                                  end  
+    		                          end 
+    		              end
+		            ,
+		            jmp_len =
+                        case   when (reset_mode ='day' and last_update != current_date()) then
+                                            ifnull(step_jmp,0)
+                               when (reset_mode ='week' and week(last_update) != week(current_date())) then
+                                            ifnull(step_jmp,0)
+                               when (reset_mode ='month' and month(last_update) != month(current_date())) then
+                                            ifnull(step_jmp,0)             
+                               when (reset_mode ='year' and year(last_update) != year(current_date())) then
+                                            ifnull(step_jmp,0)
+                               else case when (ifnull(step,1)>=0) then
+                                          case
+                                              when ((ifnull(value,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1)) >= ifnull(max_value,9999999999) ) then
+                                                        case when ((ifnull(value,ifnull(seed,0))+ifnull(step,1)) <=ifnull(max_value,9999999999)) 
+                                                                       then floor((ifnull(max_value,9999999999) -ifnull(value,ifnull(seed,0)))/ifnull(step,1) -1)
+                                                             else 0
+                                                        end
+                                              else ifnull(step_jmp,0)
+                                          end    
+                                       else
+                                          case
+                                              when ((ifnull(value,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1)) <= ifnull(min_value,0)) then
+                                                        case when (ifnull(step,1)<0 and (ifnull(value,ifnull(seed,0))+ifnull(step,1)) >=ifnull(min_value,0))
+                                                                       then floor((ifnull(value,ifnull(seed,0))- ifnull(min_value,0))/ifnull(step,1) +1)          
+                                                             else 0
+                                                        end
+                                              else ifnull(step_jmp,0)
+                                          end  
+                                  end 
+                        end
+		            ,
+		            value=
+                        case when (reset_mode ='day' and last_update != current_date()) then
+                                    (ifnull(null,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1))
+                             when (reset_mode ='week' and week(last_update) != week(current_date())) then
+                                    (ifnull(null,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1))
+                             when (reset_mode ='month' and month(last_update) != month(current_date())) then
+                                    (ifnull(null,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1))            
+                             when (reset_mode ='year' and year(last_update) != year(current_date())) then 
+                                    (ifnull(null,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1))  
+                             else case when (ifnull(step,1)>=0) then
+                                          case
+                                              when ((ifnull(value,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1)) >= ifnull(max_value,9999999999) )
+                                                   then null
+                                              else (ifnull(value,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1))
+                                          end    
+                                       else
+                                          case
+                                              when ((ifnull(value,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1)) <= ifnull(min_value,0))
+                                                   then null
+                                              else (ifnull(value,ifnull(seed,0))+ifnull(step_jmp*ifnull(step,1),0)+ifnull(step,1))
+                                          end  
+                                  end 
+                        end             
+		            ,
+		            last_update = current_date()
+		    where cgr_id=#{cgr_id} and inst_code=#{inst_code};
+		]]>
+    </when>
+    <when test="DB_TYPE=='ORACLE'">
+        <![CDATA[
+            update t_trn_base_seq 
+            set 
+                    jmp_value=
+                      case when (is_everyday ='true' and last_update != sysdate) then
+                                        (nvl(null,nvl(seed,0))+nvl(step,1))
+                             else case when (nvl(step,1)>=0) then
+                                                          case 
+                                                               when ((nvl(value,nvl(seed,0))+nvl(step_jmp*nvl(step,1),0)+nvl(step,1)) >= nvl(max_value,9999999999) ) then
+                                                                        case when ((nvl(value,nvl(seed,0))+nvl(step,1)) <=nvl(max_value,9999999999)) 
+                                                                                        then (nvl(value,nvl(seed,0))+nvl(step,1))
+                                                                             else nvl(seed,0)+nvl(step,1)
+                                                                        end
+                                                               else (nvl(value,nvl(seed,0))+nvl(step,1)) 
+                                                          end    
+                                      else
+                                                          case  
+                                                               when ((nvl(value,nvl(seed,0))+nvl(step_jmp*nvl(step,1),0)+nvl(step,1)) <= nvl(min_value,0)) then
+                                                                        case when (nvl(step,1)<0 and (nvl(value,nvl(seed,0))+nvl(step,1)) >=nvl(min_value,0))
+                                                                                        then (nvl(value,nvl(seed,0))+nvl(step,1))
+                                                                             else nvl(seed,0)+nvl(step,1)
+                                                                        end
+                                                               else (nvl(value,nvl(seed,0))+nvl(step,1)) 
+                                                          end  
+                                  end 
+                      end
+                    ,
+                    jmp_len =
+                                        case when (is_everyday ='true' and last_update != sysdate) 
+                                                                then nvl(step_jmp,0)
+                                             
+                                                 else case when (nvl(step,1)>=0) then
+                                                          case
+                                                              when ((nvl(value,nvl(seed,0))+nvl(step_jmp*nvl(step,1),0)+nvl(step,1)) >= nvl(max_value,9999999999) ) then
+                                                                        case when ((nvl(value,nvl(seed,0))+nvl(step,1)) <=nvl(max_value,9999999999)) 
+                                                                                       then floor((nvl(max_value,9999999999) -nvl(value,nvl(seed,0)))/nvl(step,1) -1)
+                                                                             else 0
+                                                                        end
+                                                              else nvl(step_jmp,0)
+                                                          end    
+                                                       else
+                                                          case
+                                                              when ((nvl(value,nvl(seed,0))+nvl(step_jmp*nvl(step,1),0)+nvl(step,1)) <= nvl(min_value,0)) then
+                                                                        case when (nvl(step,1)<0 and (nvl(value,nvl(seed,0))+nvl(step,1)) >=nvl(min_value,0))
+                                                                                       then floor((nvl(value,nvl(seed,0))- nvl(min_value,0))/nvl(step,1) +1)          
+                                                                             else 0
+                                                                        end
+                                                              else nvl(step_jmp,0)
+                                                          end  
+                                                  end 
+                                        end
+                    ,
+                    value=
+                                        case when (is_everyday ='true' and last_update != sysdate) 
+                                                  then (nvl(null,nvl(seed,0))+nvl(step_jmp*nvl(step,1),0)+nvl(step,1))   
+                                             else case when (nvl(step,1)>=0) then
+                                                          case
+                                                              when ((nvl(value,nvl(seed,0))+nvl(step_jmp*nvl(step,1),0)+nvl(step,1)) >= nvl(max_value,9999999999) )
+                                                                   then null
+                                                              else (nvl(value,nvl(seed,0))+nvl(step_jmp*nvl(step,1),0)+nvl(step,1))
+                                                          end    
+                                                       else
+                                                          case
+                                                              when ((nvl(value,nvl(seed,0))+nvl(step_jmp*nvl(step,1),0)+nvl(step,1)) <= nvl(min_value,0))
+                                                                   then null
+                                                              else (nvl(value,nvl(seed,0))+nvl(step_jmp*nvl(step,1),0)+nvl(step,1))
+                                                          end  
+                                                  end 
+                                        end             
+                    ,
+                    last_update = sysdate
+            where cgr_id=#{cgr_id} and inst_code=#{inst_code};
+        ]]>
+    </when>
+    <when test="DB_TYPE=='MSSQLSERVER'">
+        <![CDATA[
+            update t_trn_base_seq 
+            set 
+                    jmp_value=
+                      case when (is_everyday ='true' and last_update != getdate()) then
+                                        (isnull(null,isnull(seed,0))+isnull(step,1))
+                             else case when (isnull(step,1)>=0) then
+                                                          case 
+                                                               when ((isnull(value,isnull(seed,0))+isnull(step_jmp*isnull(step,1),0)+isnull(step,1)) >= isnull(max_value,9999999999) ) then
+                                                                        case when ((isnull(value,isnull(seed,0))+isnull(step,1)) <=isnull(max_value,9999999999)) 
+                                                                                        then (isnull(value,isnull(seed,0))+isnull(step,1))
+                                                                             else isnull(seed,0)+isnull(step,1)
+                                                                        end
+                                                               else (isnull(value,isnull(seed,0))+isnull(step,1)) 
+                                                          end    
+                                      else
+                                                          case  
+                                                               when ((isnull(value,isnull(seed,0))+isnull(step_jmp*isnull(step,1),0)+isnull(step,1)) <= isnull(min_value,0)) then
+                                                                        case when (isnull(step,1)<0 and (isnull(value,isnull(seed,0))+isnull(step,1)) >=isnull(min_value,0))
+                                                                                        then (isnull(value,isnull(seed,0))+isnull(step,1))
+                                                                             else isnull(seed,0)+isnull(step,1)
+                                                                        end
+                                                               else (isnull(value,isnull(seed,0))+isnull(step,1)) 
+                                                          end  
+                                  end 
+                      end
+                    ,
+                    jmp_len =
+                                        case when (is_everyday ='true' and last_update != getdate()) 
+                                                                then isnull(step_jmp,0)
+                                             
+                                                 else case when (isnull(step,1)>=0) then
+                                                          case
+                                                              when ((isnull(value,isnull(seed,0))+isnull(step_jmp*isnull(step,1),0)+isnull(step,1)) >= isnull(max_value,9999999999) ) then
+                                                                        case when ((isnull(value,isnull(seed,0))+isnull(step,1)) <=isnull(max_value,9999999999)) 
+                                                                                       then floor((isnull(max_value,9999999999) -isnull(value,isnull(seed,0)))/isnull(step,1) -1)
+                                                                             else 0
+                                                                        end
+                                                              else isnull(step_jmp,0)
+                                                          end    
+                                                       else
+                                                          case
+                                                              when ((isnull(value,isnull(seed,0))+isnull(step_jmp*isnull(step,1),0)+isnull(step,1)) <= isnull(min_value,0)) then
+                                                                        case when (isnull(step,1)<0 and (isnull(value,isnull(seed,0))+isnull(step,1)) >=isnull(min_value,0))
+                                                                                       then floor((isnull(value,isnull(seed,0))- isnull(min_value,0))/isnull(step,1) +1)          
+                                                                             else 0
+                                                                        end
+                                                              else isnull(step_jmp,0)
+                                                          end  
+                                                  end 
+                                        end
+                    ,
+                    value=
+                                        case when (is_everyday ='true' and last_update != getdate()) 
+                                                  then (isnull(null,isnull(seed,0))+isnull(step_jmp*isnull(step,1),0)+isnull(step,1))   
+                                             else case when (isnull(step,1)>=0) then
+                                                          case
+                                                              when ((isnull(value,isnull(seed,0))+isnull(step_jmp*isnull(step,1),0)+isnull(step,1)) >= isnull(max_value,9999999999) )
+                                                                   then null
+                                                              else (isnull(value,isnull(seed,0))+isnull(step_jmp*isnull(step,1),0)+isnull(step,1))
+                                                          end    
+                                                       else
+                                                          case
+                                                              when ((isnull(value,isnull(seed,0))+isnull(step_jmp*isnull(step,1),0)+isnull(step,1)) <= isnull(min_value,0))
+                                                                   then null
+                                                              else (isnull(value,isnull(seed,0))+isnull(step_jmp*isnull(step,1),0)+isnull(step,1))
+                                                          end  
+                                                  end 
+                                        end             
+                    ,
+                    last_update = getdate()
+            where cgr_id=#{cgr_id} and inst_code=#{inst_code};
+        ]]>
+    </when>
+</choose>
+		
+</update>
+
+</mapper>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>模板页</title>
+<!-- TemplateEndEditable -->
+<!-- TemplateBeginEditable name="head" -->
+<link href="../css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="js/base.js"></script>
+<script type="text/javascript" src="js/jquery.placeholder.min.js"></script>
+<script type="text/javascript">
+	$(function(){
+		
+		$(".midd_wrap").css({minHeight:$(window).height()-200});
+		
+		window.onresize=function(){
+			$(".midd_wrap").css({minHeight:$(window).height()-200});
+			
+		};
+	});
+</script>
+<!-- TemplateEndEditable -->
+</head>
+
+<body class="bg_grey">
+<div class="top_1_wrap">
+<div class="div_1024_c_wrap">
+	<div class="top_1_float f_l">
+		<div class="dologin"><a id="doLoginIn" href="/login.html">登录</a></div>
+		<div class="haslogin">
+			<span id="loginName_span"></span>
+			<a id="doLoginout" href="javaScript:void(0)" onClick="doLoginOut()">注销</a>		</div>
+		<div class="doregister"><a href="/register.html">免费注册</a></div>
+	</div>
+	<div class="top_1_float f_r">
+		<a href="../index_v2.html">首页</a>
+		<a href="../companyManage/baseInfo.html">企业中心</a>
+		<a>关于我们</a>
+		<a>帮助</a>
+	</div>
+	</div>
+</div>
+<div class="top_logon_wrap">
+	<div class="div_1024_c_wrap">
+		<div class="logo_img_wrap"><img src="../images/new/logo.png" /></div>
+		<div class="logo_right_wrap">
+			<div class="main_nav_wrap">
+				<ul>
+					<li><a href="supplierForPlateForm/registerInfo.htm">企业中心</a></li>
+					<li><a href="../taskManage/taskList.html">外协任务</a></li>
+					<li><a href="../producTaskManage/task.html">生产任务</a></li>
+					<li><a href="supplierForPlateForm/registerInfo.htm">账号管理</a></li>
+					<li><a class="hover_down">服务</a>
+						<ul>
+							<li><a href="../mngSubAccount.html">组织结构</a></li>
+							</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- TemplateBeginEditable name="EditRegion3" -->
+<!--中间-->
+<div class="midd_wrap">
+EditRegion3
+</div>
+<!-- TemplateEndEditable -->
+<!--底端-->
+<div class="bottom_wrap">
+Copyright  2016-2017 浙江泰普森（控股）集团<br />版权所有  outside.com   <a href="javascript:void(0)">备案编号：浙ICP备15003965号</a>
+</div>
+</body>
+</html>

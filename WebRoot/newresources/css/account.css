@@ -1,0 +1,33 @@
+@CHARSET "UTF-8";
+.front_pic_wrap{float:left;width:300px; height:225px;}
+.safephone_wrap{float:left; width:260px; height:auto; }
+.safephone_wrap h1{line-height:34px; font-size:18px; font-weight:normal}
+.safephone_wrap .phoneinfo_wrap{height:60px; line-height:30px;}
+.safephone_wrap button{ float:left;background-color:#58749c; color:#fff; width:120px; height:40px; line-height:40px;border-radius:5px;-webkit-border-radius: 5px; -moz-border-radius: 5px;}
+.safephone_wrap button:hover{opacity:0.8;filter:alpha(opacity=80);}
+.subTitleSplit{colro:#777;margin:0px 10px;}
+.stepBar{padding:45px 195px 55px 180px;}
+.stepBarTip{font-size:12px;font-weight:bold;color:#999;}
+.stepBarTip .curr{color:#589c6b;}
+.hide{display:none;}
+/*====弹出层====*/
+.pop_layer_wrap{ position:fixed; display:none; left:50%; top:260px; z-index:30; background-color:#fff; width:500px; height:auto; min-height:150px; margin-left:-250px; padding-bottom:20px;}
+.pop_layer_wrap .title_wrap{ position:relative;background-color:#58749c; color:#fff; font-size:14px; padding-left:10px; letter-spacing:2px; width:auto; height:40px; line-height:40px;}
+.pop_layer_wrap .pop_content_wrap{ max-height:500px;  margin:0px 10px;overflow:auto;}
+.pop_layer_wrap .button_save{ background-color:#f1af27; color:#fff; width:140px; padding:0px 4px; height:36px; line-height:36px;}
+.pop_layer_wrap .button_save:hover{opacity:0.8;filter:alpha(opacity=80);}
+.pop_layer_wrap .inner_line_wrap{ height:auto; min-height:32px; margin-bottom:20px; margin-left:20px; text-align:left; width:auto;}
+.pop_layer_wrap .inner_line_wrap .label_wrap{ float:left; height:32px; line-height:32px; text-align:left; min-width:90px; color:#707070;}
+.pop_layer_wrap .inner_line_wrap .label_wrap .no_empty{ float:right; width:20px; height:32px; line-height:32px; color:red;}
+.pop_layer_wrap .inner_line_wrap .label_wrap .no_empty_introduce{ margin-left:6px; width:20px; height:32px; line-height:32px; color:red;}
+.pop_layer_wrap .inner_line_wrap .input_wrap{ float:left; height:32px; line-height:32px; width:140px; border:1px solid #ccc;}
+.getCode_btn{float:left; width:auto; height:40px;border:1px solid #ccc; background-color:#f6f6f6; color:#0072c4;padding:0px 3px;}
+.time_count_wrap{ float:left; width:auto; height:32px;line-height:32px;}
+
+.account_display_wrap{ float:left; width:85px; height:32px; line-height:32px;}
+.account_label_wrap{float:left;min-width:72px; height:32px; line-height:32px;text-align:right;}
+
+.account_input_wrap{float:left; width:172px; height:40px; line-height:40px; border:1px solid #ccc;}
+.account_stepinner_wrap{min-height:34px; width:auto;margin-bottom:20px;}
+.button_next{float:left;background-color:#58749c;border-radius:3px; color:#fff; width:120px; text-align:center; height:40px; line-height:40px;}
+.button_next:hover{opacity:0.8;filter:alpha(opacity=80);}

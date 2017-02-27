@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.basicdata.currency.data.CurrencyMapper">
+
+
+<select id="getCurrencyList" parameterType="map" resultType="manager.basicdata.currency.model.Currency">
+	select
+		t_currency.currency_id,
+		t_currency.currency_name
+	from
+		t_currency
+		where 1=1
+		<if test="currency_name!=null">
+		and t_currency.currency_name=#{currency_name}
+	</if>
+</select>
+<insert id="addCurrency" parameterType="manager.basicdata.currency.model.Currency" keyProperty="currency_id" useGeneratedKeys="true">
+	<selectKey keyProperty="currency_id" resultType="int" order="BEFORE">
+		select  ifnull(max(currency_id)+1,1) from t_currency 		
+	</selectKey>
+	insert into t_currency
+	(
+		currency_id,
+		currency_name
+	)
+	values
+	(
+		#{currency_id},
+		#{currency_name}
+	)
+</insert>
+<update id="updateCurrency" parameterType="manager.basicdata.currency.model.Currency">
+	update t_currency
+		set
+			currency_id = #{currency_id},
+			currency_name = #{currency_name}
+		where currency_id = #{currency_id}
+</update>
+<delete id="deleteCurrency" parameterType="manager.basicdata.currency.model.Currency">
+	delete from t_currency
+	where currency_id = #{currency_id}
+</delete>
+</mapper>

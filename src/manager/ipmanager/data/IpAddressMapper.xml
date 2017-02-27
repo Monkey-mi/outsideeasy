@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.ipmanager.data.IpAddressMapper">
+
+
+<select id="getIpAddressList" parameterType="map" resultType="manager.ipmanager.model.IpAddress">
+	select
+		t_app_ip_address.adress_id,
+		t_app_ip_address.login_id,
+		t_app_ip_address.ip_address,
+		t_app_ip_address.ip_state,
+		t_app_ip_address.create_time
+	from
+		t_app_ip_address
+	where 1=1  
+      <if test="condition!=null and condition!='' ">
+      and t_app_ip_address.login_id like '%${condition}%'
+      </if>
+</select>
+<insert id="addIpAddress" parameterType="manager.ipmanager.model.IpAddress" keyProperty="adress_id" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="adress_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_ip_address
+	(
+		login_id,
+		ip_address,
+		ip_state,
+		create_time
+	)
+	values
+	(
+		#{login_id},
+		#{ip_address},
+		#{ip_state},
+		#{create_time}
+	)
+</insert>
+<update id="updateIpAddress" parameterType="manager.ipmanager.model.IpAddress">
+	update t_app_ip_address
+		set
+			adress_id = #{adress_id},
+			login_id = #{login_id},
+			ip_address = #{ip_address},
+			ip_state = #{ip_state},
+			create_time = #{create_time}
+		where adress_id = #{adress_id}
+</update>
+<update id="updateStateIpAddress" parameterType="map">
+	update t_app_ip_address
+		set		
+			ip_state = #{ip_state}		
+		where adress_id = #{adress_id}
+</update>
+<select id="getRegAccount" parameterType="map" resultType="manager.ipmanager.ipResponse.AllAccount" >
+    select		
+    	t_app_reg_accout.reg_id as id,
+		t_app_reg_accout.acc_name as allname			
+	from
+		t_app_reg_accout
+    where 
+          1=1
+		<if test="search!=null and search!=''">
+		  and t_app_reg_accout.acc_name like '%${search}%'	
+		</if>	
+</select>
+<select id="getSubAccount" parameterType="map" resultType="manager.ipmanager.ipResponse.AllAccount" >
+    select		
+	    t_app_sub_account.sa_id as id,
+		t_app_sub_account.sa_name as allname		
+	from
+		t_app_sub_account
+	where
+	  1=1
+		<if test="search!=null and search!=''">
+		  and t_app_sub_account.sa_name like '%${search}%'	
+		</if>
+</select>
+</mapper>

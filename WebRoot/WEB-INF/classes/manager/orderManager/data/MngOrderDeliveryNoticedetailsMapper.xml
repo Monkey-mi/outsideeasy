@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.orderManager.data.MngOrderDeliveryNoticedetailsMapper">
+
+
+<select id="getMngOrderDeliveryNoticedetailsList" parameterType="map" resultType="manager.orderManager.model.MngOrderDeliveryNoticedetails">
+	select
+		t_order_delivery_noticedetails.details_id,
+		t_order_delivery_noticedetails.delivery_notice_id,
+		t_order_delivery_noticedetails.order_detail_id,
+		t_order_delivery_noticedetails.notice_delivery_time,
+		t_order_delivery_noticedetails.confirm_delivery_time,
+		t_order_delivery_noticedetails.number,
+		t_order_delivery_noticedetails.pur_order_id,
+		t_order_delivery_noticedetails.delivery_address,
+		t_order_delivery_notice.delivery_notice_bh,
+		t_order_delivery_notice.notice_dt,
+		t_order_delivery_notice.notice_status,
+		t_purchase_order.order_bh,
+		t_purchase_order_detail.product_name,
+		t_purchase_order_detail.product_artno,
+		t_purchase_order_detail.product_size,
+		t_purchase_order_detail.unit,
+		t_order_delivery_noticedetails.htmx,            
+	    t_order_delivery_noticedetails.is_edit ,             
+	    t_order_delivery_noticedetails.htbh ,               
+	    t_order_delivery_noticedetails.htxh ,                
+	    t_order_delivery_noticedetails.clhh ,              
+	    t_order_delivery_noticedetails.is_modified
+	from
+		t_order_delivery_noticedetails
+		left join t_order_delivery_notice on t_order_delivery_noticedetails.delivery_notice_id=t_order_delivery_notice.delivery_notice_id
+		left join t_purchase_order_detail on t_order_delivery_noticedetails.order_detail_id=t_purchase_order_detail.order_detail_id
+		left join t_purchase_order on t_purchase_order.pur_order_id = t_order_delivery_noticedetails.pur_order_id
+		where 1=1
+		<if test="pur_order_id!=null">
+			and t_order_delivery_noticedetails.pur_order_id=#{pur_order_id}
+		</if>
+		<if test="delivery_notice_id!=null and delivery_notice_id!=''">
+		    and t_order_delivery_noticedetails.delivery_notice_id=#{delivery_notice_id}
+		</if>
+		<if test="orderId != null and orderId != ''">
+		    GROUP BY t_order_delivery_noticedetails.pur_order_id,t_order_delivery_noticedetails.details_id
+		</if>
+		<if test="detailId != null and detailId != ''">
+		    GROUP BY t_order_delivery_noticedetails.order_detail_id,t_order_delivery_noticedetails.details_id
+		</if>
+</select>
+<insert id="addMngOrderDeliveryNoticedetails" parameterType="manager.orderManager.model.MngOrderDeliveryNoticedetails" keyProperty="details_id" useGeneratedKeys="true">
+	insert into t_order_delivery_noticedetails
+	(
+		details_id,
+		delivery_notice_id,
+		order_detail_id,
+		notice_delivery_time,
+		confirm_delivery_time,
+		number,
+		pur_order_id,
+		delivery_address
+	)
+	values
+	(
+		#{details_id},
+		#{delivery_notice_id},
+		#{order_detail_id},
+		#{notice_delivery_time},
+		#{confirm_delivery_time},
+		#{number},
+		#{pur_order_id},
+		#{delivery_address}
+	)
+</insert>
+<update id="updateMngOrderDeliveryNoticedetails" parameterType="manager.orderManager.model.MngOrderDeliveryNoticedetails">
+	update t_order_delivery_noticedetails
+		set
+			details_id = #{details_id},
+			delivery_notice_id = #{delivery_notice_id},
+			order_detail_id = #{order_detail_id},
+			notice_delivery_time = #{notice_delivery_time},
+			confirm_delivery_time = #{confirm_delivery_time},
+			number = #{number},
+			pur_order_id = #{pur_order_id},
+			delivery_address = #{delivery_address}
+		where details_id = #{details_id}
+</update>
+<delete id="deleteMngOrderDeliveryNoticedetails" parameterType="manager.orderManager.model.MngOrderDeliveryNoticedetails">
+	delete from t_order_delivery_noticedetails
+	where details_id = #{details_id}
+</delete>
+</mapper>

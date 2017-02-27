@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.templet.data.MngTempletClassifyMapper">
+
+
+<select id="getMngTempletClassifyList" parameterType="map" resultType="manager.templet.model.MngTempletClassify">
+	select
+		t_templet_classify.classify_id,
+		t_templet_classify.classify_name,
+		t_templet_classify.h_id,
+		t_templet_classify.create_dt,
+		t_access_templet_head.table_name
+	from
+		t_templet_classify
+		left join t_access_templet_head on t_templet_classify.h_id = t_access_templet_head.h_id	
+</select>
+<insert id="addMngTempletClassify" parameterType="manager.templet.model.MngTempletClassify" keyProperty="classify_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="classify_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_templet_classify
+	(	
+		classify_name,
+		h_id
+	)
+	values
+	(
+		#{classify_name},
+		#{h_id}
+	)
+</insert>
+<update id="updateMngTempletClassify" parameterType="manager.templet.model.MngTempletClassify">
+	update t_templet_classify
+		set
+			classify_name = #{classify_name},
+			h_id = #{h_id}
+		where  classify_id= #{classify_id}
+</update>
+<delete id="deleteMngTempletClassify" parameterType="manager.templet.model.MngTempletClassify">
+	delete from t_templet_classify
+	where classify_id = #{classify_id}
+</delete>
+<select id="getClassifyList" parameterType="map" resultType="manager.templet.model.MngTempletClassify">
+	select
+		t_templet_classify.classify_id,
+		t_templet_classify.classify_name
+	from
+		t_templet_classify
+	where
+	     1=1
+		<if test="search!=null and search!=''">
+		  and ( t_templet_classify.classify_id like '%${search}%' or	t_templet_classify.classify_name like '%${search}%')
+		</if>
+</select>
+</mapper>

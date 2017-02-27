@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.purchaseManage.supplierManager.data.SupplierMaterialcheckMapper">
+
+
+<select id="getSupplierMaterialcheckListByAccount" parameterType="map" resultType="usercenter.purchaseManage.supplierManager.model.SupplierMaterialcheck">
+	select
+		tsmc.materialcheck_id,
+		tsmc.file_type_id,
+		tsmc.file_name,
+		tsmc.create_dt,
+		tsmc.remark,
+		tsmc.mogodb_id,
+		tsmc.supplier_id,
+		tsmc.source_type,
+		tsmc.operator_id,
+		tsmc.operator_name,
+		tsmc.send_company_id,
+		tsf.supplier_cpyname,
+		tsf.company_id
+	from
+		<if test="regId != null and regId != 0">
+			t_supplier_regaccount_info tsri,
+		</if>
+		<if test="saId != null and saId != 0">
+			t_subaccount_supplier_info tssi,
+		</if>
+		t_supplier_materialcheck tsmc,
+		t_supplier_files tsf,
+		t_supplier_owner_info tsoi
+		where 
+			tsmc.supplier_id = tsf.supplier_id
+			and
+			tsoi.supplier_id = tsf.supplier_id 
+			and 
+			tsoi.company_id = #{companyId}
+		<if test="regId != null and regId != 0">
+			AND
+			tsri.supplier_id = tsf.supplier_id
+			AND
+			tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+			AND
+			tssi.supplier_id = tsf.supplier_id
+			AND
+			tssi.is_delete = 0
+			AND
+			tssi.sa_id = #{saId}
+		</if>
+		<if test="search_text!=null and search_text!=''">
+			and tsf.supplier_cpyname like '%${search_text}%'
+		</if>
+		<if test="end_date != null and end_date !='' ">
+			and tsmc.create_dt&lt;=#{end_date}
+		</if>
+		<if test="start_date != null and start_date !='' ">
+			and tsmc.create_dt&gt;=#{start_date}
+		</if>
+		order by tsmc.create_dt DESC
+</select>
+<select id="getSupplierMaterialcheckById" parameterType="map" resultType="usercenter.purchaseManage.supplierManager.model.SupplierMaterialcheck">
+	select
+		tsmc.materialcheck_id,
+		tsmc.file_type_id,
+		tsmc.file_name,
+		tsmc.create_dt,
+		tsmc.remark,
+		tsmc.mogodb_id,
+		tsmc.supplier_id,
+		tsmc.source_type,
+		tsmc.operator_id,
+		tsmc.operator_name,
+		tsmc.send_company_id
+	from
+		t_supplier_materialcheck tsmc	
+		where tsmc.materialcheck_id=#{materialcheck_id}
+</select>
+<insert id="addSupplierMaterialcheck" parameterType="map" keyProperty="materialcheck_id" useGeneratedKeys="true">
+	insert into t_supplier_materialcheck
+	(
+		materialcheck_id,
+		file_type_id,
+		file_name,
+		remark,
+		mogodb_id,
+		supplier_id,
+		operator_id,
+		operator_name,
+		send_company_id,
+		source_type
+	)
+	values
+	(
+		#{materialcheck_id},
+		#{file_type_id},
+		#{file_name},
+		#{remark},
+		#{mogodb_id},
+		#{supplier_id},
+		#{operator_id},
+		#{operator_name},
+		#{companyId},
+		#{source_type}
+	)
+</insert>
+<update id="updateSupplierMaterialcheck" parameterType="map">
+	update t_supplier_materialcheck
+		set
+			supplier_id = #{supplier_id}
+		where materialcheck_id = #{materialcheck_id}
+</update>
+<delete id="deleteSupplierMaterialcheck" parameterType="map">
+	delete from t_supplier_materialcheck
+	where materialcheck_id = #{materialcheck_id}
+</delete>
+</mapper>

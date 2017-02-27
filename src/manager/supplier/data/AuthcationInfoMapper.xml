@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.AuthcationInfoMapper">
+
+
+<select id="getAuthcationInfoList" parameterType="map" resultType="manager.supplier.model.AuthcationInfo">
+	select
+		t_authcation_info.auth_id,
+		t_authcation_info.company_id,
+		t_authcation_info.auth_state,
+		t_authcation_info.auth_opinion,
+		t_authcation_info.create_dt
+	from
+		t_authcation_info
+		<where>
+			1=1
+			<if test="company_id!=null">
+				and t_authcation_info.company_id=#{company_id}
+			</if>
+			<if test="auth_id!=null">
+				and t_authcation_info.auth_id=#{auth_id}
+			</if>
+		</where>
+</select>
+<insert id="addAuthcationInfo" parameterType="manager.supplier.model.AuthcationInfo" keyProperty="auth_id" useGeneratedKeys="true">
+	insert into t_authcation_info
+	(
+		company_id,
+		auth_state,
+		auth_opinion,
+		create_dt
+	)
+	values
+	(
+		#{company_id},
+		#{auth_state},
+		#{auth_opinion},
+		#{create_dt}
+	)
+</insert>
+<update id="updateAuthcationInfo" parameterType="manager.supplier.model.AuthcationInfo">
+	update t_authcation_info
+		set
+			company_id = #{company_id},
+			auth_state = #{auth_state},
+			auth_opinion = #{auth_opinion},
+			create_dt = #{create_dt}
+		where auth_id = #{auth_id}
+</update>
+<delete id="deleteAuthcationInfo" parameterType="manager.supplier.model.AuthcationInfo">
+	delete from t_authcation_info
+	where auth_id = #{auth_id}
+</delete>
+</mapper>

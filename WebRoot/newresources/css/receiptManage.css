@@ -1,0 +1,101 @@
+@CHARSET "UTF-8";/*收货管理页面样式*/
+.posA{position:absolute;}
+.posR{position:relative;}
+.hide{display:none;}
+.ml25{margin-left:25px;}
+.mt15{margin-top:15px;}
+.del_bg{width:100%;height:100%;background-color:#000;opacity:0.4;filter:alpha(opacity=40);position:absolute;top:0px;left:0px;}
+.c666{color:#666;}
+.c999{color:#999;}
+.bg_f5{background:#f5f5f5;}
+.title{font-size:14px;font-weight:bold;color:#4c4c4c;}
+/*改变placeholder的字体颜色  */
+input::-webkit-input-placeholder { /* WebKit browsers */color:#999;}
+input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */color:#333;}
+input::-moz-placeholder { /* Mozilla Firefox 19+ */color:#333;}
+inpit:-ms-input-placeholder { /* Internet Explorer 10+ */color:#333;}
+
+.purchase_leftMenu{ width:auto; height:auto;background-color:#fff; overflow:hidden;}
+.purchase_left_block_title{ width:100%; height:43px; line-height:40px; color:#fff; font-size:16px; background:#f1af27 url(../images/page/buy_t.png) repeat-x;}
+.purchase_left_block_title .bg_img{ float:right; margin-right:10px;}
+
+.purchase_leftMenu .title{ height:40px; line-height:40px; border-bottom:1px solid #f1af27; padding-left:10px; font-size:14px;}
+
+.purchase_leftMenu ul{ width:100%; height:auto; }
+.purchase_leftMenu ul li{ width:100%; height:40px; text-align:center; line-height:40px;}
+.purchase_leftMenu ul li a{ float:left; width:100%; height:40px; line-height:40px; text-align:center; color:#777;padding:0px;}
+.purchase_leftMenu ul li a:hover{ background-color:#ececec; text-decoration:none;}
+.purchase_leftMenu ul li.curr{background-color:#ececec;}
+
+.purchase_right_title{ width:auto; height:46px; margin-left:10px; border-bottom:1px solid #e8e8e8;}
+.purchase_right_title span{ float:left; height:45px; line-height:45px; border-bottom:3px solid #f1af27; font-size:14px;}
+.goback{color:#58749c;bottom:5px;right:20px;}
+/*收货管理样式*/
+.deliveryManageList{ overflow:hidden; position:relative; width:auto; height:auto;}
+.deliveryManageList .tab{ overflow:hidden; border-bottom:2px solid #e7e7e7; }
+.deliveryManageList .tab li{ background-color:#f6f6f6; cursor:pointer; float:left; height:34px; width:110px; text-align:center; line-height:34px;color:#333;}
+.deliveryManageList .tab li span.split{ color:#e7e7e7; float:right; height:100%; width:auto; font-size:16px; font-weight:bold;}
+.deliveryManageList .tab li:hover{color:#333;font-weight:bold; background-image:none;}
+.deliveryManageList .tab li.curr{color:#333;font-weight:bold; background-image:none;}
+.deliveryManageList .tabcon{ display:none; width:auto; height:auto; overflow:hidden; min-height:100px; padding-bottom:30px;}
+
+.startDelivery{width:100px;height: 30px;line-height: 30px;border-radius:3px;background: #58749C;color: #FFFFFF;right:0px;top:0px;cursor: pointer;text-align:center;}
+.searchBtn{width: 55px;height: 30px;background: #58749C;color: #FFFFFF;border-radius: 3px;line-height: 30px;text-align: center;}
+.searchCriteria{width: 100%;height: auto;margin-top:15px;}
+.searchCriteria label {display:inline-block;width:70px ;height: 30px;line-height: 30px;color:#333;}
+.searchCriteria .inputWrap1{width: 180px;height: 28px;border: 1px solid #E8E8E8;line-height:28px;}
+.searchCriteria .inputWrap2{width: 80px;height: 28px;border: 1px solid #E8E8E8;line-height:28px;}
+.searchCriteria .selectShowWrap{width:170px;height: 28px;line-height: 28px;border: 1px solid #E8E8E8;color:#999;padding-left:8px;}
+.searchCriteria .selectWrap{border:1px solid #e8e8e8;heihgt:auto;left:0px;top:30px;padding-left:10px;display:none;text-align:left;color:#999;background:#fff;z-index:15;}
+
+.deliveryTableList{width:100%;height:auto;table-layout:fixed;}
+.deliveryTableList tr{min-height:60px;}
+.deliveryTableList th{color:#777;text-align:center;background:#f6f6f6;height:30px;line-height:30px;font-weight:normal;margin-bottom:10px;}
+.deliveryTableList th.wrap1{width:85px;}
+.deliveryTableList th.wrap2{width:165px;}
+.deliveryTableList th.wrap3{width:65px;}
+.deliveryTableList th.wrap4{width:50px;}
+.deliveryTableList th.wrap5{width:150px;}
+.deliveryTableList td{padding:10px 5px;line-height:20px;height:40px;color:#333;border-bottom:1px solid #e8e8e8;}
+.deliveryTableList td.center{text-align:center;}
+.deliveryTableList .operate{color:#2170e8;}
+.deliveryTableList .operate:hover{text-decoration: underline;}
+.deliveryTableList .orderNumber{color:#333;text-decoration: underline;}
+.deliveryTableList .orderNumber:hover{color:#2170e8}
+.deliveryTableList .waiting{color:#333;font-weight:bold;}
+.deliveryTableList .finished{color:#333;}
+.deliveryTableList .canceled{color:#999;}
+
+/*收货详情样式*/
+.receiptInfoTop{height:80px;line-height:80px;padding:10px 0px 10px 10px;}
+.receiptInfoTop div{float:left;font-size:14px;color:#4c4c4c;text-align:left;}
+.receiptInfoTop .name1{width:70px;}
+.receiptInfoTop .name2{width:85px;}
+.receiptInfoTop .con1{width:225px;}
+.receiptInfoTop .con2{width:290px;line-height:80px;}
+.receiptInfoTop .con3{width:55px;font-size:16px;font-weight:bold;}
+
+.receiptInfo{padding:10px;}
+.receiptInfo .logisticsInfo{width:742px;height:auto;border:1px solid #e8e8e8;padding:25px 30px 25px 20px;color:#666;}
+.receiptInfo .logisticsInfo .name{display:inline-block;width:65px;height:24px;line-height:24px;vertical-align:top;}
+.receiptInfo .logisticsInfo .con1{display:inline-block;width:180px;height:24px;line-height:24px;vertical-align:top;}
+.receiptInfo .logisticsInfo .con2{display:inline-block;width:673px;height:auto;line-height:24px;margin-left:-4px;}
+.receiptInfo .logisticsInfo .con2 li{float:left;margin-right:10px;margin-bottom:10px;position:relative;}
+.receiptInfo .logisticsInfo .con2 img {max-width:65px;max-height:50px;}
+.receiptInfo .logisticsInfo .con2 .del{position:absolute;top:15px;left:22px;color:#fff;}
+
+.receiptInfo .tableList{width:794px;height:auto;border:1px solid #e8e8e8;table-layout:fixed;}
+.receiptInfo .tableList th{color:#999;background:#f5f5f5;height:30px;line-height:30px;font-weight:normal;}
+.receiptInfo .tableList td{border-top:1px solid #e8e8e8;padding:10px 10px 10px 20px;line-height:20px;color:#666;}
+.receiptInfo .tableList td.center{text-align:center;padding:10px;}
+.receiptInfo .tableList .productImg{height:50px;width:50px;border:1px solid #e8e8e8;line-height:50px;display:inline-block;}
+.receiptInfo .tableList .productImg img{max-height:50px;max-width:50px;margin-top:-3px;}
+.receiptInfo .tableList .productName{display:inline-block;width:164px;line-height:20px;vertical-align:middle;}
+.receiptInfo .tableList .numForEdit{width:78px;height:28px;line-height:28px;border:1px solid #ccc;color:#333;outline:none;text-align: center;}
+.receiptInfo .recordNum{color:#4c4c4c;margin-left:30px;margin-top:5px;}
+.receiptInfo .memoForRead{width:754px;height:auto;color:#666;line-height:24px;margin-left:10px;padding:20px 21px;}
+.receiptInfo .memoForRead .name{width:36px;height:auto;line-height:24px;}
+.receiptInfo .memoForRead .con{width:683px;height:auto;line-height:24px;margin-left:35px;}
+.receiptInfo .memoForEdit{width:794px;height:auto;color:#666;line-height:24px;margin-left:10px;}
+.receiptInfo .memoForEdit .main{width:774px;height:60px;padding:10px;border:1px solid #ccc;color:#333;outline:none;resize:none;-ms-overflow-y:auto;}
+.receiptInfo .confirmReceipt{width:120px;height:40px;border-radius:3px;background:#58749c;color:#fff;font-size:14px;font-weight:bold;text-align:center;margin-top:40px;margin-right:10px;}

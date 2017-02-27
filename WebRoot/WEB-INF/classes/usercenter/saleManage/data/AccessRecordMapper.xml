@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AccessRecordMapper">
+
+<select id="getAccessRecordList" parameterType="map" resultType="usercenter.saleManage.model.AccessRecord">
+	select
+		t_access_application_record.record_id,
+		t_access_application_record.submit_id,
+		t_access_application_record.receive_id,
+		t_app_company_info.cpyname_cn as receive_name,
+		t_access_application_record.access_status,
+		t_access_application_record.h_id,
+		t_access_application_record.accepter_reg_id,
+		t_access_application_record.create_dt,
+		t_access_application_record.update_dt,
+		t_access_application_record.first_submit_dt,
+		t_access_application_record.orderby_dt
+	from
+		t_access_application_record
+	left join t_app_company_info on t_app_company_info.company_id=t_access_application_record.receive_id
+	where 1=1
+	<if  test="companyId!=null" >
+		and submit_id=#{companyId}
+	</if>
+	<if  test="record_id!=null" >
+		and record_id=#{record_id}
+	</if>
+</select>
+<insert id="addAccessRecord" parameterType="map" keyProperty="record_id" useGeneratedKeys="true">
+	insert into t_access_application_record
+	(
+		submit_id,
+		receive_id,
+		<if test="receive_invite_id!=null">
+		receive_invite_id,
+		</if>
+		<if test="create_dt!=null">
+		create_dt,
+		</if>
+		access_status,
+		h_id,
+		accepter_reg_id
+		<if test="object_type != '' and object_type != null">
+		,object_type
+		</if>
+	)
+	values
+	(
+		#{submit_id},
+		#{receive_id},
+		<if test="receive_invite_id!=null">
+		#{receive_invite_id},
+		</if>
+		<if test="create_dt!=null">
+		#{create_dt},
+		</if>
+		#{access_status},
+		#{h_id},
+		#{accepter_reg_id}
+		<if test="object_type != '' and object_type != null">
+		,#{object_type}
+		</if>
+	)
+</insert>
+<update id="updateAccessRecord" parameterType="map">
+	update t_access_application_record
+		set
+			record_id = #{record_id}
+			<if test="submit_id!='' and submit_id!=null">
+			,submit_id = #{submit_id}
+			</if>
+			<if test="receive_id!='' and receive_id!=null">
+			,receive_id = #{receive_id}
+			</if>
+			<if test="access_status!='' and access_status!=null">
+			,access_status = #{access_status}
+			</if>
+			<if test="update_dt!='' and update_dt!=null">
+			,update_dt = #{update_dt}
+			</if>
+			<if test="first_submit_dt!='' and first_submit_dt!=null">
+			,first_submit_dt = #{first_submit_dt}
+			</if>
+			<if test="orderby_dt!='' and orderby_dt!=null">
+			,orderby_dt = #{orderby_dt}
+			</if>
+		where record_id = #{record_id}
+</update>
+<delete id="deleteAccessRecord" parameterType="map">
+	delete from t_access_application_record
+	where record_id = #{record_id}
+</delete>
+<select id="getCountForToBeSubmittedAccess" parameterType="map" resultType="java.lang.Integer">
+	select COUNT(0) from t_access_application_record
+where 
+ submit_id=#{sup_company_id}
+and (access_status=0 or access_status=1 )
+</select>
+<select id="getCountForToBeReturnedAccess" parameterType="map" resultType="java.lang.Integer">
+	select COUNT(0) from t_access_application_record
+where 
+ submit_id=#{sup_company_id}
+and access_status=4 
+</select>
+<select id="checkRecordExist" parameterType="map" resultType="usercenter.saleManage.model.AccessRecord">
+	select
+		t_access_application_record.record_id,
+		t_access_application_record.submit_id,
+		t_access_application_record.receive_id,
+		t_access_application_record.access_status,
+		t_access_application_record.receive_invite_id,
+		t_access_application_record.h_id,
+		t_access_application_record.accepter_reg_id,
+		t_access_application_record.create_dt,
+		t_access_application_record.update_dt
+	from
+		t_access_application_record
+	where submit_id=#{submit_id}
+	and receive_id in (select company_id from t_reg_accout_company_info
+	where 1=1
+	<if test="reg_id!=null and reg_id!=''">
+			and reg_id=#{reg_id}
+	</if>
+	<if test="sa_id!=null and sa_id!=''">
+			and reg_id=(select reg_id from t_app_sub_account where sa_id=#{sa_id} limit 1)
+	</if>
+	)
+	and access_status!=3
+	limit 1
+</select>
+<select id="getSubmitRecordBySubmitId" parameterType="map" resultType="usercenter.saleManage.model.AccessRecord">
+	select
+		t_access_application_record.record_id,
+		t_access_application_record.submit_id,
+		t_access_application_record.receive_id,
+		t_access_application_record.access_status,
+		t_access_application_record.h_id,
+		t_access_application_record.accepter_reg_id,
+		t_access_application_record.create_dt,
+		t_access_application_record.update_dt
+	from
+		t_access_application_record
+	where 1=1
+		and submit_id=#{submit_id}
+		and access_status=2
+</select>
+
+<!-- 通过recordId获取审核状态 -->
+<select id="getStatusByRecordId" parameterType="map" resultType="map">
+select
+	t_access_application_record.access_status,
+	t_access_application_record.update_dt,
+	t_access_application_record.create_dt record_create_dt,
+	t_admittance_audit.audit_opinion,
+	t_admittance_audit.create_dt,
+	t_access_application_record.orderby_dt
+from
+	t_access_application_record
+	left join t_admittance_audit on t_access_application_record.record_id = t_admittance_audit.record_id
+where
+	t_access_application_record.record_id = #{record_id}
+order by t_admittance_audit.audit_id desc
+</select>
+<select id="getAccessRecordListForVerify" parameterType="map" resultType="usercenter.saleManage.model.AccessRecord">
+	select
+		t_access_application_record.record_id,
+		t_access_application_record.submit_id,
+		t_access_application_record.receive_id,
+		t_app_company_info.cpyname_cn as submit_name,
+		t_access_application_record.access_status,
+		t_access_application_record.h_id,
+		t_access_application_record.accepter_reg_id,
+		t_access_application_record.create_dt,
+		t_access_application_record.update_dt,
+		t_access_application_record.first_submit_dt,
+		t_access_application_record.orderby_dt,
+		t_access_application_record.object_type,
+		(SELECT content from t_access_application_info taai1 where e_id = 14 and t_access_application_record.record_id = taai1.record_id) as m_phone,
+		(SELECT content from t_access_application_info taai2 where e_id = 15 and t_access_application_record.record_id = taai2.record_id) as contacts
+	from
+		t_access_application_record
+	left join t_app_company_info on t_app_company_info.company_id=t_access_application_record.submit_id
+	where 1=1
+	<if  test="companyId!=null" >
+		and receive_id=#{companyId}
+	</if>
+	<if  test="access_status!=null and access_status!=5" >
+		and access_status=#{access_status}
+	</if>
+	<if  test="access_status!=null and access_status==5" >
+		and FIND_IN_SET(access_status,'2,3,4')
+	</if>
+	<if  test="verify_type==1" >
+		and update_dt is null
+	</if>
+	<if  test="verify_type==2" >
+		and update_dt is not null
+	</if>
+	<if  test="end_date!=null" >
+		and (first_submit_dt&lt;=#{end_date} or update_dt&lt;=#{end_date})
+	</if>
+	<if  test="start_date!=null" >
+		and (first_submit_dt&gt;=#{start_date} or update_dt&gt;=#{start_date})
+	</if>
+	<if  test="search_text!=null" >
+		and t_app_company_info.cpyname_cn like '%${search_text}%'
+	</if>
+	order by orderby_dt desc
+</select>
+<select id="getAccessRecordListForVerify_count" parameterType="map" resultType="Integer">
+	select
+		count(0)
+	from
+		t_access_application_record
+	left join t_app_company_info on t_app_company_info.company_id=t_access_application_record.submit_id
+	where 1=1
+	<if  test="companyId!=null" >
+		and receive_id=#{companyId}
+	</if>
+	<if  test="access_status!=null and access_status!=5" >
+		and access_status=#{access_status}
+	</if>
+	<if  test="access_status!=null and access_status==5" >
+		and FIND_IN_SET(access_status,'2,3,4')
+	</if>
+	<if  test="verify_type==1" >
+		and update_dt is null
+	</if>
+	<if  test="verify_type==2" >
+		and update_dt is not null
+	</if>
+	<if  test="end_date!=null" >
+		and (first_submit_dt&lt;=#{end_date} or update_dt&lt;=#{end_date})
+	</if>
+	<if  test="start_date!=null" >
+		and (first_submit_dt&gt;=#{start_date} or update_dt&gt;=#{start_date})
+	</if>
+	<if  test="search_text!=null" >
+		and t_app_company_info.cpyname_cn like '%${search_text}%'
+	</if>
+	order by orderby_dt desc
+</select>
+</mapper>

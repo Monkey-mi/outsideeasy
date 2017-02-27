@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.enquiryQuote.quote.data.QuotationMapper">
+
+
+<select id="getQuotationList" parameterType="map" resultType="manager.enquiryQuote.quote.model.Quotation">
+	select
+		t_app_quotation.quotation_id,
+		t_app_quotation.company_id,
+		t_app_quotation.cpyname_cn,
+		t_app_quotation.enquiry_detail_id,
+		t_app_quotation.quote_date,
+		t_app_quotation.material_costs,
+		t_app_quotation.process_cost,
+		t_app_quotation.transportation,
+		t_app_quotation.other_item,
+		t_app_quotation.other_cost,
+		t_app_quotation.vat,
+		t_app_quotation.enquiry_price,
+		t_app_quotation.status
+	from
+		t_app_quotation
+	where 1=1
+	<if test="enquiry_detail_id!=null">
+		and t_app_quotation.enquiry_detail_id=#{enquiry_detail_id}
+	</if>
+	<if test="company_id!=null">
+		and t_app_quotation.company_id=#{company_id}
+	</if>
+	<if test="condition!=null and condition!=''">
+		and ${condition}
+	</if>
+	<if test="submitFlag==1">
+		and t_app_quotation.status>0
+	</if>
+	
+</select>
+<insert id="addQuotation" parameterType="manager.enquiryQuote.quote.model.Quotation" keyProperty="quotation_id" useGeneratedKeys="true">
+	<selectKey keyProperty="quotation_id" resultType="int" order="BEFORE">
+		select  ifnull(max(quotation_id)+1,1) from t_app_quotation 		
+	</selectKey>
+	insert into t_app_quotation
+	(
+		quotation_id,
+		company_id,
+		cpyname_cn,
+		enquiry_detail_id,
+		quote_date,
+		material_costs,
+		process_cost,
+		transportation,
+		other_item,
+		other_cost,
+		vat,
+		enquiry_price,
+		status
+	)
+	values
+	(
+		#{quotation_id},
+		#{company_id},
+		#{cpyname_cn},
+		#{enquiry_detail_id},
+		#{quote_date},
+		#{material_costs},
+		#{process_cost},
+		#{transportation},
+		#{other_item},
+		#{other_cost},
+		#{vat},
+		#{enquiry_price},
+		#{status}
+	)
+</insert>
+<update id="updateQuotation" parameterType="manager.enquiryQuote.quote.model.Quotation">
+	update t_app_quotation
+		set
+			quotation_id = #{quotation_id},
+			company_id = #{company_id},
+			cpyname_cn=#{cpyname_cn},
+			enquiry_detail_id = #{enquiry_detail_id},
+			quote_date = #{quote_date},
+			material_costs = #{material_costs},
+			process_cost = #{process_cost},
+			transportation = #{transportation},
+			other_item = #{other_item},
+			other_cost = #{other_cost},
+			vat = #{vat},
+			enquiry_price = #{enquiry_price},
+			status = #{status}
+		where quotation_id = #{quotation_id}
+</update>
+<delete id="deleteQuotation" parameterType="manager.enquiryQuote.quote.model.Quotation">
+	delete from t_app_quotation
+	where quotation_id = #{quotation_id}
+</delete>
+
+<select id="getQuotationDetailList" parameterType="map" resultType="manager.enquiryQuote.quote.model.QuotationDetail">
+	select
+		t_app_quotation_detail.quodetail_id,
+		t_app_quotation_detail.quotation_id,
+		t_app_quotation_detail.item_order,
+		t_app_quotation_detail.item_name,
+		t_app_quotation_detail.item_description,
+		t_app_quotation_detail.qty,
+		t_app_quotation_detail.uom,
+		t_app_quotation_detail.unit_price,
+		t_app_quotation_detail.total_prcie
+	from
+		t_app_quotation_detail
+	where 1=1
+	<if test="quotation_id!=null">
+		and t_app_quotation_detail.quotation_id=#{quotation_id}
+	</if>
+</select>
+<insert id="addQuotationDetail" parameterType="manager.enquiryQuote.quote.model.QuotationDetail" keyProperty="quodetail_id" useGeneratedKeys="true">
+	<selectKey keyProperty="quodetail_id" resultType="int" order="BEFORE">
+		select  ifnull(max(quodetail_id)+1,1) from t_app_quotation_detail 		
+	</selectKey>
+	insert into t_app_quotation_detail
+	(
+		quodetail_id,
+		quotation_id,
+		item_order,
+		item_name,
+		item_description,
+		qty,
+		uom,
+		unit_price,
+		total_prcie
+	)
+	values
+	(
+		#{quodetail_id},
+		#{quotation_id},
+		#{item_order},
+		#{item_name},
+		#{item_description},
+		#{qty},
+		#{uom},
+		#{unit_price},
+		#{total_prcie}
+	)
+</insert>
+<update id="updateQuotationDetail" parameterType="manager.enquiryQuote.quote.model.QuotationDetail">
+	update t_app_quotation_detail
+		set
+			quodetail_id = #{quodetail_id},
+			quotation_id = #{quotation_id},
+			item_order = #{item_order},
+			item_name = #{item_name},
+			item_description = #{item_description},
+			qty = #{qty},
+			uom = #{uom},
+			unit_price = #{unit_price},
+			total_prcie = #{total_prcie}
+		where quodetail_id = #{quodetail_id}
+</update>
+<delete id="deleteQuotationDetail" parameterType="manager.enquiryQuote.quote.model.QuotationDetail">
+	delete from t_app_quotation_detail
+	where quodetail_id = #{quodetail_id}
+</delete>
+
+<select id="checkStatusSame" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_quotation where quotation_id = #{quotation_id} and status = #{status}
+</select>
+
+<select id="hasQuote" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_quotation 
+	where t_app_quotation.enquiry_detail_id in 
+	(
+		select
+			t_app_enquiry_detail.enquiry_detail_id
+		from
+			t_app_enquiry_detail
+		where t_app_enquiry_detail.enquiry_id=#{enquiry_id}
+	)
+</select>
+</mapper>

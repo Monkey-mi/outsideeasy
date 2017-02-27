@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfCompetitorMapper">
+
+
+<select id="getCompetitorOutList" parameterType="map" resultType="com.outsideasy.ws.erp.supplier.vo.CompetitorOut">
+	select
+		t_app_competitor.competitor_id,
+		t_app_competitor.competitor_name,
+		t_app_competitor.company_id
+	from
+		t_app_competitor
+	where 1=1
+	<if test="company_id!=null">
+		and t_app_competitor.company_id=#{company_id}
+	</if>
+</select>
+
+<!-- 根据companyId获取竞争对手信息 -->
+<select id="getCompetitorByCompanyId" parameterType="java.lang.Integer" resultType="platform.company.model.PfCompetitor">
+select
+	competitor_id,
+	competitor_name
+from
+	t_app_competitor
+where
+	company_id = #{companyId}
+</select>
+<!-- 根据companyId获取竞争对手信息 -->
+<select id="getCompetitorMapByCompanyId" parameterType="map" resultType="map">
+select
+	competitor_id,
+	competitor_name
+from
+	t_app_competitor
+where
+	company_id = #{companyId}
+</select>
+
+<!-- 根据竞争对手ID删除对手信息 -->
+<delete id="deleteCompetitor" parameterType="map">
+	delete from
+		t_app_competitor
+	where
+		competitor_id = #{competitorId}
+</delete>
+
+<delete id="deleteCompetitorByCompanyId" parameterType="map">
+	delete from
+		t_app_competitor
+	where
+		company_id = #{companyId}
+</delete>
+
+<!-- 根据竞争对手ID更新对手信息 -->
+<update id="updateCompetitor" parameterType="map">
+	update
+		t_app_competitor
+	<set>
+		<if test="competitorName != null and competitorName != ''">
+			competitor_name = #{competitorName},
+		</if>
+	</set>
+	where
+		competitor_id = #{competitorId}	
+</update>
+
+<!-- 增加竞争对手  -->
+<insert id="addCompetitor" parameterType="map" keyProperty="competitor_id" useGeneratedKeys="true">
+	insert into 
+		t_app_competitor(competitor_name,company_id)
+	values
+		(#{competitorName},#{companyId})
+</insert>
+
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfSupplierCheckfactoryReportMapper">
+
+
+<select id="getPfSupplierCheckfactoryReportList" parameterType="map" resultType="platform.company.model.PfSupplierCheckfactoryReport">
+	select
+		t_supplier_checkfactory_report.id,
+		t_supplier_checkfactory_report.file_type_id,
+		t_supplier_checkfactory_report.file_name,
+		t_supplier_checkfactory_report.create_dt,
+		t_supplier_checkfactory_report.remark,
+		t_supplier_checkfactory_report.mogodb_id,
+		t_supplier_checkfactory_report.check_score,
+		t_supplier_checkfactory_report.supplier_id,
+		t_supplier_checkfactory_report.source_type,
+		t_supplier_checkfactory_report.operator_id,
+		t_supplier_checkfactory_report.operator_name,
+		t_supplier_checkfactory_report.check_factory_dt,
+		t_supplier_checkfactory_report.send_company_id
+	from
+		t_supplier_checkfactory_report
+		left join t_supplier_files on t_supplier_files.supplier_id=t_supplier_checkfactory_report.supplier_id
+		<where>
+			1=1
+			<if test="supplier_id!=null">
+				t_supplier_checkfactory_report.supplier_id=#{supplier_id}
+			</if>
+			<if test="record_id!=null">
+				and t_supplier_files.record_id=#{record_id}
+			</if>
+		</where>
+		<if test="sort==null">
+			order by create_dt desc
+		</if>
+		<if test="sort!=null">
+			order by ${sort}
+		</if>
+</select>
+<insert id="addPfSupplierCheckfactoryReport" parameterType="platform.company.model.PfSupplierCheckfactoryReport" keyProperty="id" useGeneratedKeys="true">
+	insert into t_supplier_checkfactory_report
+	(
+		id,
+		file_type_id,
+		file_name,
+		create_dt,
+		remark,
+		mogodb_id,
+		check_score,
+		supplier_id,
+		source_type,
+		operator_id,
+		operator_name,
+		check_factory_dt,
+		send_company_id,
+        checkor
+	)
+	values
+	(
+		#{id},
+		#{file_type_id},
+		#{file_name},
+		#{create_dt},
+		#{remark},
+		#{mogodb_id},
+		#{check_score},
+		#{supplier_id},
+		#{source_type},
+		#{operator_id},
+		#{operator_name},
+		#{check_factory_dt},
+		#{send_company_id},
+		#{checkor}
+	)
+</insert>
+<update id="updatePfSupplierCheckfactoryReport" parameterType="platform.company.model.PfSupplierCheckfactoryReport">
+	update t_supplier_checkfactory_report
+		set
+			id = #{id},
+			file_type_id = #{file_type_id},
+			file_name = #{file_name},
+			create_dt = #{create_dt},
+			remark = #{remark},
+			mogodb_id = #{mogodb_id},
+			check_score = #{check_score},
+			supplier_id = #{supplier_id},
+			source_type = #{source_type},
+			operator_id = #{operator_id},
+			operator_name = #{operator_name},
+			check_factory_dt = #{check_factory_dt},
+			send_company_id = #{send_company_id}
+		where id = #{id}
+</update>
+<delete id="deletePfSupplierCheckfactoryReport" parameterType="platform.company.model.PfSupplierCheckfactoryReport">
+	delete from t_supplier_checkfactory_report
+	where id = #{id}
+</delete>
+</mapper>

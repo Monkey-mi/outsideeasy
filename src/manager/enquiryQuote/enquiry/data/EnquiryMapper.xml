@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.enquiryQuote.enquiry.data.EnquiryMapper">
+
+
+<select id="getEnquiryList" parameterType="map" resultType="manager.enquiryQuote.enquiry.model.Enquiry">
+	select
+		t_app_enquiry.enquiry_id,
+		t_app_enquiry.company_id,
+		t_app_enquiry.cpyname_cn,
+		t_app_enquiry.enquiry_date,
+		t_app_enquiry.enquiry_item,
+		t_app_enquiry.invoice,
+		t_app_enquiry.tax_rate,
+		t_app_enquiry.payment_way,
+		t_app_enquiry.enddate,
+		t_app_enquiry.remark,
+		t_app_enquiry.enquiry_person,
+		t_app_enquiry.enquiry_status
+	from
+		t_app_enquiry
+	where 1=1
+	<if test="company_id!=null">
+		and t_app_enquiry.company_id=#{company_id}
+	</if>
+	<if test="enquiry_id!=null">
+		and t_app_enquiry.enquiry_id=#{enquiry_id}
+	</if>
+	<if test="condition!=null  and condition!=''">
+		and ${condition}
+	</if>
+</select>
+<select id="getEnquiryListForSupplier" parameterType="map" resultType="manager.enquiryQuote.enquiry.model.Enquiry">
+	select DISTINCT
+		t_app_enquiry.enquiry_id,
+		t_app_enquiry.company_id,
+		t_app_enquiry.cpyname_cn,
+		t_app_enquiry.enquiry_date,
+		t_app_enquiry.enquiry_item,
+		t_app_enquiry.invoice,
+		t_app_enquiry.tax_rate,
+		t_app_enquiry.payment_way,
+		t_app_enquiry.enddate,
+		t_app_enquiry.remark,
+		t_app_enquiry.enquiry_person,
+		t_app_enquiry.enquiry_status
+	from
+		t_app_enquiry_distribution
+		
+	left join t_app_enquiry on t_app_enquiry.enquiry_id=t_app_enquiry.enquiry_id
+	where t_app_enquiry.enquiry_status>0
+	<if test="company_id!=null">
+		and t_app_enquiry_distribution.company_id=#{company_id}
+	</if>
+</select>
+<insert id="addEnquiry" parameterType="manager.enquiryQuote.enquiry.model.Enquiry" keyProperty="enquiry_id" useGeneratedKeys="true">
+	<selectKey keyProperty="enquiry_id" resultType="int" order="BEFORE">
+		select  ifnull(max(enquiry_id)+1,1) from t_app_enquiry 		
+	</selectKey>
+	insert into t_app_enquiry
+	(
+		enquiry_id,
+		company_id,
+		cpyname_cn,
+		enquiry_date,
+		enquiry_item,
+		invoice,
+		tax_rate,
+		payment_way,
+		enddate,
+		remark,
+		enquiry_person,
+		enquiry_status
+	)
+	values
+	(
+		#{enquiry_id},
+		#{company_id},
+		#{cpyname_cn},
+		#{enquiry_date},
+		#{enquiry_item},
+		#{invoice},
+		#{tax_rate},
+		#{payment_way},
+		#{enddate},
+		#{remark},
+		#{enquiry_person},
+		#{enquiry_status}
+	)
+</insert>
+<update id="updateEnquiry" parameterType="manager.enquiryQuote.enquiry.model.Enquiry">
+	update t_app_enquiry
+		set
+			enquiry_id = #{enquiry_id},
+			company_id = #{company_id},
+			cpyname_cn=#{cpyname_cn},
+			enquiry_date = #{enquiry_date},
+			enquiry_item = #{enquiry_item},
+			invoice = #{invoice},
+			tax_rate = #{tax_rate},
+			payment_way = #{payment_way},
+			enddate = #{enddate},
+			remark = #{remark},
+			enquiry_person = #{enquiry_person},
+			enquiry_status = #{enquiry_status}
+		where enquiry_id = #{enquiry_id}
+</update>
+<delete id="deleteEnquiry" parameterType="manager.enquiryQuote.enquiry.model.Enquiry">
+	delete from t_app_enquiry
+	where enquiry_id = #{enquiry_id}
+</delete>
+
+<select id="getEnquiryDetailList" parameterType="map" resultType="manager.enquiryQuote.enquiry.model.EnquiryDetail">
+	select
+		t_app_enquiry_detail.enquiry_detail_id,
+		t_app_enquiry_detail.enquiry_id,
+		t_app_enquiry_detail.item_order,
+		t_app_enquiry_detail.pro_name,
+		t_app_enquiry_detail.mc_id,
+		t_app_enquiry_detail.qty,
+		t_app_enquiry_detail.unit,
+		t_app_enquiry_detail.delivery_cycle,
+		t_app_enquiry_detail.description,
+		t_app_enquiry_detail.attched
+	from
+		t_app_enquiry_detail
+	where 1=1
+	<if test="enquiry_id!=null">
+		and t_app_enquiry_detail.enquiry_id=#{enquiry_id}
+	</if>
+	<if test="enquiry_detail_id!=null">
+		and t_app_enquiry_detail.enquiry_detail_id=#{enquiry_detail_id}
+	</if>
+</select>
+<insert id="addEnquiryDetail" parameterType="manager.enquiryQuote.enquiry.model.EnquiryDetail" keyProperty="enquiry_detail_id" useGeneratedKeys="true">
+	<selectKey keyProperty="enquiry_detail_id" resultType="int" order="BEFORE">
+		select  ifnull(max(enquiry_detail_id)+1,1) from t_app_enquiry_detail 		
+	</selectKey>
+	insert into t_app_enquiry_detail
+	(
+		enquiry_detail_id,
+		enquiry_id,
+		item_order,
+		pro_name,
+		mc_id,
+		qty,
+		unit,
+		delivery_cycle,
+		description,
+		attched
+	)
+	values
+	(
+		#{enquiry_detail_id},
+		#{enquiry_id},
+		#{item_order},
+		#{pro_name},
+		#{mc_id},
+		#{qty},
+		#{unit},
+		#{delivery_cycle},
+		#{description},
+		#{attched}
+	)
+</insert>
+<update id="updateEnquiryDetail" parameterType="manager.enquiryQuote.enquiry.model.EnquiryDetail">
+	update t_app_enquiry_detail
+		set
+			enquiry_detail_id = #{enquiry_detail_id},
+			enquiry_id = #{enquiry_id},
+			item_order=#{item_order},
+			pro_name = #{pro_name},
+			mc_id = #{mc_id},
+			qty = #{qty},
+			unit = #{unit},
+			delivery_cycle = #{delivery_cycle},
+			description = #{description},
+			attched = #{attched}
+		where enquiry_detail_id = #{enquiry_detail_id}
+</update>
+<delete id="deleteEnquiryDetail" parameterType="manager.enquiryQuote.enquiry.model.EnquiryDetail">
+	delete from t_app_enquiry_detail
+	where enquiry_detail_id = #{enquiry_detail_id}
+</delete>
+<delete id="deleteEnquiryDetailByEnquiry_id" parameterType="manager.enquiryQuote.enquiry.model.EnquiryDetail">
+	delete from t_app_enquiry_detail
+	where t_app_enquiry_detail.enquiry_id=#{enquiry_id}
+</delete>
+<select id="checkStatusSame" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_enquiry
+	where enquiry_id = #{enquiry_id} and enquiry_status=#{enquiry_status}
+</select>
+<update id="updateStatus" parameterType="map">
+	update t_app_enquiry
+		set enquiry_status=#{enquiry_status},enquiry_date = #{enquiry_date},enquiry_person = #{enquiry_person}
+		where enquiry_id  = #{enquiry_id}
+</update>
+
+<select id="getEnquiryDistributionList" parameterType="map" resultType="manager.enquiryQuote.enquiry.model.EnquiryDistribution">
+	select
+		t_app_enquiry_distribution.distribution_id,
+		t_app_enquiry_distribution.enquiry_id,
+		t_app_enquiry_distribution.distribute_date,
+		t_app_enquiry_distribution.company_id,
+		t_app_enquiry_distribution.cpyname_cn
+	from
+		t_app_enquiry_distribution
+	where 1=1
+	<if test="company_id!=null">
+		and t_app_enquiry_distribution.company_id=#{company_id}
+	</if>
+	<if test="enquiry_id!=null">
+		and t_app_enquiry_distribution.enquiry_id=#{enquiry_id}
+	</if>
+	<if test="condition!=null">
+		and ${condition}
+	</if>
+</select>
+<insert id="addEnquiryDistribution" parameterType="manager.enquiryQuote.enquiry.model.EnquiryDistribution" keyProperty="distribution_id" useGeneratedKeys="true">
+	<selectKey keyProperty="distribution_id" resultType="int" order="BEFORE">
+		select  ifnull(max(distribution_id)+1,1) from t_app_enquiry_distribution 		
+	</selectKey>
+	insert into t_app_enquiry_distribution
+	(
+		distribution_id,
+		enquiry_id,
+		distribute_date,
+		company_id,
+		cpyname_cn
+	)
+	values
+	(
+		#{distribution_id},
+		#{enquiry_id},
+		#{distribute_date},
+		#{company_id},
+		#{cpyname_cn}
+	)
+</insert>
+<update id="updateEnquiryDistribution" parameterType="manager.enquiryQuote.enquiry.model.EnquiryDistribution">
+	update t_app_enquiry_distribution
+		set
+			distribution_id = #{distribution_id},
+			enquiry_id = #{enquiry_id},
+			distribute_date = #{distribute_date},
+			company_id = #{company_id},
+			cpyname_cn=#{cpyname_cn}
+		where distribution_id = #{distribution_id}
+</update>
+<delete id="deleteEnquiryDistribution" parameterType="manager.enquiryQuote.enquiry.model.EnquiryDistribution">
+	delete from t_app_enquiry_distribution
+	where distribution_id = #{distribution_id}
+</delete>
+<select id="getEnquiryCount" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_enquiry_distribution 
+	left join t_app_enquiry on t_app_enquiry_distribution.enquiry_id=t_app_enquiry.enquiry_id
+	where t_app_enquiry_distribution.company_id=#{company_id} and enquiry_status=1<!-- 1是发布 -->
+</select>
+</mapper>

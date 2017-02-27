@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.common.announcement.data.AnnouncementMapper">
+
+
+<select id="getAnnouncementList" parameterType="map" resultType="usercenter.common.announcement.model.Announcement">
+	select
+		t_web_content.web_id,
+		t_web_content.web_title,
+		t_web_content.content,
+		t_web_content.abstract as content_abstract,
+		t_web_content.creator,
+		t_web_content.signed_release,
+		t_web_content.create_dt,
+		t_web_content.update_dt
+	from
+		t_web_content
+		where 1=1
+		<if test="content_type!=null">
+		and t_web_content.content_type=#{content_type}
+		</if>
+		<if test="module_id!=null">
+		and t_web_content.module_id=#{module_id}
+		</if>
+		<if test="search_text!=null">
+		and (t_web_content.web_title like '%${search_text}%'
+		or t_web_content.abstract like '%${search_text}%'
+		or t_web_content.creator like '%${search_text}%')
+		</if>
+		<if test="content_type==1">
+		order by t_web_content.create_dt desc
+		</if>
+		<if test="content_type==2">
+		order by t_web_content.create_dt 
+		</if>
+</select>
+<insert id="addAnnouncement" parameterType="map" keyProperty="web_id" useGeneratedKeys="true">
+<selectKey keyProperty="web_id" resultType="int" order="BEFORE">
+		select  ifnull(max(web_id)+1,1) from t_web_content 
+	</selectKey>
+	insert into t_web_content
+	(
+		web_id,
+		content,
+		web_title,
+		creator,
+		abstract
+	)
+	values
+	(
+		#{web_id},
+		#{content},
+		#{web_title},
+		#{creator},
+		#{content_abstract}
+	)
+</insert>
+<update id="updateAnnouncement" parameterType="map">
+	update t_web_content
+		set
+			web_id = #{web_id},
+			content = #{content},
+			creator = #{creator},
+			update_dt = #{update_dt},
+			web_title = #{web_title},
+			abstract = #{content_abstract}
+		where  web_id= #{web_id}
+</update>
+<delete id="deleteAnnouncement" parameterType="map">
+	delete from t_web_content
+	where  web_id= #{web_id}
+</delete>
+<select id="getNewAnnouncementList" parameterType="map" resultType="usercenter.common.announcement.model.Announcement">
+	select
+		t_web_content.web_id,
+		t_web_content.web_title,
+		t_web_content.content,
+		t_web_content.creator,
+		t_web_content.create_dt,
+		t_web_content.signed_release,
+		t_web_content.update_dt
+	from
+		t_web_content
+		where  t_web_content.content_type=1
+		order by t_web_content.create_dt desc
+		<if test="limit!=null">
+			limit #{limit}
+		</if>
+</select>
+<select id="getAnnouncementById" parameterType="map" resultType="usercenter.common.announcement.model.Announcement">
+	select
+		t_web_content.web_id,
+		t_web_content.web_title,
+		t_web_content.content,
+		t_web_content.abstract as content_abstract,
+		t_web_content.creator,
+		t_web_content.create_dt,
+		t_web_content.signed_release,
+		t_web_content.update_dt
+	from
+		t_web_content
+		where 1=1
+		<if test="web_id!=null">
+		and t_web_content.web_id=#{web_id}
+		</if>
+</select>
+<select id="getHelpContentList" parameterType="map" resultType="usercenter.common.announcement.model.WebContentVo">
+	select
+		t_web_content_module.module_id,
+		t_web_content_module.content_type,
+		t_web_content_module.module_name,
+		t_web_content_module.create_dt
+	from
+		t_web_content_module
+		where 1=1
+		<if test="content_type!=null">
+		and t_web_content_module.content_type=#{content_type}
+		</if>
+</select>
+</mapper>

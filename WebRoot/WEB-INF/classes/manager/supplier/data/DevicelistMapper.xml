@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.DevicelistMapper">
+
+
+<select id="getDevicelistList" parameterType="map" resultType="manager.supplier.model.Devicelist">
+	select
+		t_app_devicelist.device_id,
+		t_app_devicelist.device_name,
+		t_app_devicelist.company_id,
+		t_app_devicelist.specifications,
+		t_app_devicelist.place,
+		t_app_devicelist.price,
+		t_app_devicelist.buy_day,
+		t_app_devicelist.advanced,
+		t_app_devicelist.device_num
+	from
+		t_app_devicelist
+		where 1=1
+	<if test="company_id!=null">
+		and t_app_devicelist.company_id=#{company_id}
+	</if>
+</select>
+<insert id="addDevicelist" parameterType="manager.supplier.model.Devicelist" keyProperty="device_id" useGeneratedKeys="true">
+	<selectKey keyProperty="device_id" resultType="int" order="BEFORE">
+		select  ifnull(max(device_id)+1,1) from t_app_devicelist 		
+	</selectKey>
+	insert into t_app_devicelist
+	(
+		device_id,
+		device_name,
+		company_id,
+		specifications,
+		place,
+		price,
+		buy_day,
+		advanced,
+		device_num
+	)
+	values
+	(
+		#{device_id},
+		#{device_name},
+		#{company_id},
+		#{specifications},
+		#{place},
+		#{price},
+		#{buy_day},
+		#{advanced},
+		#{device_num}
+	)
+</insert>
+<insert id="addDevicelist1" parameterType="map" keyProperty="device_id" useGeneratedKeys="true">
+	<selectKey keyProperty="device_id" resultType="int" order="BEFORE">
+		select  ifnull(max(device_id)+1,1) from t_app_devicelist 		
+	</selectKey>
+	insert into t_app_devicelist
+	(
+		device_id,
+		device_name,
+		company_id,
+		specifications,
+		place,
+		price,
+		buy_day,
+		advanced,
+		device_num
+	)
+	values
+	(
+		#{device_id},
+		#{device_name},
+		#{company_id},
+		#{specifications},
+		#{place},
+		#{price},
+		#{buy_day},
+		#{advanced},
+		#{device_num}
+	)
+</insert>
+<update id="updateDevicelist" parameterType="manager.supplier.model.Devicelist">
+	update t_app_devicelist
+		set
+			device_id = #{device_id},
+			device_name = #{device_name},
+			company_id = #{company_id},
+			specifications = #{specifications},
+			place = #{place},
+			price = #{price},
+			buy_day = #{buy_day},
+			advanced = #{advanced},
+			device_num=#{device_num} 
+		where device_id = #{device_id}
+</update>
+<update id="updateDevicelist1" parameterType="map">
+	update t_app_devicelist
+		set
+			device_id = #{device_id},
+			device_name = #{device_name},
+			company_id = #{company_id},
+			specifications = #{specifications},
+			place = #{place},
+			price = #{price},
+			buy_day = #{buy_day},
+			advanced = #{advanced},
+			device_num=#{device_num} 
+		where device_id = #{device_id}
+</update>
+<delete id="deleteDevicelist" parameterType="manager.supplier.model.Devicelist">
+	delete from t_app_devicelist
+	where device_id = #{device_id}
+	
+</delete>
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.applicationRecord.data.MngSupplierFilesMapper">
+
+
+<select id="getMngSupplierFilesList" parameterType="map" resultType="manager.applicationRecord.model.MngSupplierFiles">
+	select
+		t_supplier_files.supplier_id,
+		t_supplier_files.company_id,
+		t_supplier_files.record_id,
+		t_supplier_files.supplier_cpyname,
+		t_supplier_files.file_status,
+		t_supplier_files.create_dt,
+		t_supplier_files.no_check,
+		t_supplier_files.is_auth_updated
+	from
+		t_supplier_files
+</select>
+<insert id="addMngSupplierFiles" parameterType="manager.applicationRecord.model.MngSupplierFiles" keyProperty="supplier_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="supplier_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_supplier_files
+	(
+		company_id,
+		record_id,
+		supplier_cpyname,
+		file_status,
+		create_dt,
+		no_check,
+		is_auth_updated
+	)
+	values
+	(
+		#{company_id},
+		#{record_id},
+		#{supplier_cpyname},
+		#{file_status},
+		#{create_dt},
+		#{no_check},
+		#{is_auth_updated}
+	)
+</insert>
+<update id="updateMngSupplierFiles" parameterType="manager.applicationRecord.model.MngSupplierFiles">
+	update t_supplier_files
+		set
+			company_id = #{company_id},
+			record_id = #{record_id},
+			supplier_cpyname = #{supplier_cpyname},
+			file_status = #{file_status},
+			no_check = #{no_check},
+			is_auth_updated = #{is_auth_updated}
+		where supplier_id = #{supplier_id}
+</update>
+<delete id="deleteMngSupplierFiles" parameterType="manager.applicationRecord.model.MngSupplierFiles">
+	delete from t_supplier_files
+	where supplier_id = #{supplier_id}
+</delete>
+<update id = "UpdateMngSupplierFileState" parameterType="map">
+ update t_supplier_files
+		set						
+			file_status = #{file_status}						
+      where	record_id = #{record_id}
+</update>
+</mapper>

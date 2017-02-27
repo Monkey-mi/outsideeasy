@@ -1,0 +1,12 @@
+Ext.define('srm.supplierManager.model.AccessScoreSummary',{
+	extend:'Ext.data.Model',
+	fields:[
+		{name:'company_id',type:'int'},
+		{name:'fitem_name'},
+		{name:'fitem_id',type:'int'},
+		{name:'weightValue',type:'float'},
+		{name:'realmum',type:'float'},
+		{name:'maxmum',type:'float'},
+		{name:'score',type:'float'}
+	]
+});

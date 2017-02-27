@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.tradeManager.data.OrderCancelRecordMapper">
+
+
+<select id="getOrderCancelRecordById" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderCancelRecord">
+	select
+		t_order_cancel_record.order_cancel_id,
+		t_order_cancel_record.pur_order_id,
+		t_order_cancel_record.cancel_reason,
+		t_order_cancel_record.cancel_description,
+		t_order_cancel_record.create_dt
+	from
+		t_order_cancel_record
+	where
+	    t_order_cancel_record.pur_order_id = #{pur_order_id}
+	    ORDER BY create_dt DESC LIMIT 1 
+</select>
+<insert id="addOrderCancelRecord" parameterType="usercenter.saleManage.tradeManager.model.OrderCancelRecord" keyProperty="order_cancel_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="order_cancel_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_order_cancel_record
+	(
+		pur_order_id,
+		cancel_reason,
+		cancel_description	
+	)
+	values
+	(
+		#{pur_order_id},
+		#{cancel_reason},
+		#{cancel_description}
+	)
+</insert>
+<update id="updateOrderCancelRecord" parameterType="usercenter.saleManage.tradeManager.model.OrderCancelRecord">
+	update t_order_cancel_record
+		set
+			pur_order_id = #{pur_order_id},
+			cancel_reason = #{cancel_reason},
+			cancel_description = #{cancel_description}		
+		where order_cancel_id = #{order_cancel_id}
+</update>
+<delete id="deleteOrderCancelRecord" parameterType="usercenter.saleManage.tradeManager.model.OrderCancelRecord">
+	delete from t_order_cancel_record
+	where order_cancel_id = #{order_cancel_id}
+</delete>
+</mapper>

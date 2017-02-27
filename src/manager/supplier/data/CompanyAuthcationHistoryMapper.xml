@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.CompanyAuthcationHistoryMapper">
+
+
+<select id="getCompanyAuthcationHistoryList" parameterType="map" resultType="manager.supplier.model.CompanyAuthcationHistory">
+	select
+		t_company_authcation_history.auth_history_id,
+		t_company_authcation_history.company_id,
+		t_company_authcation_history.class_id,
+		t_company_authcation_history.nature_id,
+		t_company_authcation_history.key_remark,
+		t_company_authcation_history.cpyname_cn,
+		
+		t_company_authcation_history.industry_id,
+		
+		t_company_authcation_history.corporation,
+		t_company_authcation_history.reg_fund,
+		t_company_authcation_history.currency_id,
+		t_company_authcation_history.establish_dt,
+		t_company_authcation_history.created_dt
+	from
+		t_company_authcation_history
+		<where>
+			1=1
+			<if test="auth_history_id!=null">
+				and t_company_authcation_history.auth_history_id=#{auth_history_id}
+			</if>
+		</where>
+</select>
+<insert id="addCompanyAuthcationHistory" parameterType="manager.supplier.model.CompanyAuthcationHistory" >
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="auth_history_id" >
+		SELECT LAST_INSERT_ID()
+	</selectKey>
+	insert into t_company_authcation_history
+	(
+		company_id,
+		class_id,
+		nature_id,
+		key_remark,
+		cpyname_cn,
+		industry_id,
+		corporation,
+		reg_fund,
+		currency_id,
+		establish_dt,
+		created_dt
+	)
+	values
+	(
+		#{company_id},
+		#{class_id},
+		#{nature_id},
+		#{key_remark},
+		#{cpyname_cn},
+		#{industry_id},
+		#{corporation},
+		#{reg_fund},
+		#{currency_id},
+		#{establish_dt},
+		#{created_dt}
+	)
+</insert>
+<update id="updateCompanyAuthcationHistory" parameterType="manager.supplier.model.CompanyAuthcationHistory">
+	update t_company_authcation_history
+		set
+			auth_history_id = #{auth_history_id},
+			company_id = #{company_id},
+			class_id = #{class_id},
+			nature_id = #{nature_id},
+			key_remark = #{key_remark},
+			cpyname_cn = #{cpyname_cn},
+			
+			industry_id = #{industry_id},
+			
+			corporation = #{corporation},
+			reg_fund = #{reg_fund},
+			currency_id = #{currency_id},
+			establish_dt = #{establish_dt},
+			created_dt = #{created_dt}
+			
+		where auth_history_id = #{auth_history_id}
+</update>
+<delete id="deleteCompanyAuthcationHistory" parameterType="manager.supplier.model.CompanyAuthcationHistory">
+	delete from t_company_authcation_history
+	where auth_history_id = #{auth_history_id}
+</delete>
+</mapper>

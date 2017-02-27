@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.contract.data.PfOrderAgreementFileMapper">
+
+
+<select id="getPfOrderAgreementFileList" parameterType="map" resultType="platform.contract.model.PfOrderAgreementFile">
+	select
+		t_order_agreement_file.agreement_id,
+		t_order_agreement_file.pur_order_id,
+		t_order_agreement_file.agreement_bh,
+		t_order_agreement_file.agreement_status,
+		t_order_agreement_file.agreement_name,
+		t_order_agreement_file.mogodb_id,
+		t_order_agreement_file.create_dt,
+		t_order_agreement_file.creator_id,
+		t_order_agreement_file.creator_name,
+		t_order_agreement_file.source_type,
+		t_order_agreement_file.suffix_name
+	from
+		t_order_agreement_file
+	<where>
+	         t_order_agreement_file.agreement_status = 1 
+	          and  t_order_agreement_file.pur_order_id = #{pur_order_id}
+	</where>	
+</select>
+<insert id="addPfOrderAgreementFile" parameterType="platform.contract.model.PfOrderAgreementFile" keyProperty="" useGeneratedKeys="true">
+	insert into t_order_agreement_file
+	(
+		agreement_id,
+		pur_order_id,
+		agreement_bh,
+		agreement_status,
+		agreement_name,
+		mogodb_id,
+		create_dt,
+		creator_id,
+		creator_name,
+		source_type,
+		suffix_name
+	)
+	values
+	(
+		#{agreement_id},
+		#{pur_order_id},
+		#{agreement_bh},
+		#{agreement_status},
+		#{agreement_name},
+		#{mogodb_id},
+		#{create_dt},
+		#{creator_id},
+		#{creator_name},
+		#{source_type},
+		#{suffix_name}
+	)
+</insert>
+<update id="updatePfOrderAgreementFile" parameterType="platform.contract.model.PfOrderAgreementFile">
+	update t_order_agreement_file
+		set
+			agreement_id = #{agreement_id},
+			pur_order_id = #{pur_order_id},
+			agreement_bh = #{agreement_bh},
+			agreement_status = #{agreement_status},
+			agreement_name = #{agreement_name},
+			mogodb_id = #{mogodb_id},
+			create_dt = #{create_dt},
+			creator_id = #{creator_id},
+			creator_name = #{creator_name},
+			source_type = #{source_type},
+			suffix_name = #{suffix_name}
+		where  = #{}
+</update>
+<delete id="deletePfOrderAgreementFile" parameterType="platform.contract.model.PfOrderAgreementFile">
+	delete from t_order_agreement_file
+	where  = #{}
+</delete>
+</mapper>

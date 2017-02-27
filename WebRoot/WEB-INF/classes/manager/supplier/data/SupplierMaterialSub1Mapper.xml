@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.SupplierMaterialSub1Mapper">
+
+
+<select id="getSupplierMaterialSub1List" parameterType="map" resultType="manager.supplier.model.SupplierMaterialSub1">
+	select
+		t_app_supplier_material_sub1.id,
+		t_app_supplier_material_sub1.mc_id,
+		t_app_supplier_material_sub1.create_dt,
+		t_app_supplier_material_sub1.company_id
+	from
+		t_app_supplier_material_sub1
+		where 1=1
+	<if test="company_id!=null">
+		and t_app_supplier_material_sub1.company_id=#{company_id}
+	</if>
+</select>
+<insert id="addSupplierMaterialSub1" parameterType="manager.supplier.model.SupplierMaterialSub1" keyProperty="id" useGeneratedKeys="true">
+	insert into t_app_supplier_material_sub1
+	(
+		mc_id,
+		create_dt,
+		company_id
+	)
+	values
+	(
+		#{mc_id},
+		#{create_dt},
+		#{company_id}
+	)
+</insert>
+<update id="updateSupplierMaterialSub1" parameterType="manager.supplier.model.SupplierMaterialSub1">
+	update t_app_supplier_material_sub1
+		set
+			id = #{id},
+			mc_id = #{mc_id},
+			create_dt = #{create_dt},
+			company_id = #{company_id}
+		where id = #{id}
+</update>
+<delete id="deleteSupplierMaterialSub1" parameterType="manager.supplier.model.SupplierMaterialSub1">
+	delete from t_app_supplier_material_sub1
+	where id = #{id}
+</delete>
+</mapper>

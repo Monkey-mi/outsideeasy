@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>左侧菜单</title>
+<!-- <link href="/newresources/css/helpCenterLeftMenu.css" rel="stylesheet" type="text/css" />
+<link href="/newresources/css/common.css" rel="stylesheet" type="text/css" /> -->
+ <script id="evaluationtmpl" type="text/x-dot-template">
+{{ for(var prop in it) { }}
+	<p class="title">{{= replaceNullAsStr(it[prop].module_name)}}</p>
+	<ul>
+		{{ for(var pro in it[prop].list) { }}
+			<li><a onclick="goHelpContent('announcement/helpCenterContent.htm',{{= replaceNullAsStr(it[prop].list[pro].web_id)}})">{{= replaceNullAsStr(it[prop].list[pro].web_title)}}</a></li>
+		{{ } }}
+	</ul>
+{{ } }}
+</script>
+<script type="text/javascript">
+$(function(){
+getWebContentList(2)
+//var data=getWebContentList(2);
+//var evalText=doT.template($("#evaluationtmpl").text());
+//$("#helpCenter").html(evalText(data));
+});
+/**
+ * 获取网页列表
+* getWebContentList
+* @param content_type
+* @return void
+* @author yukai
+* 2016-11-17
+ */
+function getWebContentList(content_type){
+	//var data;
+	var url="announcement/getHelpContentList.do";
+	var params={};
+	params.content_type=content_type;
+
+	var fn=function(result){
+		//data=result.data;
+		var evalText=doT.template($("#evaluationtmpl").text());
+		$("#helpCenter").html(evalText(result.data));
+		switch(web_id){
+				case 12:
+					$("#leftMenuPage").children().eq(1).children().eq(1).children().eq(0).find("a").prepend(">>");
+					$("#leftMenuPage").children().eq(1).children().eq(1).children().eq(0).addClass("currVip");
+					break;
+				case 13:
+					$("#leftMenuPage").children().eq(1).children().eq(1).children().eq(1).find("a").prepend(">>");
+					$("#leftMenuPage").children().eq(1).children().eq(1).children().eq(1).addClass("currVip");
+					break;
+				case 14:
+					$("#leftMenuPage").children().eq(1).children().eq(1).children().eq(2).find("a").prepend(">>");
+					$("#leftMenuPage").children().eq(1).children().eq(1).children().eq(2).addClass("currVip");
+					break;
+				case 15:
+					$("#leftMenuPage").children().eq(1).children().eq(3).children().eq(0).find("a").prepend(">>");
+					$("#leftMenuPage").children().eq(1).children().eq(3).children().eq(0).addClass("currVip");
+					break;
+				case 16:
+					$("#leftMenuPage").children().eq(1).children().eq(3).children().eq(1).find("a").prepend(">>");
+					$("#leftMenuPage").children().eq(1).children().eq(3).children().eq(1).addClass("currVip");
+					break;
+				case 17:
+					$("#leftMenuPage").children().eq(1).children().eq(3).children().eq(2).find("a").prepend(">>");
+					$("#leftMenuPage").children().eq(1).children().eq(3).children().eq(2).addClass("currVip");
+					break;
+				case 18:
+					$("#leftMenuPage").children().eq(1).children().eq(3).children().eq(3).find("a").prepend(">>");
+					$("#leftMenuPage").children().eq(1).children().eq(3).children().eq(3).addClass("currVip");
+					break;
+		}
+	};
+	asyncAjaxMethod(url,params,true,fn);
+	//return data;
+}
+/**
+ * 跳转网页详细页面
+* goHelpContent
+* @param url,web_id
+* @return void
+* @author yukai
+* 2016-11-17
+ */
+ function goHelpContent(url,web_id){
+ 	var param ={"webId":web_id};
+	addParamsToWindowName(param);
+	window.location.href=getwebroot()+url;
+ }
+</script>
+</head>
+<body>
+<div id="leftMenuPage" class="viphelpCenterleftMenu">
+	<div class="vip_help_center_left_block_title">
+	<img src="/vip/resources/images/title help.png">
+	</div>
+	<div id="helpCenter"></div>
+	<!-- <p class="title">新手上路</p>
+	<ul>
+		<li><a href="/helpCenter/newUser/registerAndLogin.html">注册登录</a></li>
+		<li><a href="/helpCenter/newUser/certificationHelp.html">入驻认证</a></li>
+		<li><a href="/helpCenter/newUser/updateCertificationHelp.html">入驻变更</a></li>
+	</ul>
+	<p class="title">注册信息维护</p>
+	<ul>
+		<li><a href="/helpCenter/infoMaintain/modifyEmail.html">修改邮箱</a></li>
+		<li><a href="/helpCenter/infoMaintain/modifyPassword.html">修改密码</a></li>
+		<li><a href="/helpCenter/infoMaintain/mobileBunding.html">手机绑定</a></li>
+		<li><a href="/helpCenter/infoMaintain/companyInfo.html">企业信息</a></li>
+	</ul> -->
+	
+</div>
+</body>
+</html>

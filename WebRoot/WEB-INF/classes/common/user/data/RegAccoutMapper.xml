@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.user.data.RegAccoutMapper">
+
+<select id="getRegAccoutList" parameterType="map" resultType="common.user.model.RegAccout">
+	select
+		t_app_reg_accout.reg_id,
+		t_app_reg_accout.company_id,
+		t_app_company_info.cpyname_cn,
+		t_app_reg_accout.role_id,
+		t_app_reg_accout.acc_name,
+		t_app_reg_accout.password,
+		t_app_reg_accout.reg_email,
+		t_app_reg_accout.email_valid,
+		t_app_reg_accout.reg_phone,
+		t_app_reg_accout.reg_date,
+		t_app_reg_accout.enabled,
+		t_app_reg_accout.last_login_ip
+	from
+		t_app_reg_accout
+	left join t_app_company_info on t_app_company_info.company_id = t_app_reg_accout.company_id
+	where 1=1
+	<if test="reg_id!=null  and reg_id!=''">
+		and t_app_reg_accout.reg_id=#{reg_id}
+	</if>
+	<if test="acc_name!=null  and acc_name!=''">
+		and t_app_reg_accout.acc_name=#{acc_name}
+	</if>
+	<if test="reg_email!=null and reg_email!=''">
+		and t_app_reg_accout.reg_email=#{reg_email}
+	</if>
+	<if test="email_valid!=null and email_valid!=''">
+		and t_app_reg_accout.email_valid=#{email_valid}
+	</if>
+	<if test="password!=null  and password!=''">
+		and t_app_reg_accout.password=#{password}
+	</if>
+	<if test="accname_or_email!=null and accname_or_email!=''">
+		and (t_app_reg_accout.acc_name=#{accname_or_email} or t_app_reg_accout.reg_email=#{accname_or_email})
+	</if>
+	<if test="reg_id!=null and reg_id!=''">
+		and t_app_reg_accout.reg_id=#{reg_id} 
+	</if>
+	<if test="phoneNum!=null and phoneNum!=''">
+		and t_app_reg_accout.reg_phone=#{phoneNum} 
+	</if>
+</select>
+
+<insert id="addRegAccout" parameterType="common.user.model.RegAccout" keyProperty="reg_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="reg_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_reg_accout
+	(
+		company_id,
+		role_id,
+		acc_name,
+		password,
+		reg_email,
+		email_valid,
+		reg_phone,
+		reg_date,
+		enabled,
+		update_date,
+		last_login_ip
+	)
+	values
+	(
+		#{company_id},
+		#{role_id},
+		#{acc_name},
+		#{password},
+		#{reg_email},
+		#{email_valid},
+		#{reg_phone},
+		#{reg_date},
+		#{enabled},
+		#{update_date},
+		#{last_login_ip}
+	)
+</insert>
+
+<update id="updateRegAccout" parameterType="common.user.model.LoginAccount">
+	update t_app_reg_accout
+		 <trim prefix="SET" suffixOverrides=","> 
+		 	<if test="reg_id != '' and reg_id != null">
+		 	reg_id = #{reg_id},
+		 	</if>
+		 	<if test="company_id != '' and company_id != null">
+		 	company_id = #{company_id},
+		 	</if>
+		 	<if test="role_id != '' and role_id != null">
+		 	role_id = #{role_id},
+		 	</if>
+		 	<if test="acc_name != '' and acc_name != null">
+		 	acc_name = #{acc_name},
+		 	</if>
+		 	<if test="password != '' and password != null">
+		 	password = #{password},
+		 	</if>
+		 	<if test="reg_email != '' and reg_email != null">
+		 	reg_email = #{reg_email},
+		 	</if>
+		 	<if test="reg_phone != '' and reg_phone != null">
+		 	reg_phone = #{reg_phone},
+		 	</if>
+		 	<if test="reg_date != '' and reg_date != null">
+		 	reg_date = #{reg_date},
+		 	</if>
+		 	<if test="enabled != '' and enabled != null">
+		 	enabled = #{enabled},
+		 	</if>
+		 	<if test="last_login_ip != '' and last_login_ip != null">
+		 	last_login_ip = #{last_login_ip}
+		 	</if>
+		</trim> 
+		where reg_id = #{reg_id}
+</update>
+
+<!-- 通过ID修改电话号 -->
+<update id="updateRegAccoutById" parameterType="common.user.model.LoginAccount">
+	update 
+		t_app_reg_accout
+	set
+		reg_phone = #{account_phone}
+	where
+		reg_id = #{login_id}
+</update>
+
+<update id="updateRegAccoutEamilValid" parameterType="map">
+	update t_app_reg_accout
+		set
+			reg_email = #{reg_email},
+			email_valid = #{email_valid}
+		where 
+			reg_id = #{reg_id}
+</update>
+
+<delete id="deleteRegAccout" parameterType="common.user.model.RegAccout">
+	delete from t_app_reg_accout
+	where reg_id = #{reg_id}
+</delete>
+
+<select id="getUserEmailCount" parameterType="map" resultType="Integer">
+	select 
+		count(0) from t_app_reg_accout 
+	where
+		reg_email = #{email}
+</select>
+
+<select id="getUserNameCount" parameterType="map" resultType="Integer">
+	select 
+		count(0) from t_app_reg_accout 
+	where
+		acc_name = #{userName}
+</select>
+
+<update id="updateRegAccoutPsw" parameterType="common.user.model.RegAccout">
+	update 
+		t_app_reg_accout
+	set
+		password = #{password}
+	where
+		acc_name = #{acc_name}
+</update>
+
+<update id="updateRegAccoutEmail" parameterType="common.user.model.RegAccout">
+	update 
+		t_app_reg_accout
+	set
+		reg_email = #{reg_email} , 
+		update_date = #{update_date}
+	where
+		acc_name = #{acc_name}
+</update>
+
+<!-- 将公司表换为t_app_company_info -->
+<insert id="addCompany" parameterType="common.user.model.TempCompany" >
+ 	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="company_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey> 
+	insert into t_app_company_info
+	(
+		cpyname_cn,
+		is_main,
+		create_dt
+	)
+	values
+	(
+		#{company_name},
+		#{is_main},
+		#{create_dt}
+	)
+</insert>
+
+ <select id="getUserCompanyNameCount" parameterType="map" resultType="Integer">
+	select 
+		count(*) 
+	from 
+		t_app_company_info
+	where
+		cpyname_cn = #{companyName}
+</select>
+
+<insert id="addSalt" parameterType="common.user.model.RegSalt" >
+	insert into t_app_reg_rel_salt
+	(
+		acc_name,
+		salt
+	)
+	values
+	(
+		#{acc_name},
+		#{salt}
+	)
+</insert>
+
+<select id="getRegSaltList" parameterType="map" resultType="common.user.model.RegSalt">
+	select
+		t_app_reg_rel_salt.acc_name,
+		t_app_reg_rel_salt.salt
+	from
+		t_app_reg_rel_salt
+	where 1=1
+	<if test="accname!=null and accname!=''">
+		and t_app_reg_rel_salt.acc_name=#{accname} 
+	</if>
+</select>
+
+<update id="updateRegSalt" parameterType="common.user.model.RegSalt">
+	update 
+		t_app_reg_rel_salt
+	set
+		salt = #{salt}
+	where
+		acc_name = #{acc_name}
+</update>
+
+<delete id="deleteRegSalt" parameterType="String">
+	delete from t_app_reg_rel_salt
+	where acc_name = #{acc_name}
+</delete>
+
+<!-- 更新账户最新登录的IP -->
+<update id="updateLastIpAddress" parameterType="map">
+	update 
+		t_app_reg_accout
+	set
+		last_login_ip = #{lastLoginIp},
+		update_date = #{updateDt}
+	where
+		acc_name = #{accName}
+</update>
+</mapper>

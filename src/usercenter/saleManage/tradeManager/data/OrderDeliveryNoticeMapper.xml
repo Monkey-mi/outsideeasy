@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.tradeManager.data.OrderDeliveryNoticeMapper">
+
+<select id="getOrderDeliveryNoticeList" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderDeliveryNotice">
+	select
+	    distinct
+		t_order_delivery_notice.delivery_notice_id,
+		t_order_delivery_notice.delivery_notice_bh,
+		t_order_delivery_notice.notice_dt,
+		t_order_delivery_notice.notice_status,
+		t_order_delivery_notice.source_type,
+		t_order_delivery_notice.creator_id,
+		t_order_delivery_notice.creator_name
+	from
+		t_order_delivery_notice
+		left join t_order_delivery_noticedetails on t_order_delivery_notice.delivery_notice_id = t_order_delivery_noticedetails.delivery_notice_id
+	where  t_order_delivery_noticedetails.pur_order_id = #{pur_order_id}
+</select>
+<select id="getOrderDeliveryNoticeListForAccept" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderDeliveryNotice">
+	select
+	    distinct
+		t_order_delivery_notice.delivery_notice_id,
+		t_order_delivery_notice.delivery_notice_bh,
+		t_order_delivery_notice.notice_dt,
+		t_order_delivery_notice.notice_status,
+		t_order_delivery_notice.source_type,
+		t_order_delivery_notice.creator_id,
+		t_order_delivery_notice.creator_name
+	from
+		t_order_delivery_notice
+		left join t_order_delivery_noticedetails on t_order_delivery_notice.delivery_notice_id = t_order_delivery_noticedetails.delivery_notice_id
+	where  t_order_delivery_noticedetails.pur_order_id = #{pur_order_id}
+	       order by t_order_delivery_notice.notice_dt desc limit 1
+</select>
+
+<!-- 送货通知 -->
+<select id="getOrderDeliveryNoticeListInfo" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderDeliveryNotice">
+	select
+		t_order_delivery_notice.delivery_notice_id,
+		t_order_delivery_notice.delivery_notice_bh,
+		t_order_delivery_notice.notice_dt,
+		t_order_delivery_notice.notice_status,
+		t_order_delivery_notice.source_type,
+		t_order_delivery_notice.creator_id,
+		t_order_delivery_notice.creator_name,
+		t_order_delivery_notice.pur_company_id,
+		t_order_delivery_notice.sup_company_id,
+		t_order_delivery_notice.supplier_id,
+		t_app_company_info.cpyname_cn,
+		t_order_delivery_notice.update_dt
+	from
+		t_order_delivery_notice,
+		t_app_company_info
+		<if test="searchKey != null and searchKey != ''">
+		,(SELECT
+			delivery_notice_id,htbh
+			FROM
+			t_order_delivery_noticedetails
+			GROUP BY
+			delivery_notice_id,
+			htbh) as todn
+		</if>
+	where 1 = 1
+		<if test="supCompanyId != null and supCompanyId != ''">
+			and t_order_delivery_notice.sup_company_id = #{supCompanyId}
+			and t_app_company_info.company_id = t_order_delivery_notice.pur_company_id
+		</if>
+		<if test="purCompanyId != null and purCompanyId != ''">
+			and t_order_delivery_notice.pur_company_id = #{purCompanyId}
+			and t_app_company_info.company_id = t_order_delivery_notice.sup_company_id
+		</if>
+		<if test="noticeStatus != '' and noticeStatus != null">
+			and t_order_delivery_notice.notice_status = #{noticeStatus}<!-- 根据状态查询不同的数据  -->
+		</if>
+		<if test="deliveryNoticeId != null and deliveryNoticeId != ''">
+			and t_order_delivery_notice.delivery_notice_id = #{deliveryNoticeId}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			<![CDATA[and DATE_FORMAT(t_order_delivery_notice.notice_dt,'%Y-%m-%d') >= #{startTime}]]>
+		</if>
+		<if test="endTime != null and endTime != ''">
+			<![CDATA[and DATE_FORMAT(t_order_delivery_notice.notice_dt,'%Y-%m-%d') <= #{endTime}]]>
+		</if>
+		<if test="searchKey != null and searchKey != ''">
+			and
+			t_order_delivery_notice.delivery_notice_id = todn.delivery_notice_id
+			and
+			 (
+					t_app_company_info.cpyname_cn like CONCAT('%',#{searchKey},'%') 
+					or 
+					t_order_delivery_notice.delivery_notice_bh like CONCAT('%',#{searchKey},'%')
+					or
+					CAST(todn.htbh AS char(10)) like CONCAT('%',#{searchKey},'%')
+				)
+		</if>
+		order by notice_dt desc	
+		<if test="limit != null and limit != 0">
+			limit #{start},#{limit}
+		</if>
+</select>
+
+<!-- 送货通知总数 -->
+<select id="getOrderDeliveryNoticeListInfoCount" parameterType="map" resultType="Integer">
+	select
+		count(*)
+	from
+		t_order_delivery_notice,
+		t_app_company_info
+		<if test="searchKey != null and searchKey != ''">
+		,(SELECT
+			delivery_notice_id,htbh
+			FROM
+			t_order_delivery_noticedetails
+			GROUP BY
+			delivery_notice_id,
+			htbh) as todn
+		</if>
+	where 1 = 1
+		<if test="supCompanyId != null and supCompanyId != ''">
+			and t_order_delivery_notice.sup_company_id = #{supCompanyId}
+			and t_app_company_info.company_id = t_order_delivery_notice.pur_company_id
+		</if>
+		<if test="purCompanyId != null and purCompanyId != ''">
+			and t_order_delivery_notice.pur_company_id = #{purCompanyId}
+			and t_app_company_info.company_id = t_order_delivery_notice.sup_company_id
+		</if>
+		<if test="noticeStatus != null">
+			and t_order_delivery_notice.notice_status = #{noticeStatus}<!-- 根据状态查询不同的数据  -->
+		</if>
+		<if test="startTime != null and startTime != ''">
+			<![CDATA[and DATE_FORMAT(t_order_delivery_notice.notice_dt,'%Y-%m-%d') >= #{startTime}]]>
+		</if>
+		<if test="endTime != null and endTime != ''">
+			<![CDATA[and DATE_FORMAT(t_order_delivery_notice.notice_dt,'%Y-%m-%d') <= #{endTime}]]>
+		</if>
+		<if test="searchKey != null and searchKey != ''">
+			and
+			t_order_delivery_notice.delivery_notice_id = todn.delivery_notice_id
+			and
+			 (
+					t_app_company_info.cpyname_cn like CONCAT('%',#{searchKey},'%') 
+					or 
+					t_order_delivery_notice.delivery_notice_bh like CONCAT('%',#{searchKey},'%')
+					or
+					CAST(todn.htbh AS char(10)) like CONCAT('%',#{searchKey},'%')
+				)
+		</if>
+</select>
+
+<select id="getOrderDeliveryNoticeListCount" parameterType="map" resultType="Integer">
+select
+	    COUNT(DISTINCT t_order_delivery_notice.delivery_notice_id)	
+	from
+		t_order_delivery_notice
+		left join t_order_delivery_noticedetails on t_order_delivery_notice.delivery_notice_id = t_order_delivery_noticedetails.delivery_notice_id
+	where  t_order_delivery_noticedetails.pur_order_id = #{pur_order_id}
+</select>
+
+<insert id="addOrderDeliveryNotice" parameterType="usercenter.saleManage.tradeManager.model.OrderDeliveryNotice" keyProperty="delivery_notice_id" useGeneratedKeys="true">
+	insert into t_order_delivery_notice
+	(
+		delivery_notice_id,
+		delivery_notice_bh,
+		notice_dt,
+		notice_status,
+		source_type,
+		creator_id,
+		creator_name
+	)
+	values
+	(
+		#{delivery_notice_id},
+		#{delivery_notice_bh},
+		#{notice_dt},
+		#{notice_status},
+		#{source_type},
+		#{creator_id},
+		#{creator_name}
+	)
+</insert>
+<update id="updateOrderDeliveryNotice" parameterType="usercenter.saleManage.tradeManager.model.OrderDeliveryNotice">
+	update t_order_delivery_notice
+		set
+			delivery_notice_id = #{delivery_notice_id},
+			delivery_notice_bh = #{delivery_notice_bh},
+			notice_dt = #{notice_dt},
+			notice_status = #{notice_status},
+			source_type = #{source_type},
+			creator_id = #{creator_id},
+			creator_name = #{creator_name}
+		where delivery_notice_id = #{delivery_notice_id}
+</update>
+<delete id="deleteOrderDeliveryNotice" parameterType="usercenter.saleManage.tradeManager.model.OrderDeliveryNotice">
+	delete from t_order_delivery_notice
+	where delivery_notice_id = #{delivery_notice_id}
+</delete>
+
+<!--  更新送货通知状态 -->
+<update id="updateDeliveryStatue" parameterType="map">
+	update
+		t_order_delivery_notice
+	set
+		notice_status = #{noticeStatus},
+		update_dt = now()
+	where
+		delivery_notice_id = #{noticeId}		
+</update>
+
+<select id="getLastThreeOrderDeliveryNotice" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderDeliveryNotice">
+	select
+		t_order_delivery_notice.delivery_notice_id,
+		t_order_delivery_notice.delivery_notice_bh,
+		t_order_delivery_notice.notice_dt,
+		t_order_delivery_notice.notice_status,
+		t_order_delivery_notice.source_type,
+		t_order_delivery_notice.creator_id,
+		t_order_delivery_notice.creator_name,
+		t_order_delivery_notice.pur_company_id,
+		t_order_delivery_notice.sup_company_id,
+		t_order_delivery_notice.supplier_id,
+		a.cpyname_cn,
+		b.cpyname_cn as sup_cpyname_cn
+	from
+		t_order_delivery_notice
+		left join t_app_company_info a on t_order_delivery_notice.pur_company_id = a.company_id
+		left join t_app_company_info b on t_order_delivery_notice.sup_company_id = b.company_id
+	where 1=1  
+	<if test="sup_company_id!=null and sup_company_id!=''">
+	and t_order_delivery_notice.sup_company_id = #{sup_company_id}
+	</if>
+	<if test="pur_company_id!=null and pur_company_id!=''">
+	and t_order_delivery_notice.pur_company_id = #{pur_company_id}
+	</if>
+	and t_order_delivery_notice.notice_status=2	
+	order by notice_dt desc limit 3
+</select>
+<select id="getToBeConfirmedDeliveryNoticeCount" parameterType="map" resultType="java.lang.Integer">
+	select
+		count(0)
+	from
+		t_order_delivery_notice
+	where  1=1
+	 <if test="sup_company_id!=null and sup_company_id!=''">
+	and t_order_delivery_notice.sup_company_id = #{sup_company_id}
+	</if>
+	<if test="pur_company_id!=null and pur_company_id!=''">
+	and t_order_delivery_notice.pur_company_id = #{pur_company_id}
+	</if>
+	and t_order_delivery_notice.notice_status = 0
+</select>
+
+<!-- 更新送货通知表确认时间 -->
+<update id="updateNullConfirmDate" parameterType="map">
+	UPDATE
+	t_order_delivery_noticedetails
+	SET
+	confirm_delivery_time = notice_delivery_time
+	WHERE
+	confirm_delivery_time is null
+	and
+	delivery_notice_id = #{noticeId}
+</update>
+
+<select id="getDeliveryStatu" parameterType="map" resultType="java.lang.Integer">
+	select 
+	notice_status
+	from
+	t_order_delivery_notice
+	where
+	delivery_notice_id = #{noticeId}
+</select>
+<!-- 查询更新信息 -->
+<select id="getDeliveryUdt" parameterType="map" resultType="map">
+select
+*
+from
+t_order_delivery_notice
+where
+delivery_notice_id = #{noticeId}
+</select>
+</mapper>

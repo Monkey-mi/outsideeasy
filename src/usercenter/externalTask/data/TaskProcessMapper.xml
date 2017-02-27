@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.TaskProcessMapper">
+
+
+<select id="getTaskProcessList" parameterType="Integer" resultType="usercenter.externalTask.model.TaskProcess">
+	select
+		t_app_task_process.tp_id,
+		t_app_task_process.t_id,
+		t_app_task_process.process_name,
+		t_app_task_process.order_no,
+		t_app_task_process.stand_time,
+	    t_app_task_process.sec_id,
+	    t_app_task_process.patter,
+	    t_app_task_process.mjbz
+	from
+		t_app_task_process
+		where 
+		t_id = #{t_id}
+</select>
+<insert id="addTaskProcess" parameterType="usercenter.externalTask.model.TaskProcess">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="tp_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task_process
+	(		
+		t_id,
+		process_name,
+		order_no,
+		stand_time,
+		patter,
+		sec_id,
+		mjbz
+	)
+	values
+	(		
+		#{t_id},
+		#{process_name},
+		#{order_no},
+		#{stand_time},
+		#{patter},
+		#{sec_id},
+		#{mjbz}
+		
+	)
+</insert>
+<update id="updateTaskProcess" parameterType="usercenter.externalTask.model.TaskProcess">
+	update t_app_task_process
+		set			
+			t_id = #{t_id},
+			process_name = #{process_name},
+			order_no = #{order_no},
+			stand_time = #{stand_time},
+			patter = #{patter},
+			sec_id = #{sec_id},
+			mjbz = #{mjbz}
+		where tp_id = #{tp_id}
+</update>
+<delete id="deleteTaskProcess" parameterType="usercenter.externalTask.model.TaskProcess">
+	delete from t_app_task_process
+	where tp_id = #{tp_id}
+</delete>
+</mapper>

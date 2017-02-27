@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.user.data.RoleAccountRefMapper">
+
+
+<select id="getRoleAccountRefList" parameterType="map" resultType="common.user.model.RoleAccountRef">
+	select
+		t_sys_role_account_ref.ID,
+		t_sys_role_account_ref.account_id,
+		t_sys_role_account_ref.role_id,
+		t_sys_role_account_ref.account_type,
+		t_sys_role_account_ref.create_dt
+	from
+		t_sys_role_account_ref
+		left join t_sys_role on t_sys_role.role_id=t_sys_role_account_ref.role_id
+		where 1=1
+		<if test="is_enable!=null">
+		and t_sys_role.is_enable=#{is_enable}
+		</if>
+		<if test="account_id!=null">
+		and t_sys_role_account_ref.account_id=#{account_id}
+		</if>
+		<if test="role_id!=null">
+		and t_sys_role_account_ref.role_id=#{role_id}
+		</if>
+		<if test="account_type!=null">
+		and t_sys_role_account_ref.account_type=#{account_type}
+		</if>
+</select>
+<select id="getRoleAccountRefCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+	select
+		count(*) 
+	from
+		t_sys_role_account_ref
+		where 1=1
+	<if test="account_id!=null">
+		and t_sys_role_account_ref.account_id=#{account_id}
+		</if>
+		<if test="role_id!=null">
+		and t_sys_role_account_ref.role_id=#{role_id}
+		</if>
+		<if test="account_type!=null">
+		and t_sys_role_account_ref.account_type=#{account_type}
+		</if>
+</select>
+<insert id="addRoleAccountRef" parameterType="common.user.model.RoleAccountRef" keyProperty="ID" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="ID" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_sys_role_account_ref
+	(
+		account_id,
+		role_id,
+		account_type,
+		create_dt
+	)
+	values
+	(
+		#{account_id},
+		#{role_id},
+		#{account_type},
+		#{create_dt}
+	)
+</insert>
+<update id="updateRoleAccountRef" parameterType="common.user.model.RoleAccountRef">
+	update t_sys_role_account_ref
+		set
+			account_id = #{account_id},
+			role_id = #{role_id},
+			account_type = #{account_type},
+			create_dt = #{create_dt}
+		where ID = #{ID}
+</update>
+<delete id="deleteRoleAccountRef" parameterType="common.user.model.RoleAccountRef">
+	delete from t_sys_role_account_ref
+	where ID = #{ID}
+</delete>
+<delete id="customDeleteRoleAccountRef" parameterType="map">
+	delete from t_sys_role_account_ref
+	where account_id = #{account_id} and role_id = #{role_id} and account_type = #{account_type}
+</delete>
+</mapper>

@@ -1,0 +1,22 @@
+/* CSS Document */
+html,body{width: 100%;height: 100%;}
+/*==表单元素在手机中点击时防止出现边框==*/
+* {-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}
+* {margin: 0;padding: 0;}
+body {color:#333; font-size:12px; line-height:150%; font-family:"Microsoft YaHei", tahoma, arial, Hiragino Sans GB, \5b8b\4f53; min-width:1024px; }
+a {text-decoration: none; color:#333; cursor:pointer;}
+a:hover{ text-decoration:underline; }
+.bg_grey{ background-color:#f6f6f6;}
+.error_midd_wrap{ position:relative; width:500px; height:300px; top:180px; left:50%; margin-left:-250px; }
+
+.error_midd_wrap p{color:#777777;}
+.error_midd_wrap .p1{ height:56px; line-height:56px;}
+.error_midd_wrap .p1 img{float:left;}
+.error_midd_wrap .p1 .span1{ float:left; height:100%; font-size:46px; font-family:Arial, Helvetica, sans-serif; font-weight:bold; font-style:italic; margin-left:15px;}
+.error_midd_wrap .p2{font-size:24px; height:50px; line-height:50px;}
+.error_midd_wrap .p3{ font-size:60px; height:80px; line-height:80px;}
+.error_midd_wrap .p4{ height:36px; line-height:36px; color:#333; margin-top:15px;}
+.error_midd_wrap .p4 button{ float:left; background-color:#fff; width:100px; height:34px; border:1px solid #e8e8e8; color:#333; cursor:pointer; margin-right:10px;}
+.error_midd_wrap .p4 .span4{ float:left; color:#333;}
+
+.count_span{ color:#f1af27; margin:0px 8px; font-weight:bold;}

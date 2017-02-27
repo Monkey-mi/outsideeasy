@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.mes.wxdata.data.MesTaskMapper">
+
+<select id="getMesTaskListByT_id" parameterType="map" resultType="platform.mes.wxdata.model.PfTask">
+	select
+		t_app_task.t_id,
+		t_app_task.rwdh,
+		t_app_task.product_name,
+		t_app_task.serial_no,
+		t_app_task.state,
+		t_app_task.send_company,
+		t_app_task.receive_company,
+		t_app_task.total_qty,
+		t_app_task.produced_qty,
+		t_app_task.confirmed_qty,
+		t_app_task.plan_start,
+		t_app_task.plan_complete,
+		t_app_task.qc_type,
+		t_app_task.scdh,
+		t_app_task.producers_company_name
+	from
+		t_app_task
+	where t_app_task.rwdh=#{rwdh} and send_company=#{send_company} and state!=30
+</select>
+<insert id="addPfTask" parameterType="platform.mes.wxdata.model.PfTask">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="t_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task
+	(
+		t_id,
+		rwdh,
+		product_name,
+		serial_no,
+		state,
+		send_company,
+		receive_company,
+		total_qty,
+		produced_qty,
+		confirmed_qty,
+		plan_start,
+		plan_complete,
+		qc_type,
+		czsj,
+		producers_company_name,
+		scdh
+	)
+	values
+	(
+		#{t_id},
+		#{rwdh},
+		#{product_name},
+		#{serial_no},
+		#{state},
+		#{send_company},
+		#{receive_company},
+		#{total_qty},
+		#{produced_qty},
+		#{confirmed_qty},
+		#{plan_start},
+		#{plan_complete},
+		#{qc_type},
+		#{czsj},
+		#{producers_company_name},
+		#{scdh}
+	)
+</insert>
+<select id="getCountOfPfTask" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_task
+	where send_company = #{send_company} and rwdh=#{rwdh} and state!=30
+</select>
+<select id="getPfTaskOutputByT_id" parameterType="java.lang.Integer" resultType="platform.mes.wxdata.model.PfTaskOutput">
+	select
+		t_app_task_output.record_id,
+		t_app_task_output.t_id,
+		t_app_task_output.scrq,
+		t_app_task_output.worker_no,
+		t_app_task_output.work_time,
+		t_app_task_output.yield_qty,
+		t_app_task_output.sec_id,
+		t_app_process_section.section_name,
+		t_app_process_section.mjbz
+	from
+		t_app_task_output
+	left join t_app_process_section on t_app_process_section.sec_id=t_app_task_output.sec_id
+	where t_app_task_output.t_id =#{t_id}
+</select>
+
+<insert id="addPfTaskProcess" parameterType="platform.mes.wxdata.model.PfTaskProcess" >
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="tp_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task_process
+	(
+		
+		sec_id,
+		t_id,
+		process_name,
+		order_no,
+		mjbz,
+		stand_time
+	)
+	values
+	(
+		
+		#{sec_id},
+		#{t_id},
+		#{process_name},
+		#{order_no},
+		#{mjbz},
+		#{stand_time}
+	)
+</insert>
+ 
+<insert id="addPfProcessSection" parameterType="platform.mes.wxdata.model.PfProcessSection">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="sec_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_process_section
+	(
+		
+		t_id,
+		section_name,
+		mjbz,
+		sx
+	)
+	values
+	(
+		
+		#{t_id},
+		#{section_name},
+		#{mjbz},
+		#{sx}
+	)
+</insert>
+<insert id="addPfTaskBom" parameterType="platform.mes.wxdata.model.PfTaskBom">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="tb_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task_bom
+	(
+		
+		t_id,
+		order_no,
+		material,
+		consumption,
+		unit,
+		total_consumption
+	)
+	values
+	(
+		
+		#{t_id},
+		#{order_no},
+		#{material},
+		#{consumption},
+		#{unit},
+		#{total_consumption}
+	)
+</insert>
+</mapper>

@@ -1,0 +1,9 @@
+Ext.define('srm.role.model.RoleConfig',{
+	extend:'Ext.data.Model',
+	idProperty:'id',
+	fields:[
+	        {name:'id',type:'int'},
+	        {name:'role_id',type:'int'},
+	        {name:'con_id',type:'int'}
+	        ]
+});

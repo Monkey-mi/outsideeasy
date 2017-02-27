@@ -1,0 +1,18 @@
+Ext.define('srm.user.model.UserRole',{
+    extend:'Ext.data.Model',
+    idProperty:'id',
+    identifier:'negative',
+    fields:[
+    {
+    	name:'id',type:'int'
+    },
+    {
+    	name:'u_id',type:'int'
+    },
+    {
+    	name:'role_id',type:'int'
+    },
+    {name:'name'},
+    {name:'login_id'}
+    ]
+});

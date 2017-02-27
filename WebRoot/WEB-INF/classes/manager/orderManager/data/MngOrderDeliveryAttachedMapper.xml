@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.orderManager.data.MngOrderDeliveryAttachedMapper">
+
+<select id="getMngOrderDeliveryAttachedList" parameterType="map" resultType="manager.orderManager.model.MngOrderDeliveryAttached">
+	select
+		     t_order_delivery_attached.id,
+		     t_order_delivery_attached.file_type_id,
+		     t_order_delivery_attached.register_id,
+		     t_order_delivery_attached.file_name,
+		     t_order_delivery_attached.mogodb_id,
+		     t_order_delivery_attached.suffix_name,
+		     t_order_delivery_attached.create_dt
+	from
+		t_order_delivery_attached
+	where 1=1
+	<if test="register_id!=null and register_id!=''">
+		and register_id =  #{register_id}
+	</if>
+	<if test="orderBySQL!=null and orderBySQL!=''">
+		order by  ${orderBySQL}
+	</if>
+</select>
+
+<insert id="addMngOrderDeliveryAttached" parameterType="manager.orderManager.model.MngOrderDeliveryAttached" keyProperty="id" useGeneratedKeys="true">
+	<selectKey keyProperty="id" resultType="Integer" order="BEFORE">
+		select  isnull(max(id)+1,1) from t_order_delivery_attached 		
+	</selectKey>
+	insert into t_order_delivery_attached
+	(
+		     id,
+		     file_type_id,
+		     register_id,
+		     file_name,
+		     mogodb_id,
+		     suffix_name,
+		     create_dt
+	)
+	values
+	(
+		     #{id},
+		     #{file_type_id},
+		     #{register_id},
+		     #{file_name},
+		     #{mogodb_id},
+		     #{suffix_name},
+		     #{create_dt}
+	)
+</insert>
+<update id="updateMngOrderDeliveryAttached" parameterType="manager.orderManager.model.MngOrderDeliveryAttached">
+	update t_order_delivery_attached
+		set
+		     id=#{id},
+		     file_type_id=#{file_type_id},
+		     register_id=#{register_id},
+		     file_name=#{file_name},
+		     mogodb_id=#{mogodb_id},
+		     suffix_name=#{suffix_name},
+		     create_dt=#{create_dt}
+		where id= #{id}
+</update>
+<delete id="deleteMngOrderDeliveryAttached" parameterType="manager.orderManager.model.MngOrderDeliveryAttached">
+	delete from t_order_delivery_attached
+	where id= #{id}
+</delete>
+</mapper>

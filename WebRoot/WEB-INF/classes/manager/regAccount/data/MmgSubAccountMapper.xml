@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.regAccount.data.MmgSubAccountMapper">
+
+<select id="getSubAccountList" parameterType="map" resultType="usercenter.subAccount.model.SubAccount">
+	select
+		t_app_sub_account.sa_id,
+		t_app_sub_account.reg_id,
+		t_app_sub_account.org_id,
+		t_app_sub_account.role_id,
+		t_app_sub_account.sa_name,
+		t_app_sub_account.phone,
+		t_app_sub_account.sa_password,
+		t_app_sub_account.enabled,
+		t_app_sub_account.create_date,
+		t_app_sub_account.username,
+		t_app_sub_account.emp_no
+	from
+		t_app_sub_account
+	where 1=1
+    <if test="reg_id!=null and reg_id!=''">
+       and t_app_sub_account.reg_id =#{reg_id}
+    </if>
+    <if test="org_id!=null and org_id!=''">
+       and t_app_sub_account.org_id =#{org_id}
+    </if>
+</select>
+
+<select id="getSubAccountBysa_id" parameterType="map" resultType="usercenter.subAccount.model.SubAccount">
+	select *
+	from
+		t_app_sub_account
+	where sa_id=#{sa_id}
+</select>
+<insert id="addSubAccount" parameterType="usercenter.subAccount.model.SubAccount">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="sa_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_sub_account
+	(
+		
+		reg_id,
+		org_id,
+		role_id,
+		sa_name,
+		phone,
+		sa_password,
+		enabled,
+		create_date,
+		username,
+		emp_no
+	)
+	values
+	(
+		
+		#{reg_id},
+		#{org_id},
+		#{role_id},
+		#{sa_name},
+		#{phone},
+		#{sa_password},
+		#{enabled},
+		#{create_date},
+		#{username},
+		#{emp_no}
+	)
+</insert>
+<update id="updateSubAccount" parameterType="usercenter.subAccount.model.SubAccount">
+	update t_app_sub_account
+		set
+			org_id = #{org_id},
+			role_id = #{role_id},
+			sa_name = #{sa_name},
+			phone = #{phone},
+			enabled = #{enabled},
+			username = #{username},
+			emp_no = #{emp_no}
+		where sa_id = #{sa_id}
+</update>
+<delete id="deleteSubAccountbg" parameterType="usercenter.subAccount.model.SubAccount">
+	delete from t_app_sub_account
+	where sa_id = #{sa_id}
+</delete>
+<delete id="deleteSubAccount" parameterType="map">
+	delete from t_app_sub_account
+	where sa_id = #{sa_id}
+</delete>
+<select id="findSubAccountByorg_id" parameterType="map" resultType="java.lang.Integer">
+	select count(*)
+	from t_app_sub_account
+	where org_id =#{org_id} 
+</select>
+<select id="getXiajiCount" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_sub_account where org_id =#{sa_id}
+</select>
+<select id="getCountForAdd" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_sub_account where reg_id = #{reg_id} and sa_name = #{sa_name}
+</select>
+<select id="getCountForUpdate" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_sub_account where reg_id = #{reg_id} and sa_name = #{sa_name} and sa_id != #{sa_id}
+</select>
+</mapper>

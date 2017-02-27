@@ -1,0 +1,55 @@
+@CHARSET "UTF-8";
+/* CSS Document */
+body{
+	font-size:12px;
+}
+.TreeGrid{
+	border-collapse: collapse; 
+	font-size: 12px;
+	width:100%;
+	border:0px;
+}
+
+.TreeGrid .header{
+	background-color: #f6f6f6;
+	color:#707070;
+	border:1px solid #e8e8e8;
+}
+.TreeGrid tr{ border-bottom:1px solid #e8e8e8;}
+.TreeGrid tr:hover{	background-color: #f6f6f6;}
+.TreeGrid th{ height:30px; line-height:30px; font-weight:normal;}
+.TreeGrid td{ height:30px;padding:0px 10px;
+}
+.TreeGrid td input{ height:30px; line-height:30px; border:1px solid #ccc; width:200px;}
+
+.TreeGrid img{ cursor:pointer;}
+.TreeGrid a{
+	color: #0072c4;
+}
+
+.TreeGrid a:hover{
+	color: #0072c4;
+}
+
+
+
+.TreeGrid .image_hand{
+	border: 0;
+	cursor:hand;
+	align:absmiddle;
+	margin-right:8px;
+	margin-left:4px;
+}
+
+.TreeGrid .image_nohand{
+	border: 0;
+	align:absmiddle;
+}
+
+.TreeGrid .row_hover{
+	background-color:#f6f6f6;
+}
+
+.TreeGrid .row_active{
+	background-color: #f6f6f6;
+}

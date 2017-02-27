@@ -1,0 +1,1265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.SupplierFileMapper">
+
+
+<select id="getSupplierFileList" parameterType="map" resultType="manager.supplier.model.SupplierFile">
+	select
+		t_app_company_info.company_id,
+		t_app_company_info.class_id,
+		t_app_company_info.nature_id,
+		t_app_company_info.industry_id,
+		t_app_company_info.taxman_id,
+		t_app_company_info.inner_level,
+		t_app_company_info.apply_sts,
+		t_app_company_info.update_state,
+		t_app_company_info.cpyname_en,
+		t_app_company_info.cpyname_cn,
+		t_app_company_info.reg_addr_code,
+		t_app_company_info.reg_addr,
+		t_app_company_info.contact_addr_code,
+		t_app_company_info.contact_addr,
+		t_app_company_info.f_phone,
+		t_app_company_info.corporation,
+		t_app_company_info.contacts,
+		t_app_company_info.m_phone,
+		t_app_company_info.fax,
+		t_app_company_info.email,
+		t_app_company_info.contact_email,
+		t_app_company_info.bus_license,
+		t_app_company_info.tax_no,
+		t_app_company_info.reg_fund,
+		t_app_company_info.currency_id,
+		t_app_company_info.establish_dt,
+		t_app_company_info.emplyees,
+		t_app_company_info.college_num,
+		t_app_company_info.diploma_num,
+		t_app_company_info.diploma_down_num,
+		t_app_company_info.op_num,
+		t_app_company_info.tech_num,
+		t_app_company_info.qc_num,
+		t_app_company_info.staff_num,
+		t_app_company_info.internal_auditor_num,
+		t_app_company_info.qe_num,
+		t_app_company_info.company_area,
+		t_app_company_info.factory_area,
+		t_app_company_info.factory_owner,
+		t_app_company_info.use_begintime,
+		t_app_company_info.use_endtime,
+		t_app_company_info.turnover,
+		t_app_company_info.turnover_currency_id,
+		t_app_company_info.export_num,
+		t_app_company_info.export_currency_id,
+		t_app_company_info.import_num,
+		t_app_company_info.import_currency_id,
+		t_app_company_info.certification_system,
+		t_app_company_info.create_dt,
+		t_app_company_info.ip_addr,
+		t_app_company_info.is_oem,
+		t_app_company_info.quality_control,
+		t_app_company_info.checked_date,
+		t_app_company_info.version,
+		t_app_company_info.manage_score,
+		t_app_company_info.improve_score,
+		t_app_company_info.area_score,
+		t_app_company_info.exploit_score,
+		t_app_company_info.storage_score,
+		t_app_company_info.equ_score,
+		t_app_company_info.tec_score,
+		t_app_company_info.pro_file_score,
+		t_app_company_info.research_score,
+		t_app_company_info.reject_score,
+		t_app_company_info.quality_score,
+		t_app_company_info.qc_score,
+		t_app_company_info.rz_company_id,
+		t_app_company_info.filesave_score,
+		t_app_company_info.is_archive,
+		t_app_company_info.is_delete,
+		t_app_company_info.operator,
+		t_app_company_info.operater_dt,
+		t_app_company_info.auditor,
+		t_app_company_info.audit_dt,
+		t_app_company_info.is_chinese,
+		t_app_company_info.mc_id_1,
+		t_app_company_info.mc_name_1,
+		t_app_company_info.mc_id_2,
+		t_app_company_info.mc_name_2,
+		t_app_company_info.mc_id_3,
+		t_app_company_info.mc_name_3,
+		t_app_company_info.key_remark,
+		t_app_company_info.lng,
+		t_app_company_info.lat,
+		t_app_company_info.head_audit,
+		t_app_company_info.assess_dt,
+		t_app_company_info.company_introduction,
+		t_app_company_info.school_coop,
+		t_app_company_info.total_score,
+		(select t_app_reg_accout.acc_name from t_app_reg_accout where t_app_reg_accout.reg_id=
+		(SELECT t_reg_accout_company_info.reg_id from t_reg_accout_company_info where t_reg_accout_company_info.company_id=t_app_company_info.company_id limit 1)) as account
+	from
+		t_app_company_info
+		<where>
+		1=1
+		 and t_app_company_info.apply_sts is NOT NULL
+		 and t_app_company_info.apply_sts>4
+		<if test="apply_sts!=null and apply_sts>4">
+			and t_app_company_info.apply_sts=#{apply_sts}
+		</if>
+		<if test="condition!=null and condition!=''">
+		  	and (cpyname_cn like '%${condition}%' or cpyname_en like '${condition}%' )
+		</if>
+		<if test="company_id!=null">
+			and t_app_company_info.company_id=#{company_id}
+		</if>
+		<!--准入评估、申请时获取的列表检索条件，其中apply_sts状态10：供应商已受理，20：不合格 -->
+		<if test="accessflag!=null and accessflag=='true'">
+			and (t_app_company_info.apply_sts=10 or t_app_company_info.apply_sts=20)
+		</if>
+		<!-- 左侧导航按分层等级 -->
+		<if test="level_id!=null and level_id>0">
+			<!--and t_app_company_info.company_id in(select company_id from t_app_material_confirmation where  
+ mc_id in(select mc_id from t_app_material_class where t_app_material_class.level_id=#{level_id}))
+ 			--> 
+ 			and t_app_company_info.company_id in (select company_id from t_app_supplier_material_sub1 where mc_id in
+(select mc_id from t_app_material_class where level_id=#{level_id})) 
+		</if>
+		<!-- 左侧导航按材料列表 -->
+		<if test="mc_id!=null and mc_id>0">
+			<!--and t_app_company_info.company_id in(select company_id from t_app_material_confirmation where mc_id=#{mc_id})
+			and ( t_app_company_info.mc_id_1=#{mc_id} or t_app_company_info.mc_id_2=#{mc_id} or t_app_company_info.mc_id_3 like '%${mc_id}%' )-->
+			and t_app_company_info.company_id in (SELECT company_id from t_app_supplier_material_sub1 where mc_id =#{mc_id})
+		</if>
+		<!-- 归档标记 -->
+		<if test="is_archive!=null">
+			and t_app_company_info.is_archive=#{is_archive}
+		</if>
+		<!-- 删除标记 -->
+		<if test="is_delete!=null">
+			and t_app_company_info.is_delete=#{is_delete}
+		</if>
+		<!-- 厂商类别 -->
+		<if test="mc_id_1!=null and mc_id_1!=''">
+			and t_app_company_info.mc_id_1=#{mc_id_1}
+		</if>
+		<if test="mc_id_2!=null and mc_id_2!=''">
+			and FIND_IN_SET(#{mc_id_2},t_app_company_info.mc_id_2)
+		</if>
+		<if test="mc_id_3!=null and mc_id_3!=''">
+			and FIND_IN_SET(#{mc_id_3},t_app_company_info.mc_id_3)
+		</if>
+		<!-- 查找同名的供应商是否存在 -->
+		<if test="cpyname_cn!=null and cpyname_cn!=''">
+			and trim(t_app_company_info.cpyname_cn)=#{cpyname_cn}
+		</if>
+		<if test="cpyname_en!=null and cpyname_en!=''">
+			and trim(t_app_company_info.cpyname_en)=#{cpyname_en}
+		</if>
+		<if test="moreCondition!=null  and moreCondition!=''">
+		and ${moreCondition}
+		</if>
+		<if test="multi_search_key1!=null and multi_search_key1!=''">
+			and (t_app_company_info.cpyname_cn like '%${multi_search_key1}%' or t_app_company_info.key_reark like '%${multi_search_key1}%')
+		</if>
+		<if test="multi_search_key2!=null and multi_search_key2!=''">
+			and (t_app_company_info.cpyname_cn like '%${multi_search_key2}%' or t_app_company_info.key_reark like '%${multi_search_key2}%')
+		</if>
+		<if test="multi_search_key3!=null and multi_search_key3!=''">
+			and (t_app_company_info.cpyname_cn like '%${multi_search_key3}%' or t_app_company_info.key_reark like '%${multi_search_key3}%')
+		</if>
+		</where>
+		<if test="orderby_flag!=null and orderby_flag==1">
+			order by create_dt DESC
+		</if>
+		<if test="orderby_flag!=null and orderby_flag==2">
+			order by operater_dt DESC
+		</if>
+</select>
+
+<!-- 查找符合条件的信息 -->
+<select id="getSuppliersByMultiSearch" parameterType="map" resultType="manager.supplier.model.SupplierFile">
+select
+		t_app_company_info.company_id,
+		t_app_company_info.class_id,
+		t_app_company_info.nature_id,
+		t_app_company_info.industry_id,
+		t_app_company_info.taxman_id,
+		t_app_company_info.inner_level,
+		t_app_company_info.apply_sts,
+		t_app_company_info.update_state,
+		t_app_company_info.cpyname_en,
+		t_app_company_info.cpyname_cn,
+		t_app_company_info.reg_addr_code,
+		t_app_company_info.reg_addr,
+		t_app_company_info.contact_addr_code,
+		t_app_company_info.contact_addr,
+		t_app_company_info.f_phone,
+		t_app_company_info.corporation,
+		t_app_company_info.contacts,
+		t_app_company_info.m_phone,
+		t_app_company_info.fax,
+		t_app_company_info.email,
+		t_app_company_info.contact_email,
+		t_app_company_info.bus_license,
+		t_app_company_info.tax_no,
+		t_app_company_info.reg_fund,
+		t_app_company_info.currency_id,
+		t_app_company_info.establish_dt,
+		t_app_company_info.emplyees,
+		t_app_company_info.college_num,
+		t_app_company_info.diploma_num,
+		t_app_company_info.diploma_down_num,
+		t_app_company_info.op_num,
+		t_app_company_info.tech_num,
+		t_app_company_info.qc_num,
+		t_app_company_info.staff_num,
+		t_app_company_info.internal_auditor_num,
+		t_app_company_info.qe_num,
+		t_app_company_info.company_area,
+		t_app_company_info.factory_area,
+		t_app_company_info.factory_owner,
+		t_app_company_info.use_begintime,
+		t_app_company_info.use_endtime,
+		t_app_company_info.turnover,
+		t_app_company_info.turnover_currency_id,
+		t_app_company_info.export_num,
+		t_app_company_info.export_currency_id,
+		t_app_company_info.import_num,
+		t_app_company_info.import_currency_id,
+		t_app_company_info.certification_system,
+		t_app_company_info.create_dt,
+		t_app_company_info.ip_addr,
+		t_app_company_info.is_oem,
+		t_app_company_info.quality_control,
+		t_app_company_info.checked_date,
+		t_app_company_info.version,
+		t_app_company_info.manage_score,
+		t_app_company_info.improve_score,
+		t_app_company_info.area_score,
+		t_app_company_info.exploit_score,
+		t_app_company_info.storage_score,
+		t_app_company_info.equ_score,
+		t_app_company_info.tec_score,
+		t_app_company_info.pro_file_score,
+		t_app_company_info.research_score,
+		t_app_company_info.reject_score,
+		t_app_company_info.quality_score,
+		t_app_company_info.qc_score,
+		t_app_company_info.rz_company_id,
+		t_app_company_info.filesave_score,
+		t_app_company_info.is_archive,
+		t_app_company_info.is_delete,
+		t_app_company_info.operator,
+		t_app_company_info.operater_dt,
+		t_app_company_info.auditor,
+		t_app_company_info.audit_dt,
+		t_app_company_info.is_chinese,
+		t_app_company_info.mc_id_1,
+		t_app_company_info.mc_name_1,
+		t_app_company_info.mc_id_2,
+		t_app_company_info.mc_name_2,
+		t_app_company_info.mc_id_3,
+		t_app_company_info.mc_name_3,
+		t_app_company_info.key_remark,
+		t_app_company_info.lng,
+		t_app_company_info.lat,
+		t_app_company_info.head_audit,
+		t_app_company_info.assess_dt,
+		t_app_company_info.company_introduction,
+		t_app_company_info.school_coop,
+		t_app_company_info.total_score
+	from
+		t_app_company_info
+		<where>
+		1=1
+		<if test="multi_search_key1!=null and multi_search_key1!=''">
+			and (t_app_company_info.cpyname_cn like '%${multi_search_key1}%' or t_app_company_info.key_remark like '%${multi_search_key1}%')
+		</if>
+		</where>
+</select>
+
+
+<select id="getSupplierFileByID" parameterType="map" resultType="manager.supplier.model.SupplierFile">
+	select
+		t_app_company_info.company_id,
+		t_app_company_info.class_id,
+		t_app_company_info.nature_id,
+		t_app_company_info.industry_id,
+		t_app_company_info.taxman_id,
+		t_app_company_info.inner_level,
+		t_app_company_info.apply_sts,
+		t_app_company_info.update_state,
+		t_app_company_info.cpyname_en,
+		t_app_company_info.cpyname_cn,
+		t_app_company_info.reg_addr_code,
+		t_app_company_info.reg_addr,
+		t_app_company_info.contact_addr_code,
+		t_app_company_info.contact_addr,
+		t_app_company_info.f_phone,
+		t_app_company_info.corporation,
+		t_app_company_info.contacts,
+		t_app_company_info.m_phone,
+		t_app_company_info.fax,
+		t_app_company_info.email,
+		t_app_company_info.contact_email,
+		t_app_company_info.bus_license,
+		t_app_company_info.tax_no,
+		t_app_company_info.reg_fund,
+		t_app_company_info.currency_id,
+		t_app_company_info.establish_dt,
+		t_app_company_info.emplyees,
+		t_app_company_info.college_num,
+		t_app_company_info.diploma_num,
+		t_app_company_info.diploma_down_num,
+		t_app_company_info.op_num,
+		t_app_company_info.tech_num,
+		t_app_company_info.qc_num,
+		t_app_company_info.staff_num,
+		t_app_company_info.internal_auditor_num,
+		t_app_company_info.qe_num,
+		t_app_company_info.company_area,
+		t_app_company_info.factory_area,
+		t_app_company_info.factory_owner,
+		t_app_company_info.use_begintime,
+		t_app_company_info.use_endtime,
+		t_app_company_info.turnover,
+		t_app_company_info.turnover_currency_id,
+		t_app_company_info.export_num,
+		t_app_company_info.export_currency_id,
+		t_app_company_info.import_num,
+		t_app_company_info.import_currency_id,
+		t_app_company_info.certification_system,
+		t_app_company_info.create_dt,
+		t_app_company_info.ip_addr,
+		t_app_company_info.is_oem,
+		t_app_company_info.quality_control,
+		t_app_company_info.checked_date,
+		t_app_company_info.version,
+		t_app_company_info.manage_score,
+		t_app_company_info.improve_score,
+		t_app_company_info.area_score,
+		t_app_company_info.exploit_score,
+		t_app_company_info.storage_score,
+		t_app_company_info.equ_score,
+		t_app_company_info.tec_score,
+		t_app_company_info.pro_file_score,
+		t_app_company_info.research_score,
+		t_app_company_info.reject_score,
+		t_app_company_info.quality_score,
+		t_app_company_info.qc_score,
+		t_app_company_info.rz_company_id,
+		t_app_company_info.filesave_score,
+		t_app_company_info.is_archive,
+		t_app_company_info.is_delete,
+		t_app_company_info.operator,
+		t_app_company_info.operater_dt,
+		t_app_company_info.auditor,
+		t_app_company_info.audit_dt,
+		t_app_company_info.is_chinese,
+		t_app_company_info.mc_id_1,
+		t_app_company_info.mc_name_1,
+		t_app_company_info.mc_id_2,
+		t_app_company_info.mc_name_2,
+		t_app_company_info.mc_id_3,
+		t_app_company_info.mc_name_3,
+		t_app_company_info.key_remark,
+		t_app_company_info.lng,
+		t_app_company_info.lat,
+		t_app_company_info.head_audit,
+		t_app_company_info.assess_dt,
+		t_app_company_info.company_introduction,
+		t_app_company_info.school_coop,
+		t_app_company_info.total_score
+	from
+		t_app_company_info
+	where 1=1
+	<if test="company_id!=null">
+		and t_app_company_info.company_id=#{company_id}
+	</if>
+</select>
+
+<insert id="addSupplierFile" parameterType="manager.supplier.model.SupplierFile" keyProperty="company_id" useGeneratedKeys="true">
+	<selectKey keyProperty="company_id" resultType="int" order="BEFORE">
+		select  ifnull(max(company_id)+1,1) from t_app_company_info 
+	</selectKey>
+	insert into t_app_company_info
+	(
+		company_id,
+		class_id,
+		nature_id,
+		industry_id,
+		taxman_id,
+		inner_level,
+		apply_sts,
+		update_state,
+		cpyname_en,
+		cpyname_cn,
+		reg_addr_code,
+		reg_addr,
+		contact_addr_code,
+		contact_addr,
+		f_phone,
+		corporation,
+		contacts,
+		m_phone,
+		fax,
+		email,
+		contact_email,
+		bus_license,
+		tax_no,
+		reg_fund,
+		currency_id,
+		establish_dt,
+		emplyees,
+		college_num,
+		diploma_num,
+		diploma_down_num,
+		op_num,
+		tech_num,
+		qc_num,
+		staff_num,
+		internal_auditor_num,
+		qe_num,
+		company_area,
+		factory_area,
+		factory_owner,
+		use_begintime,
+		use_endtime,
+		turnover,
+		turnover_currency_id,
+		export_num,
+		export_currency_id,
+		import_num,
+		import_currency_id,
+		certification_system,
+		create_dt,
+		ip_addr,
+		is_oem,
+		quality_control,
+		checked_date,
+		version,
+		manage_score,
+		improve_score,
+		area_score,
+		exploit_score,
+		storage_score,
+		equ_score,
+		tec_score,
+		pro_file_score,
+		research_score,
+		reject_score,
+		quality_score,
+		qc_score,
+		rz_company_id,
+		filesave_score,
+		is_archive,
+		is_delete,
+		operator,
+		operater_dt,
+		auditor,
+		audit_dt,
+		is_chinese,
+		mc_id_1,
+		mc_name_1,
+		mc_id_2,
+		mc_name_2,
+		mc_id_3,
+		mc_name_3,
+		key_remark,
+		lng,
+		lat,
+		head_audit,
+		assess_dt,
+		company_introduction,
+		school_coop,
+		total_score
+	)
+	values
+	(
+		#{company_id},
+		#{class_id},
+		#{nature_id},
+		#{industry_id},
+		#{taxman_id},
+		#{inner_level},
+		#{apply_sts},
+		#{update_state},
+		#{cpyname_en},
+		#{cpyname_cn},
+		#{reg_addr_code},
+		#{reg_addr},
+		#{contact_addr_code},
+		#{contact_addr},
+		#{f_phone},
+		#{corporation},
+		#{contacts},
+		#{m_phone},
+		#{fax},
+		#{email},
+		#{contact_email},
+		#{bus_license},
+		#{tax_no},
+		#{reg_fund},
+		#{currency_id},
+		#{establish_dt},
+		#{emplyees},
+		#{college_num},
+		#{diploma_num},
+		#{diploma_down_num},
+		#{op_num},
+		#{tech_num},
+		#{qc_num},
+		#{staff_num},
+		#{internal_auditor_num},
+		#{qe_num},
+		#{company_area},
+		#{factory_area},
+		#{factory_owner},
+		#{use_begintime},
+		#{use_endtime},
+		#{turnover},
+		#{turnover_currency_id},
+		#{export_num},
+		#{export_currency_id},
+		#{import_num},
+		#{import_currency_id},
+		#{certification_system},
+		#{create_dt},
+		#{ip_addr},
+		#{is_oem},
+		#{quality_control},
+		#{checked_date},
+		#{version},
+		#{manage_score},
+		#{improve_score},
+		#{area_score},
+		#{exploit_score},
+		#{storage_score},
+		#{equ_score},
+		#{tec_score},
+		#{pro_file_score},
+		#{research_score},
+		#{reject_score},
+		#{quality_score},
+		#{qc_score},
+		#{rz_company_id},
+		#{filesave_score},
+		#{is_archive},
+		#{is_delete},
+		#{operator},
+		#{operater_dt},
+		#{auditor},
+		#{audit_dt},
+		#{is_chinese},
+		#{mc_id_1},
+		#{mc_name_1},
+		#{mc_id_2},
+		#{mc_name_2},
+		#{mc_id_3},
+		#{mc_name_3},
+		#{key_remark},
+		#{lng},
+		#{lat},
+		#{head_audit},
+		#{assess_dt},
+		#{company_introduction},
+		#{school_coop},
+		#{total_score}
+	)
+</insert>
+<insert id="addSupplierFile1" parameterType="map" keyProperty="company_id" useGeneratedKeys="true">
+	<selectKey keyProperty="company_id" resultType="int" order="BEFORE">
+		select  ifnull(max(company_id)+1,1) from t_app_company_info 
+	</selectKey>
+	insert into t_app_company_info
+	(
+		company_id,
+		class_id,
+		nature_id,
+		industry_id,
+		taxman_id,
+		inner_level,
+		apply_sts,
+		update_state,
+		cpyname_en,
+		cpyname_cn,
+		reg_addr_code,
+		reg_addr,
+		contact_addr_code,
+		contact_addr,
+		f_phone,
+		corporation,
+		contacts,
+		m_phone,
+		fax,
+		email,
+		contact_email,
+		bus_license,
+		tax_no,
+		reg_fund,
+		currency_id,
+		establish_dt,
+		emplyees,
+		college_num,
+		diploma_num,
+		diploma_down_num,
+		op_num,
+		tech_num,
+		qc_num,
+		staff_num,
+		internal_auditor_num,
+		qe_num,
+		company_area,
+		factory_area,
+		factory_owner,
+		use_begintime,
+		use_endtime,
+		turnover,
+		turnover_currency_id,
+		export_num,
+		export_currency_id,
+		import_num,
+		import_currency_id,
+		certification_system,
+		create_dt,
+		ip_addr,
+		is_oem,
+		quality_control,
+		checked_date,
+		version,
+		manage_score,
+		improve_score,
+		area_score,
+		exploit_score,
+		storage_score,
+		equ_score,
+		tec_score,
+		pro_file_score,
+		research_score,
+		reject_score,
+		quality_score,
+		qc_score,
+		rz_company_id,
+		filesave_score,
+		is_archive,
+		is_delete,
+		operator,
+		operater_dt,
+		auditor,
+		audit_dt,
+		is_chinese,
+		key_remark,
+		lng,
+		lat,
+		head_audit,
+		assess_dt,
+		company_introduction,
+		school_coop,
+		total_score
+	)
+	values
+	(
+		#{company_id},
+		#{class_id},
+		#{nature_id},
+		#{industry_id},
+		#{taxman_id},
+		#{inner_level},
+		#{apply_sts},
+		#{update_state},
+		#{cpyname_en},
+		#{cpyname_cn},
+		#{reg_addr_code},
+		#{reg_addr},
+		#{contact_addr_code},
+		#{contact_addr},
+		#{f_phone},
+		#{corporation},
+		#{contacts},
+		#{m_phone},
+		#{fax},
+		#{email},
+		#{contact_email},
+		#{bus_license},
+		#{tax_no},
+		#{reg_fund},
+		#{currency_id},
+		#{establish_dt},
+		#{emplyees},
+		#{college_num},
+		#{diploma_num},
+		#{diploma_down_num},
+		#{op_num},
+		#{tech_num},
+		#{qc_num},
+		#{staff_num},
+		#{internal_auditor_num},
+		#{qe_num},
+		#{company_area},
+		#{factory_area},
+		#{factory_owner},
+		#{use_begintime},
+		#{use_endtime},
+		#{turnover},
+		#{turnover_currency_id},
+		#{export_num},
+		#{export_currency_id},
+		#{import_num},
+		#{import_currency_id},
+		#{certification_system},
+		#{create_dt},
+		#{ip_addr},
+		#{is_oem},
+		#{quality_control},
+		#{checked_date},
+		#{version},
+		#{manage_score},
+		#{improve_score},
+		#{area_score},
+		#{exploit_score},
+		#{storage_score},
+		#{equ_score},
+		#{tec_score},
+		#{pro_file_score},
+		#{research_score},
+		#{reject_score},
+		#{quality_score},
+		#{qc_score},
+		#{rz_company_id},
+		#{filesave_score},
+		#{is_archive},
+		#{is_delete},
+		#{operator},
+		#{operater_dt},
+		#{auditor},
+		#{audit_dt},
+		#{is_chinese},
+		#{key_remark},
+		#{lng},
+		#{lat},
+		#{head_audit},
+		#{assess_dt},
+		#{company_introduction},
+		#{school_coop},
+		#{total_score}
+	)
+</insert>
+<update id="updateSupplierFile" parameterType="manager.supplier.model.SupplierFile">
+	update t_app_company_info
+		set
+			company_id = #{company_id},
+			class_id = #{class_id},
+			nature_id = #{nature_id},
+			industry_id = #{industry_id},
+			taxman_id = #{taxman_id},
+			inner_level = #{inner_level},
+			apply_sts = #{apply_sts},
+			update_state = #{update_state},
+			cpyname_en = #{cpyname_en},
+			cpyname_cn = #{cpyname_cn},
+			reg_addr_code = #{reg_addr_code},
+			reg_addr = #{reg_addr},
+			contact_addr_code = #{contact_addr_code},
+			contact_addr = #{contact_addr},
+			f_phone = #{f_phone},
+			corporation = #{corporation},
+			contacts = #{contacts},
+			m_phone = #{m_phone},
+			fax = #{fax},
+			email = #{email},
+			contact_email = #{contact_email},
+			bus_license = #{bus_license},
+			tax_no = #{tax_no},
+			reg_fund = #{reg_fund},
+			currency_id = #{currency_id},
+			establish_dt = #{establish_dt},
+			emplyees = #{emplyees},
+			college_num = #{college_num},
+			diploma_num = #{diploma_num},
+			diploma_down_num = #{diploma_down_num},
+			op_num = #{op_num},
+			tech_num = #{tech_num},
+			qc_num = #{qc_num},
+			staff_num = #{staff_num},
+			internal_auditor_num = #{internal_auditor_num},
+			qe_num = #{qe_num},
+			company_area = #{company_area},
+			factory_area = #{factory_area},
+			factory_owner = #{factory_owner},
+			use_begintime = #{use_begintime},
+			use_endtime = #{use_endtime},
+			turnover = #{turnover},
+			turnover_currency_id = #{turnover_currency_id},
+			export_num = #{export_num},
+			export_currency_id = #{export_currency_id},
+			import_num = #{import_num},
+			import_currency_id = #{import_currency_id},
+			certification_system = #{certification_system},
+			create_dt = #{create_dt},
+			ip_addr = #{ip_addr},
+			is_oem = #{is_oem},
+			quality_control = #{quality_control},
+			checked_date = #{checked_date},
+			version = #{version},
+			manage_score = #{manage_score},
+			improve_score = #{improve_score},
+			area_score = #{area_score},
+			exploit_score = #{exploit_score},
+			storage_score = #{storage_score},
+			equ_score = #{equ_score},
+			tec_score = #{tec_score},
+			pro_file_score = #{pro_file_score},
+			research_score = #{research_score},
+			reject_score = #{reject_score},
+			quality_score = #{quality_score},
+			qc_score = #{qc_score},
+			rz_company_id = #{rz_company_id},
+			filesave_score = #{filesave_score},
+			is_archive = #{is_archive},
+			is_delete = #{is_delete},
+			operator = #{operator},
+			operater_dt = #{operater_dt},
+			auditor = #{auditor},
+			audit_dt = #{audit_dt},
+			is_chinese = #{is_chinese},
+			mc_id_1 = #{mc_id_1},
+			mc_name_1 = #{mc_name_1},
+			mc_id_2 = #{mc_id_2},
+			mc_name_2 = #{mc_name_2},
+			mc_id_3 = #{mc_id_3},
+			mc_name_3 = #{mc_name_3},
+			key_remark = #{key_remark},
+			lng = #{lng},
+			lat = #{lat},
+			head_audit = #{head_audit},
+			assess_dt = #{assess_dt},
+			company_introduction = #{company_introduction},
+			school_coop = #{school_coop},
+			total_score = #{total_score}
+		where company_id = #{company_id}
+</update>
+
+<delete id="deleteSupplierFile" parameterType="manager.supplier.model.SupplierFile">
+	delete from t_app_company_info
+	where company_id = #{company_id}
+</delete>
+
+<select id="checkStatusSame" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_company_info where company_id = #{company_id} and apply_sts = #{apply_sts}
+</select>
+<select id="getCompanyClassList" parameterType="map" resultType="manager.basicdata.companyClass.model.CompanyClass">
+	select
+		t_company_class.nature_id,
+		t_company_class.nature_name,
+		t_company_class.f_id
+	from
+		t_company_class
+</select>
+
+<select id="getCountByIdAndName" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_company_info where company_id != #{company_id} and cpyname_cn = #{cpyname_cn}
+</select>
+
+<select id="getCountByName" parameterType="map" resultType="java.lang.Integer">
+	select count(cpyname_cn) from t_app_company_info where trim(cpyname_cn) = #{cpyname_cn}
+</select>
+
+<select id="getAreaList" parameterType="map" resultType="manager.basicdata.area.model.Area">
+	select
+		t_app_area.area_id,
+		t_app_area.area_name,
+		t_app_area.f_id,
+		t_app_area.shortName,
+		t_app_area.levelType,
+		t_app_area.cityCode,
+		t_app_area.zipCode,
+		t_app_area.mergerName,
+		t_app_area.ing,
+		t_app_area.lat,
+		t_app_area.pinyin
+	from
+		t_app_area
+	where 1=1
+	<if test="f_id!=null">
+		and t_app_area.f_id=#{f_id}
+	</if>
+	<if test="levelType!=null">
+		and t_app_area.levelType=#{levelType}
+	</if>
+</select>
+
+<select id="getMaterialClassList" parameterType="map" resultType="manager.basicdata.materialClass.model.MaterialClass">
+	select
+		t_app_material_class.mc_id,
+		t_app_material_class.mc_name,
+		t_app_material_class.f_id,
+		t_app_material_class.level_id,
+		t_app_material_class.leaf
+	from
+		t_app_material_class
+	where 1=1
+	<if test="node!=null">
+		and t_app_material_class.f_id=#{node}
+	</if>
+	<if test="f_id!=null">
+		and t_app_material_class.f_id=#{f_id}
+	</if>
+	<if test="nodeIdForGrid!=null">
+		and (t_app_material_class.f_id=#{nodeIdForGrid} or t_app_material_class.mc_id=#{nodeIdForGrid})
+	</if>
+	<if test="mc_name!=null">
+		and t_app_material_class.mc_name=#{mc_name}
+	</if>
+	
+	<if test="level_id!=null">
+		and t_app_material_class.level_id=#{level_id}
+	</if>
+	<if test="is_archive!=null">
+		and t_app_material_class.is_archive=#{is_archive}
+	</if>
+</select>
+
+<!-- 后台根据公司名称查询 -->
+<select id="getSuppliersByCpnameSearch" parameterType="map" resultType="manager.supplier.model.SupplierFile">
+select
+		t_app_company_info.company_id,		
+		t_app_company_info.cpyname_en,
+		t_app_company_info.cpyname_cn				
+	from
+		t_app_company_info				
+		where
+		1=1
+		<if test="search!=null">
+		  and (t_app_company_info.cpyname_cn like '%${search}%' or t_app_company_info.cpyname_en like '%${search}%' or t_app_company_info.company_id like '%${search}%')	
+		</if>	
+</select>
+
+<select id="getCompanyForReg" parameterType="map" resultType="manager.supplier.model.SupplierFile">
+select
+		t_app_company_info.company_id,		
+		t_app_company_info.cpyname_en,
+		t_app_company_info.cpyname_cn,
+		t_app_company_info.apply_sts,	
+		t_app_company_info.reg_addr,
+		t_app_company_info.contact_addr,
+		t_app_company_info.corporation,
+		t_app_company_info.emplyees		
+	from
+		t_app_company_info	
+		left join t_reg_accout_company_info as t on	t.company_id = 	t_app_company_info.company_id
+		where
+		t.reg_id = #{reg_id}
+</select>
+<select id="getSupplierFileInfoList" parameterType="map" resultType="manager.supplier.model.SupplierFile">
+select  
+		t_supplier_files.supplier_id,
+		t_supplier_files.company_id ,
+		t_supplier_files.is_delete,
+		t_supplier_files.create_dt,
+		file_status,
+		auth_dt,
+		t_app_company_info.cpyname_cn,
+		t_app_company_info.currency_id,
+		t_app_company_info.class_id,
+		t_trade_class.class_name,
+		t_app_company_info.nature_id,
+		t_company_class.nature_name,
+		t_app_company_info.industry_id,
+		t_app_company_info.reg_addr_code,
+		t_app_company_info.reg_addr,
+		t_industry_class.industry_name,
+		corporation,
+		establish_dt,
+		reg_fund,
+		key_remark,
+	  	0 as is_chinese,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'taxman_id'),SIGNED) as taxman_id,
+		shiftdim1(t_supplier_files.supplier_id,'inner_level') as inner_level,
+		shiftdim1(t_supplier_files.supplier_id,'cpyname_cn1') as cpyname_cn1,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'reg_addr_code'),SIGNED) as contact_addr_code,
+		shiftdim1(t_supplier_files.supplier_id,'contact_addr') as contact_addr,
+		shiftdim1(t_supplier_files.supplier_id,'f_phone') as f_phone,
+		shiftdim1(t_supplier_files.supplier_id,'contacts') as contacts,
+		shiftdim1(t_supplier_files.supplier_id,'tax_no') as tax_no,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'emplyees'),SIGNED) as emplyees,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'college_num'),SIGNED) as college_num,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'op_num'),SIGNED) as op_num,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'tech_num'),SIGNED) as tech_num,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'qc_num'),SIGNED) as qc_num,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'staff_num'),SIGNED) as staff_num,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'internal_auditor_num'),SIGNED) as internal_auditor_num,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'companyArea'),DECIMAL) as company_area,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'factoryArea'),DECIMAL) as factory_area,
+		shiftdim1(t_supplier_files.supplier_id,'factory_owner') as factory_owner,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'use_begintime'),DATETIME) as use_begintime,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'use_endtime'),DATETIME) as use_endtime,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'turnover'),DECIMAL) as turnover,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'turnover_currency_id'),SIGNED) as turnover_currency_id,
+		shiftdim1(t_supplier_files.supplier_id,'certification_system') as certification_system,
+		shiftdim1(t_supplier_files.supplier_id,'ip_addr') as ip_addr,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'checked_date'),DATETIME) aschecked_date,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'version'),SIGNED) as version,
+		CONVERT(shiftdim1(t_supplier_files.supplier_id,'mc_id_1'),SIGNED) as mc_id_1,
+		shiftdim1(t_supplier_files.supplier_id,'mc_name_1') as mc_name_1,
+		shiftdim1(t_supplier_files.supplier_id,'mc_id_2') as mc_id_2,
+		shiftdim1(t_supplier_files.supplier_id,'mc_name_2') as mc_name_2,
+		shiftdim1(t_supplier_files.supplier_id,'mc_id_3') as mc_id_3,
+		shiftdim1(t_supplier_files.supplier_id,'mc_name_3') as mc_name_3,
+		t_currency.currency_name,
+		t_supplier_owner_info.owner_cpyname,
+		t_app_reg_accout.acc_name
+	from t_supplier_files
+	LEFT JOIN t_app_company_info on t_app_company_info.company_id=t_supplier_files.company_id
+	left join t_trade_class on t_trade_class.class_id=t_app_company_info.class_id
+	left join t_company_class on t_company_class.nature_id=t_app_company_info.nature_id
+	left join t_industry_class on t_industry_class.industry_id=t_app_company_info.industry_id
+left join t_currency on t_currency.currency_id=t_app_company_info.currency_id
+left join t_supplier_owner_info on t_supplier_owner_info.supplier_id=t_supplier_files.supplier_id
+left join t_supplier_regaccount_info on t_supplier_regaccount_info.supplier_id=t_supplier_files.supplier_id
+left join t_app_reg_accout on t_supplier_regaccount_info.reg_id=t_app_reg_accout.reg_id
+    <where>
+		1=1
+		and t_supplier_files.is_delete=0
+		<if test="cpyname_cn!=null">
+			and t_app_company_info.cpyname_cn like '%${cpyname_cn}%'
+		</if>
+		<if test="supplier_id!=null">
+			and t_supplier_files.supplier_id =#{supplier_id}
+		</if>
+		<if test="file_status!=null">
+			and t_supplier_files.file_status =#{file_status}
+		</if>
+		<if test="condition!=null">
+			and ${condition}
+		</if>
+	</where>
+	order by t_supplier_files.create_dt desc
+</select>
+<update id="updateSupplierFile1" parameterType="map">
+	update t_app_company_info
+		<trim prefix="SET" suffixOverrides=",">  
+			<if test="class_id != null">
+			class_id = #{class_id},
+			</if>
+			<if test="nature_id != null">
+			nature_id = #{nature_id},
+			</if>
+			<if test="apply_sts!= null">
+			apply_sts = #{apply_sts},
+			</if>
+			<if test="cpyname_en != null">
+			cpyname_en = #{cpyname_en},
+			</if>
+			<if test="cpynameCn != null">
+			cpyname_cn = #{cpynameCn},
+			</if>
+			<if test="reg_addr_code != null">
+			reg_addr_code = #{reg_addr_code},
+			</if>
+			<if test="reg_addr != null">
+			reg_addr = #{reg_addr},
+			</if>
+			<if test="contact_addr_code != null">
+			contact_addr_code = #{contact_addr_code},
+			</if>
+			<if test="industry_id != null">
+			industry_id = #{industry_id},
+			</if>
+			<if test="contact_addr != null">
+			contact_addr = #{contact_addr},
+			</if>
+			<if test="f_phone!= null">
+			f_phone = #{f_phone},
+			</if>
+			<if test="corporation != null">
+			corporation = #{corporation},
+			</if>
+			<if test="contacts != null">
+			contacts = #{contacts},
+			</if>
+			<if test="m_phone != null">
+			m_phone = #{m_phone},
+			</if>
+			<if test="fax != null ">
+			fax = #{fax},
+			</if>
+			<if test="email != null">
+			email = #{email},
+			</if>
+			<if test="contact_email != null">
+			contact_email = #{contact_email},
+			</if>
+			<if test="bus_license != null">
+			bus_license = #{bus_license},
+			</if>
+			<if test="tax_no != null">
+			tax_no = #{tax_no},
+			</if>
+			<if test="reg_fund != null and reg_fund != ''">
+			reg_fund = #{reg_fund},
+			</if>
+			<if test="taxman_id != null">
+			taxman_id = #{taxman_id},
+			</if>
+			<if test="currency_id != null">
+			currency_id = #{currency_id},
+			</if>
+			<if test="establish_dt != null and establish_dt != ''">
+			establish_dt = #{establish_dt},
+			</if>
+			<if test="emplyees != null">
+			emplyees = #{emplyees},
+			</if>
+			<if test="college_num != null">
+			college_num = #{college_num},
+			</if>
+			<if test="diploma_num != null">
+			diploma_num = #{diploma_num},
+			</if>
+			<if test="diploma_down_num != null">
+			diploma_down_num = #{diploma_down_num},
+			</if>
+			<if test="op_num != null">
+			op_num = #{op_num},
+			</if>
+			<if test="tech_num != null">
+			tech_num = #{tech_num},
+			</if>
+			<if test="qc_num != null">
+			qc_num = #{qc_num},
+			</if>
+			<if test="staff_num != null">
+			staff_num = #{staff_num},
+			</if>
+			<if test="internal_auditor_num != null">
+			internal_auditor_num = #{internal_auditor_num},
+			</if>
+			<if test="qe_num != null">
+			qe_num = #{qe_num},
+			</if>
+			<if test="company_area != null">
+			company_area = #{company_area},
+			</if>
+			<if test="factory_area != null">
+			factory_area = #{factory_area},
+			</if>
+			<if test="factory_owner != null">
+			factory_owner = #{factory_owner},
+			</if>
+			<if test="use_begintime != null and use_begintime!=''">
+			use_begintime = #{use_begintime},
+			</if>
+			<if test="use_endtime != null and use_endtime!=''">
+			use_endtime = #{use_endtime},
+			</if>
+			<if test="turnover != null ">
+			turnover = #{turnover},
+			</if>
+			<if test="turnover_currency_id != null ">
+			turnover_currency_id = #{turnover_currency_id},
+			</if>
+			<if test="import_num != null">
+			import_num = #{import_num},
+			</if>
+			<if test="import_currency_id != null ">
+			import_currency_id = #{import_currency_id},
+			</if>
+			<if test="export_num != null">
+			export_num= #{export_num},
+			</if>
+			<if test="export_currency_id != null">
+			export_currency_id = #{export_currency_id},
+			</if>
+			<if test="certification_system != null">
+			certification_system = #{certification_system},
+			</if>
+			<if test="create_dt != null">
+			create_dt = #{create_dt},
+			</if>
+			<if test="ip_addr != null">
+			ip_addr = #{ip_addr},
+			</if>
+			<if test="checked_date != null">
+			checked_date = #{checked_date},
+			</if>
+			<if test="version != null">
+			version = #{version},
+			</if>
+			<if test="lng != null">
+			lng = #{lng},
+			</if>
+			<if test="lat != null">
+			lat = #{lat},
+			</if>
+			<if test="is_oem != null">
+			is_oem = #{is_oem},
+			</if>
+			<if test="quality_control != null">
+			quality_control = #{quality_control},
+			</if>
+			<if test="key_remark != null">
+			key_remark = #{key_remark},
+			</if>
+			<if test="is_archive != null">
+			is_archive = #{is_archive},
+			</if>
+			<if test="is_delete != null">
+			is_delete = #{is_delete},
+			</if>
+			<if test="operator != null">
+			operator = #{operator},
+			</if>
+			<if test="operater_dt != null">
+			operater_dt = #{operater_dt},
+			</if>
+			<if test="audit_dt != null">
+			audit_dt = #{audit_dt},
+			</if>
+			<if test="auditor != null">
+			auditor = #{auditor},
+			</if>
+			<if test="is_chinese != null">
+			is_chinese = #{is_chinese},
+			</if>
+			<if test="mcId1 != null">
+			mc_id_1 = #{mcId1},
+			</if>
+			<if test="mcName1 != null">
+			mc_name_1 = #{mcName1},
+			</if>
+			<if test="mcId2 != null">
+			mc_id_2 = #{mcId2},
+			</if>
+			<if test="mcName2 != null">
+			mc_name_2 = #{mcName2},
+			</if>
+			<if test="mcId3 != null">
+			mc_id_3 = #{mcId3},
+			</if>
+			<if test="mcName3 != null">
+			mc_name_3 = #{mcName3},
+			</if>
+			<if test="company_introduction != null">
+			company_introduction = #{company_introduction},
+			</if>
+			<if test="school_coop != null">
+			school_coop = #{school_coop},
+			</if>
+			<if test="apply_sts != null">
+			apply_sts = #{apply_sts}
+			</if>
+		</trim>
+		where 
+			company_id = #{company_id}
+</update>
+<select id="getOwnerCompanyList" parameterType="map" resultType="manager.supplier.model.SupplierFile">
+	select  
+		t_app_company_info.company_id,
+		t_app_company_info.cpyname_cn
+	from 
+		t_app_company_info
+	where company_id in(select company_id from t_reg_accout_company_info where reg_id=(select reg_id from t_app_reg_accout where role_id=5 limit 1))
+	and t_app_company_info.apply_sts=15
+</select>
+</mapper>

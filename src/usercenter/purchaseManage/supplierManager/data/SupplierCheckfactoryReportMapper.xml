@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.purchaseManage.supplierManager.data.SupplierCheckfactoryReportMapper">
+
+
+<select id="getSupplierCheckfactoryReportList" parameterType="map" resultType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryReport">
+	select
+		t_supplier_checkfactory_report.id,
+		t_supplier_checkfactory_report.file_name,
+		t_supplier_checkfactory_report.create_dt,
+		t_supplier_checkfactory_report.remark,
+		t_supplier_checkfactory_report.mogodb_id,
+		t_supplier_checkfactory_report.check_score,
+		t_supplier_checkfactory_report.supplier_id,
+		t_supplier_checkfactory_report.source_type,
+		t_supplier_checkfactory_report.operator_id,
+		t_supplier_checkfactory_report.operator_name,
+		t_supplier_checkfactory_report.check_factory_dt,
+		t_supplier_checkfactory_report.send_company_id,
+		t_supplier_checkfactory_report.checkor
+	from
+		t_supplier_checkfactory_report
+</select>
+<insert id="addSupplierCheckfactoryReport" parameterType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryReport" keyProperty="id" useGeneratedKeys="true">
+	insert into t_supplier_checkfactory_report
+	(
+		id,
+		file_name,
+		create_dt,
+		remark,
+		mogodb_id,
+		check_score,
+		supplier_id,
+		source_type,
+		operator_id,
+		operator_name,
+		check_factory_dt,
+		send_company_id,
+		checkor
+	)
+	values
+	(
+		#{id},
+		#{file_name},
+		#{create_dt},
+		#{remark},
+		#{mogodb_id},
+		#{check_score},
+		#{supplier_id},
+		#{source_type},
+		#{operator_id},
+		#{operator_name},
+		#{check_factory_dt},
+		#{send_company_id},
+		#{checkor}
+	)
+</insert>
+<update id="updateSupplierCheckfactoryReport" parameterType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryReport">
+	update t_supplier_checkfactory_report
+		set
+			id = #{id},
+			file_name = #{file_name},
+			create_dt = #{create_dt},
+			remark = #{remark},
+			mogodb_id = #{mogodb_id},
+			check_score = #{check_score},
+			supplier_id = #{supplier_id},
+			source_type = #{source_type},
+			operator_id = #{operator_id},
+			operator_name = #{operator_name},
+			check_factory_dt = #{check_factory_dt},
+			send_company_id = #{send_company_id},
+			checkor = #{checkor}
+		where id = #{id}
+</update>
+<delete id="deleteSupplierCheckfactoryReport" parameterType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryReport">
+	delete from t_supplier_checkfactory_report
+	where id = #{id}
+</delete>
+
+<!-- 通过账号获取验厂报告列表 -->
+<select id="getSupplierCheckfactoryReportListByAccount" parameterType="map" resultType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryReport">
+	select
+		tscr.id,
+		tscr.file_name,
+		tscr.create_dt,
+		tscr.remark,
+		tscr.mogodb_id,
+		tscr.check_score,
+		tscr.supplier_id,
+		tscr.source_type,
+		tscr.operator_id,
+		tscr.operator_name,
+		tscr.check_factory_dt,
+		tscr.send_company_id,
+		tscr.checkor,
+		tsf.supplier_cpyname,
+		tsf.company_id
+	from
+		<if test="regId != null and regId != 0">
+			t_supplier_regaccount_info tsri,
+		</if>
+		<if test="saId != null and saId != 0">
+			t_subaccount_supplier_info tssi,
+		</if>
+		t_supplier_checkfactory_report tscr,
+		t_supplier_files tsf,
+		t_supplier_owner_info tsoi,
+		t_app_company_info taci
+	where	
+		tscr.supplier_id = tsf.supplier_id
+		and
+		tsoi.supplier_id = tsf.supplier_id 
+		and
+		taci.company_id = tsf.company_id
+		and 
+		tsoi.company_id = #{companyId}
+		<if test="regId != null and regId != 0">
+			AND
+			tsri.supplier_id = tsf.supplier_id
+			AND
+			tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+			AND
+			tssi.supplier_id = tsf.supplier_id
+			AND
+			tssi.is_delete = 0
+			AND
+			tssi.sa_id = #{saId}
+		</if>
+		<if test="mulParams != null and mulParams != ''">
+		and(
+			tsf.supplier_cpyname like CONCAT("%",#{mulParams},"%")
+			or
+			tscr.file_name like CONCAT("%",#{mulParams},"%")
+			or
+			tscr.checkor like CONCAT("%",#{mulParams},"%")
+		)
+		</if>
+		<if test="(startDate != null and startDate != '') or (endDate != null and endDate != '')">
+			<choose>
+				<when test="dateType == 1"><!-- 报告日期 -->
+					<if test="startDate != null and startDate != ''"><![CDATA[and tscr.create_dt >= #{startDate}]]></if>
+					<if test="endDate != null and endDate != ''"><![CDATA[and tscr.create_dt <= #{endDate}]]></if>
+				</when>
+				<when test="dateType == 2"><!-- 验厂日期 -->
+					<if test="startDate != null and startDate != ''"><![CDATA[and tscr.check_factory_dt >= #{startDate}]]></if>
+					<if test="endDate != null and endDate != ''"><![CDATA[and tscr.check_factory_dt <= #{endDate}]]></if>
+				</when>
+			</choose>
+		</if>
+		<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+		and(
+			<if test="provinceCodes != null and cityCodes == null">
+			FLOOR(taci.contact_addr_code / 10000)*10000
+			in
+			<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			</if>
+			<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+			FLOOR(taci.contact_addr_code / 100)*100
+			in
+			<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			</if>
+			<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+			(FLOOR(taci.contact_addr_code / 10000)*10000
+			in
+			<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			)or(
+			FLOOR(taci.contact_addr_code / 100)*100
+			in
+			<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+			)	
+			</if>
+		)
+		</if>
+	order by tscr.create_dt desc
+	limit #{start},#{limit}	
+</select>
+
+<!-- 通过账号获取验厂报告总数 -->
+<select id="getSupplierCheckfactoryReportListByAccountTotal" parameterType="map" resultType="Integer">
+	select
+		count(*)
+	from
+		<if test="regId != null and regId != 0">
+			t_supplier_regaccount_info tsri,
+		</if>
+		<if test="saId != null and saId != 0">
+			t_subaccount_supplier_info tssi,
+		</if>
+		t_supplier_checkfactory_report tscr,
+		t_supplier_files tsf,
+		t_supplier_owner_info tsoi,
+		t_app_company_info taci
+	where	
+		tscr.supplier_id = tsf.supplier_id
+		and
+		tsoi.supplier_id = tsf.supplier_id 
+		and
+		taci.company_id = tsf.company_id
+		and 
+		tsoi.company_id = #{companyId}
+		<if test="regId != null and regId != 0">
+			AND
+			tsri.supplier_id = tsf.supplier_id
+			AND
+			tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+			AND
+			tssi.supplier_id = tsf.supplier_id
+			AND
+			tssi.is_delete = 0
+			AND
+			tssi.sa_id = #{saId}
+		</if>
+		<if test="mulParams != null and mulParams != ''">
+		and(
+			tsf.supplier_cpyname like CONCAT("%",#{mulParams},"%")
+			or
+			tscr.file_name like CONCAT("%",#{mulParams},"%")
+			or
+			tscr.checkor like CONCAT("%",#{mulParams},"%")
+		)
+		</if>
+		<if test="(startDate != null and startDate != '') or (endDate != null and endDate != '')">
+			<choose>
+				<when test="dateType == 1"><!-- 报告日期 -->
+					<if test="startDate != null and startDate != ''"><![CDATA[and tscr.create_dt >= #{startDate}]]></if>
+					<if test="endDate != null and endDate != ''"><![CDATA[and tscr.create_dt <= #{endDate}]]></if>
+				</when>
+				<when test="dateType == 2"><!-- 验厂日期 -->
+					<if test="startDate != null and startDate != ''"><![CDATA[and tscr.check_factory_dt >= #{startDate}]]></if>
+					<if test="endDate != null and endDate != ''"><![CDATA[and tscr.check_factory_dt <= #{endDate}]]></if>
+				</when>
+			</choose>
+		</if>	
+		<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+		and(
+			<if test="provinceCodes != null and cityCodes == null">
+			FLOOR(taci.contact_addr_code / 10000)*10000
+			in
+			<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			</if>
+			<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+			FLOOR(taci.contact_addr_code / 100)*100
+			in
+			<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			</if>
+			<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+			(FLOOR(taci.contact_addr_code / 10000)*10000
+			in
+			<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			)or(
+			FLOOR(taci.contact_addr_code / 100)*100
+			in
+			<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+			)	
+			</if>
+		)
+		</if>	
+</select>
+
+</mapper>

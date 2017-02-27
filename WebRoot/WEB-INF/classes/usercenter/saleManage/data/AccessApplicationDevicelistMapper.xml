@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AccessApplicationDevicelistMapper">
+
+<select id="getPfAccessApplicationDevicelistList" parameterType="map" resultType="com.outsideasy.ws.erp.supplier.vo.DeviceOut">
+	select
+		t_access_application_devicelist.device_id,
+		t_access_application_devicelist.device_name,
+		t_access_application_devicelist.specifications as format,
+		t_access_application_devicelist.place,
+		t_access_application_devicelist.price,
+		t_access_application_devicelist.buy_day,
+		t_access_application_devicelist.advanced,
+		t_access_application_devicelist.device_num,
+		t_access_application_devicelist.create_dt,
+		t_access_application_devicelist.record_id
+	from
+		t_access_application_devicelist
+		where 1=1
+		<if test="record_id!=null">
+			and record_id=#{record_id}
+		</if>
+		<if test="deviceId!=null">
+			and device_id=#{deviceId}
+		</if>
+		<if test="supplier_id!=null and supplier_id!=''">
+		and	supplier_id=#{supplier_id}
+		</if>
+</select>
+<select id="getAccessApplicationDevicelistList" parameterType="map" resultType="usercenter.saleManage.model.AccessApplicationDevicelist">
+	select
+		t_access_application_devicelist.device_id,
+		t_access_application_devicelist.app_device_id,
+		t_access_application_devicelist.device_name,
+		t_access_application_devicelist.specifications,
+		t_access_application_devicelist.place,
+		t_access_application_devicelist.price,
+		t_access_application_devicelist.buy_day,
+		t_access_application_devicelist.advanced,
+		t_access_application_devicelist.device_num,
+		t_access_application_devicelist.create_dt,
+		t_access_application_devicelist.record_id
+	from
+		t_access_application_devicelist
+		<where>
+		<if test="record_id!=null or supplier_id!=null">
+			and (record_id=#{record_id} or supplier_id=#{supplier_id})
+		</if>
+		<if test="customerId!=null">
+			and customer_id=#{customerId}
+		</if>
+		</where>
+</select>
+<insert id="addAccessApplicationDevicelist" parameterType="map" keyProperty="device_id" useGeneratedKeys="true">
+	insert into t_access_application_devicelist
+	(
+		device_name,
+		app_device_id,
+		specifications,
+		place,
+		<if test="price != null and price != ''">
+		price,
+		</if>
+		<if test="buyDay != null and buyDay != ''">
+		buy_day,
+		</if>
+		advanced,
+		<if test="deviceNum != null and deviceNum != ''">
+		device_num,
+		</if>
+		record_id,
+		supplier_id
+	)
+	values
+	(
+		#{deviceName},
+		#{AppDeviceId},
+		#{specifications},
+		#{place},
+		<if test="price != null and price != ''">
+		#{price},
+		</if>
+		<if test="buyDay != null and buyDay != ''">
+		#{buyDay},
+		</if>
+		#{advanced},
+		<if test="deviceNum != null and deviceNum != ''">
+		#{deviceNum},
+		</if>
+		#{record_id},
+		#{supplier_id}
+	)
+</insert>
+<update id="updateAccessApplicationDevicelist" parameterType="map">
+	update t_access_application_devicelist
+		set
+			device_id = #{deviceId}
+			<if test="deviceName != null and deviceName != ''">
+			,device_name = #{deviceName}
+			</if>
+			<if test="specifications != null and specifications != ''">
+			,specifications = #{specifications}
+			</if>
+			<if test="place != null and place != ''">
+			,place = #{place}
+			</if>
+			<if test="price != null and price != ''">
+			,price = #{price}
+			</if>
+			<if test="buyDay != null and buyDay != ''">
+			,buy_day = #{buyDay}
+			</if>
+			<if test="advanced != null and advanced != ''">
+			,advanced = #{advanced}
+			</if>
+			<if test="deviceNum != null and deviceNum != ''">
+			,device_num = #{deviceNum}
+			</if>
+			<if test="record_id != null and record_id != ''">
+			,record_id = #{record_id}
+			</if>
+		where device_id = #{deviceId}
+</update>
+<delete id="deleteAccessApplicationDevicelist" parameterType="map">
+	delete from t_access_application_devicelist
+	where device_id = #{deviceId}
+</delete>
+<delete id="deleteAccessApplicationDevicelistByRI" parameterType="map">
+	delete from t_access_application_devicelist
+	where record_id = #{record_id}
+</delete>
+</mapper>

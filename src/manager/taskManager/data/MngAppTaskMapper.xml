@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.taskManager.data.MngAppTaskMapper">
+
+
+<select id="getAppTaskList" parameterType="map" resultType="manager.taskManager.taskResponse.MngTask">
+	select
+		t_app_task.t_id,
+		t_app_task.rwdh,
+		t_app_task.scdh,
+		t_app_task.product_name,
+		t_app_task.serial_no,
+		t_app_task.state,
+		t_app_task.send_company,
+		t_app_task.receive_company,
+		t.cpyname_cn as receive_cpyname_cn,
+		d.cpyname_cn as send_cpyname_cn,
+		t_app_task.total_qty,
+		t_app_task.produced_qty,
+		t_app_task.confirmed_qty,
+		t_app_task.plan_start,
+		t_app_task.plan_complete,
+		t_app_task.qc_type,
+		t_app_task.product_pic,
+		t_app_task.czsj,
+		t_app_task.stopreason,
+		t_app_task.send_time,
+		t_app_task.receive_time,
+		t_app_task.finish_product_time,
+		t_app_task.finish_task_time,
+		t_app_task.qualified_qty,
+		t_app_task.stop_time,
+		t_app_task.remark,
+		t_app_task.operator_file,
+		t_app_task.confirmed_qtyVo,
+		t_app_task.sendout_qty,
+		t_app_task.ddh,
+		t_app_task.is_delete
+	from
+		t_app_task
+		left join t_app_company_info as t on t_app_task.receive_company = t.company_id
+		left join t_app_company_info as d on t_app_task.send_company = d.company_id
+	where 1=1
+		<if test="condition != null and condition != ''">
+		 and (t_app_task.rwdh like '%${condition}%' 
+		 or t_app_task.product_name like '%${condition}%'
+		 or t_app_task.send_company like '%${condition}%'
+		 or t_app_task.receive_company  like '%${condition}%'
+		 or t_app_task.scdh like '%${condition}%')
+		</if>
+		<if test="apply_sts != null and apply_sts != ''">
+		 and t_app_task.state = #{apply_sts} 	 
+		</if>
+</select>
+<insert id="addAppTask" parameterType="manager.taskManager.model.MngAppTask" keyProperty="t_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="t_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task
+	(
+		
+		rwdh,
+		product_name,
+		serial_no,
+		state,
+		send_company,
+		receive_company,
+		total_qty,
+		produced_qty,
+		confirmed_qty,
+		plan_start,
+		plan_complete,
+		qc_type,
+		scdh
+	)
+	values
+	(
+		
+		#{rwdh},
+		#{product_name},
+		#{serial_no},
+		#{state},
+		#{send_company},
+		#{receive_company},
+		#{total_qty},
+		#{produced_qty},
+		#{confirmed_qty},
+		#{plan_start},
+		#{plan_complete},
+		#{qc_type},
+		#{scdh}
+	)
+</insert>
+<update id="updateAppTask" parameterType="manager.taskManager.model.MngAppTask">
+	update t_app_task
+		set
+			rwdh = #{rwdh},
+			product_name = #{product_name},
+			serial_no = #{serial_no},
+			state = #{state},
+			send_company = #{send_company},
+			receive_company = #{receive_company},
+			total_qty = #{total_qty},
+			produced_qty = #{produced_qty},
+			confirmed_qty = #{confirmed_qty},
+			plan_start = #{plan_start},
+			plan_complete = #{plan_complete},
+			qc_type = #{qc_type},
+			scdh = #{scdh}
+		where t_id = #{t_id}
+</update>
+<delete id="deleteAppTask" parameterType="manager.taskManager.model.MngAppTask">
+	delete from t_app_task
+	where t_id = #{t_id}
+</delete>
+
+<!--自己编写的sql  -->
+<select id="getStatusById" parameterType="map" resultType="Integer">
+	select		
+		t_app_task.state
+	from
+		t_app_task
+		where t_id = #{t_id}
+</select>
+<select id="checkAdd" parameterType="map" resultType="Integer">
+	select		
+		count(*)
+	from
+		t_app_task
+		where rwdh = #{rwdh}
+</select>
+<select id="checkUpdate" parameterType="map" resultType="Integer">
+	select		
+		count(*)
+	from
+		t_app_task
+		where rwdh = #{rwdh} and t_id != #{t_id}
+</select>
+</mapper>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.regAccount.data.MmgRegAccountMapper">
+
+
+<select id="getRegAccoutList" parameterType="map" resultType="common.user.model.RegAccout">
+	select
+		t_app_reg_accout.reg_id,
+		t_app_reg_accout.company_id,		
+		t_app_reg_accout.role_id,
+		t_app_reg_accout.acc_name,		
+		t_app_reg_accout.reg_email,
+		t_app_reg_accout.reg_phone,
+		t_app_reg_accout.reg_date,
+		t_app_reg_accout.enabled,
+		t_app_reg_accout.password
+	from
+		t_app_reg_accout		
+	where 1=1
+	<if test="reg_id!=null  and reg_id!=''">
+		and t_app_reg_accout.reg_id=#{reg_id}
+	</if>
+	<if test="acc_name!=null  and acc_name!=''">
+		and t_app_reg_accout.acc_name=#{acc_name}
+	</if>
+	<if test="reg_email!=null and reg_email!=''">
+		and t_app_reg_accout.reg_email=#{reg_email}
+	</if>
+	<if test="password!=null  and password!=''">
+		and t_app_reg_accout.password=#{password}
+	</if>
+	<if test="accname_or_email!=null and accname_or_email!=''">
+		and t_app_reg_accout.acc_name=#{accname_or_email} or t_app_reg_accout.reg_email=#{accname_or_email}
+	</if>
+	
+</select>
+<insert id="addRegAccout" parameterType="common.user.model.RegAccout" keyProperty="reg_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="reg_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_reg_accout
+	(
+		
+		company_id,
+		role_id,
+		acc_name,
+		password,
+		reg_email,
+		reg_phone,
+		reg_date,
+		enabled,
+		update_date
+	)
+	values
+	(
+		
+		#{company_id},
+		#{role_id},
+		#{acc_name},
+		#{password},
+		#{reg_email},
+		#{reg_phone},
+		#{reg_date},
+		#{enabled},
+		#{update_date}
+	)
+</insert>
+<update id="updateRegAccout" parameterType="common.user.model.RegAccout">
+	update t_app_reg_accout
+		set
+			reg_id = #{reg_id},
+			company_id = #{company_id},
+			role_id = #{role_id},
+			acc_name = #{acc_name},
+			password = #{password},
+			reg_email = #{reg_email},
+			reg_phone = #{reg_phone},
+			reg_date = #{reg_date},
+			enabled = #{enabled}
+		where reg_id = #{reg_id}
+</update>
+<delete id="deleteRegAccout" parameterType="common.user.model.RegAccout">
+	delete from t_app_reg_accout
+	where reg_id = #{reg_id}
+</delete>
+  <select id="getCountForAdd"      parameterType="map" resultType="Integer">
+  select count(*)
+  from t_app_reg_accout
+  where company_id=#{company_id} and acc_name = #{acc_name}
+  
+  </select>
+  <select id="getCountForUpdate"      parameterType="map" resultType="Integer">
+  select count(*)
+  from t_app_reg_accout
+  where company_id=#{company_id} and acc_name = #{acc_name} and reg_id != #{reg_id}
+  
+  </select>
+   <select id="getCountXiaji"      parameterType="map" resultType="Integer">  
+    select count(*)
+    from t_app_sub_account
+    where reg_id = #{reg_id}   
+  </select>
+ <select id="getRegAccoutListbg" parameterType="map" resultType="manager.regAccount.model.RegAccountResponse">
+	select
+		t_app_reg_accout.reg_id,
+		t_app_reg_accout.company_id,		
+		t_app_reg_accout.role_id,
+		t_app_reg_accout.acc_name,		
+		t_app_reg_accout.reg_email,
+		t_app_reg_accout.reg_phone,
+		t_app_reg_accout.reg_date,
+		t_app_reg_accout.enabled,
+		t_app_company_info.cpyname_cn
+	from
+		t_app_reg_accout
+		left join t_app_company_info on t_app_reg_accout.company_id = t_app_company_info.company_id 
+		
+	where 1=1
+	<if test="reg_id!=null  and reg_id!=''">
+		and t_app_reg_accout.reg_id=#{reg_id}
+	</if>
+	<if test="acc_name!=null  and acc_name!=''">
+		and t_app_reg_accout.acc_name=#{acc_name}
+	</if>
+	<if test="reg_email!=null and reg_email!=''">
+		and t_app_reg_accout.reg_email=#{reg_email}
+	</if>
+	<if test="password!=null  and password!=''">
+		and t_app_reg_accout.password=#{password}
+	</if>
+	<if test="accname_or_email!=null and accname_or_email!=''">
+		and t_app_reg_accout.acc_name=#{accname_or_email} or t_app_reg_accout.reg_email=#{accname_or_email}
+	</if>
+	
+</select>
+</mapper>

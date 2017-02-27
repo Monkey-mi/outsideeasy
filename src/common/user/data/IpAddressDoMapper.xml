@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.user.data.IpAddressDoMapper">
+
+<!-- 获取账号下的IP地址信息,不查询失效的IP -->
+<select id="getIpAddressList" parameterType="map" resultType="common.user.model.IpAddress">
+	select
+		t_app_ip_address.adress_id,
+		t_app_ip_address.login_id,
+		t_app_ip_address.ip_address,
+		t_app_ip_address.ip_state,
+		t_app_ip_address.create_time
+	from
+		t_app_ip_address
+	where
+		t_app_ip_address.ip_state != -1
+		<if test="loginId != null and loginId != ''">
+			and	t_app_ip_address.login_id = #{loginId}
+		</if>
+</select>
+
+<insert id="addIpAddress" parameterType="common.user.model.IpAddress" keyProperty="adress_id" useGeneratedKeys="true">
+	insert into t_app_ip_address
+	(
+		adress_id,
+		login_id,
+		ip_address,
+		ip_state,
+		create_time
+	)
+	values
+	(
+		#{adress_id},
+		#{login_id},
+		#{ip_address},
+		#{ip_state},
+		#{create_time}
+	)
+</insert>
+<update id="updateIpAddress" parameterType="common.user.model.IpAddress">
+	update t_app_ip_address
+		set
+			adress_id = #{adress_id},
+			login_id = #{login_id},
+			ip_address = #{ip_address},
+			ip_state = #{ip_state},
+			create_time = #{create_time}
+		where adress_id = #{adress_id}
+</update>
+<delete id="deleteIpAddress" parameterType="common.user.model.IpAddress">
+	delete from t_app_ip_address
+	where adress_id = #{adress_id}
+</delete>
+</mapper>

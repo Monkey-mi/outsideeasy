@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.webPublish.data.WebContentFileMapper">
+
+
+<select id="getWebContentFileList" parameterType="map" resultType="manager.webPublish.model.WebContentFile">
+	select
+		t_web_content_file.id,
+		t_web_content_file.web_id,
+		t_web_content_file.file_name,
+		t_web_content_file.file_format,
+		t_web_content_file.mogodb_id,
+		t_web_content_file.create_dt
+	from
+		t_web_content_file
+	where 1=1
+	<if test="web_id!=null">
+	and t_web_content_file.web_id=#{web_id}
+	</if>
+</select>
+<insert id="addWebContentFile" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+	insert into t_web_content_file
+	(
+		web_id,
+		file_name,
+		file_format,
+		mogodb_id
+	)
+	values
+	(
+		#{web_id},
+		#{file_name},
+		#{file_format},
+		#{mogodb_id}
+	)
+</insert>
+<update id="updateWebContentFile" parameterType="map">
+	update t_web_content_file
+		set
+			web_id = #{web_id}
+		where mogodb_id = #{mogodb_id}
+</update>
+<delete id="deleteWebContentFile" parameterType="manager.webPublish.model.WebContentFile">
+	delete from t_web_content_file
+	where id = #{id}
+</delete>
+</mapper>

@@ -1,0 +1,56 @@
+@charset "utf-8";
+/* CSS Document */
+.account_right_title{ width:100%; height:30px; line-height:30px; background-color:#ececec;}
+@media screen and (-webkit-min-device-pixel-ratio:0) { .span_rz{ -webkit-transform:scale(0.75);} }
+.span_rz{ background-color:#fff; color:#589c6b; border:1px solid #589c6b;border-radius:3px;-webkit-border-radius: 3px; -moz-border-radius: 3px; padding:1px 3px; }
+.account_right_inner_wrap{ width:100%; height:auto; background-color:#fff; padding-bottom:20px; overflow:hidden;}
+.account_right_inner_wrap h4{ padding-left:10px; text-align:left; font-size:14px; height:40px; line-height:40px; letter-spacing:1px; font-weight:normal;}
+
+.companyInfo_tab{ position:relative; top:0px; width:auto; height:34px;background:#f6f6f6;}
+.companyInfo_tab li{ float:left; width:90px; height:34px; line-height:34px;/* margin-left:-8px!important;margin-left:-14px; *//* -webkit-transform: skew(20deg);-moz-transform: skew(20deg);-o-transform: skew(20deg);-ms-transform: skew(20deg); */color:#777;}
+.companyInfo_tab li a{float:left; height:34px; width:70px;/* -webkit-transform: skew(-20deg);-moz-transform: skew(-20deg);-o-transform: skew(-20deg);-ms-transform: skew(-20deg);  */margin-left:10px; text-decoration:none;color:#666;text-align:center;}
+.companyInfo_tab li span.split{ color:#bababa; float:right; height:100%; width:auto; font-size:16px; font-weight:bold;}
+.companyInfo_tab li a.selected{color:#2170e8;}
+.baseInfo_sub_wrap{clear:both; height:auto; width:100%;}
+
+.stepBar{padding:50px 287px 50px 277px;}
+.stepBarTip{font-size:12px;font-weight:bold;color:#999;}
+.stepBarTip .curr{color:#589c6b;}
+.goToCenter{width:120px;height:40px;background:#58749c;color:#fff;text-align:center;line-height: 40px;border-radius:3px;margin-right:125px;}
+/*======表单中的一行信息样式======*/
+/*
+.inner_line_wrap{ height:auto; min-height:32px; margin-bottom:10px; text-align:left; width:auto;}
+.inner_line_wrap .label_wrap{ float:left; height:32px; line-height:32px; text-align:left; min-width:80px; color:#707070;}
+.inner_line_wrap .label_wrap .no_empty{ float:right; width:20px; height:32px; line-height:32px; color:red;}
+.inner_line_wrap .input_wrap{ float:left; height:30px; line-height:30px; width:330px; border:1px solid #ccc;}
+*/
+
+
+/*=====定位地图====*/
+
+.remarkMap_a{ float:left; color:#0072c4; width:auto; height:30px; line-height:30px;}
+.baseInfo_sub_wrap .map_wrap{ position:absolute; z-index:2; top:40px; left:30px; width:500px; height:500px; display:none;}
+
+.baseInfo_sub_wrap #remove_overlay{  position:absolute; display:none; z-index:10;top:54px; left:85px; width:60px; height:auto;border-radius:5px;background:#58749c;color:#fff;font-weight:bold;line-height:20px;text-align:center;}
+.baseInfo_sub_wrap .close_btn{  position:absolute; display:none; z-index:10; width:20px; height:20px; border-radius:10px; font-size:12px;top:56px; left:505px;background:#58749c; color:#fff;text-align:center;text-decoration:none;}
+/* .baseInfo_sub_wrap .close_btn:hover{opacity:1;filter:alpha(opacity=100); text-decoration:none; font-weight:bold;} */
+
+.baseInfo_sub_wrap #r-result{width:370px; position:absolute; top:50px; left:100px; z-index:10; display:none;}
+#r-result input{ border:1px solid #ccc; height:26px; line-height:26px; width:300px;}
+#searchResultPanel{position:absolute; top:40px;right:300px; z-index:20;width:200px;height:auto; display:none;}
+
+/*表单中的一行信息样式*/
+/*
+.info_explain_wrap{ float:left; display:none; margin-left:10px; width:auto; height:32px; line-height:32px;}
+.info_explain_wrap .info_explain{ position:relative; width:100%; height:100%;}
+.info_explain_wrap .info_explain .info_explain_icon{ position:absolute; left:0px; top:50%; margin-top:-6px; width:11px; height:14px; z-index:10;}
+.info_explain .info_explain_tip{position:absolute;left:11px; top:0px;  margin-left:-1px; padding:4px 4px 4px 10px; font-size:12px; color:#666; height:auto; width:140px; border:1px solid #d0d0d0; line-height:22px;border-radius:4px;-webkit-border-radius: 4px; -moz-border-radius: 4px; background-color:#fff;}
+*/
+/*=====定位地图====*/
+ .close_btn{ position:absolute; width:20px; height:20px; line-height:20px; top:0px; right:0px;color:#fff; font-weight:normal;opacity:0.8;filter:alpha(opacity=80); text-decoration:none;}
+/*  .close_btn:hover{opacity:1;filter:alpha(opacity=100); text-decoration:none; font-weight:bold;} */
+ 
+ 
+
+
+

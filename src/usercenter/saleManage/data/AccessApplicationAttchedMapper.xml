@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AccessApplicationAttchedMapper">
+
+
+<select id="getAccessApplicationAttchedList" parameterType="map" resultType="usercenter.saleManage.model.AccessApplicationAttched">
+	select
+		t_access_application_attched.id,
+		t_access_application_attched.app_id,
+		t_access_application_attched.file_type_id,
+		t_access_application_attched.file_name,
+		t_access_application_attched.file_format,
+		t_access_application_attched.create_dt,
+		t_access_application_attched.remark,
+		t_access_application_attched.mogodb_id,
+		t_access_application_attched.record_id
+	from
+		t_access_application_attched
+		where 1=1
+		<if test="record_id!='' and record_id!=null">
+			and t_access_application_attched.record_id=#{record_id}
+		</if>
+		<if test="flag!='' and flag!=null">
+			and t_access_application_attched.record_id is null
+		</if>
+		<if test="file_type_id!='' and file_type_id!=null">
+			and t_access_application_attched.file_type_id=#{file_type_id}
+		</if>
+		<if test="id!='' and id!=null">
+			and t_access_application_attched.id=#{id}
+		</if>
+		<if test="supplier_id!=null and supplier_id!=''">
+		and	supplier_id=#{supplier_id}
+		</if>
+</select>
+<insert id="addAccessApplicationAttched" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+	insert into t_access_application_attched
+	(
+		app_id,
+		file_type_id,
+		file_name,
+		file_format,
+		remark,
+		mogodb_id,
+		record_id,
+		supplier_id
+	)
+	values
+	(
+		#{app_id},
+		#{file_type_id},
+		#{file_name},
+		#{file_format},
+		#{remark},
+		#{mogodb_id},
+		#{record_id},
+		#{supplier_id}
+	)
+</insert>
+<update id="updateAccessApplicationAttched" parameterType="map">
+	update t_access_application_attched
+		set
+			record_id = #{record_id},
+			supplier_id = #{supplier_id}
+		where id = #{fileId}
+</update>
+<update id="updateAccessApplicationAttchedMogoId" parameterType="map">
+	update t_access_application_attched
+		set
+			mogodb_id = #{mogodb_id},
+			file_name = #{file_name}
+		where id = #{id}
+</update>
+<update id="updateAccessApplicationAttchedName" parameterType="map">
+	update t_access_application_attched
+		set
+			file_name = #{fileName}
+		where 
+			mogodb_id = #{mongoId}
+</update>
+<delete id="deleteAccessApplicationAttched" parameterType="map">
+	delete from t_access_application_attched
+	where id = #{id}
+</delete>
+<delete id="deleteAccessApplicationAttchedByRI" parameterType="map">
+	delete from t_access_application_attched
+	where record_id = #{record_id}
+</delete>
+<select id="getAllAccessAttched" parameterType="map" resultType="usercenter.saleManage.model.AccessApplicationAttched">
+	select
+		t_app_register_attched.id,
+		t_app_register_attched.company_id,
+		t_app_register_attched.file_name,
+		t_app_register_attched.file_path,
+		t_app_register_attched.mogodb_id,
+		t_app_register_attched.file_format,
+		t_base_file_type.type_name
+	from
+		t_app_register_attched
+		left outer join t_base_file_type on t_base_file_type.ft_id=t_app_register_attched.file_type_id
+		where  t_app_register_attched.file_type_id in (18,19,20,21)
+			and t_app_register_attched.company_id=(select company_id from t_supplier_files where supplier_id=#{supplier_id} limit 1)
+	union all
+	select
+		t_access_application_attched.id,
+		t_access_application_attched.record_id,
+		t_access_application_attched.file_name,
+		"" as file_path,
+		t_access_application_attched.mogodb_id,
+		t_access_application_attched.file_format,
+		t_base_file_type.type_name
+	from
+		t_access_application_attched
+		left outer join t_base_file_type on t_base_file_type.ft_id=t_access_application_attched.file_type_id
+		where  t_access_application_attched.supplier_id=#{supplier_id}
+</select>
+</mapper>

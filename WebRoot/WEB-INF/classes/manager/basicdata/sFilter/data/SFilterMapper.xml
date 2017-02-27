@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.basicdata.sFilter.data.SFilterMapper">
+
+
+<select id="getSFilterList" parameterType="map" resultType="manager.basicdata.sFilter.model.SFilter">
+	select
+		t_sys_filter.filter_id,
+		t_sys_filter.filter_url,
+		t_sys_filter.remark
+	from
+		t_sys_filter
+</select>
+<insert id="addSFilter" parameterType="manager.basicdata.sFilter.model.SFilter" keyProperty="filter_id" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="filter_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_sys_filter
+	(
+	
+		filter_url,
+		remark
+	)
+	values
+	(
+		
+		#{filter_url},
+		#{remark}
+	)
+</insert>
+<update id="updateSFilter" parameterType="manager.basicdata.sFilter.model.SFilter">
+	update t_sys_filter
+		set
+			filter_id = #{filter_id},
+			filter_url = #{filter_url},
+			remark = #{remark}
+		where filter_id = #{filter_id}
+</update>
+<delete id="deleteSFilter" parameterType="manager.basicdata.sFilter.model.SFilter">
+	delete from t_sys_filter
+	where filter_id = #{filter_id}
+</delete>
+
+
+<select id="getCountForAdd" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_sys_filter where  filter_url=#{filter_url} and remark = #{remark}
+</select>
+
+<select id="getCountForUpdate" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_sys_filter where  filter_url=#{filter_url} and remark = #{remark} and filter_id != #{filter_id}
+</select>
+<select id="getXiajiCount" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_sys_filter where filter_id =#{filter_id}
+</select>
+
+</mapper>

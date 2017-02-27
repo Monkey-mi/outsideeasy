@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplierAccess.data.SupplierAccessScoreDetailsMapper">
+
+
+<select id="getSupplierAccessScoreDetailsList" parameterType="map" resultType="manager.supplierAccess.model.SupplierAccessScoreDetails">
+select t_score.score_id,
+t_score.company_id, 
+t_score.item_id, 
+t_score.item_fid, 
+t_score.assess_score, 
+t1.item_name,
+t2.item_name as fitem_name,
+t2.f_id as fitem_fid,
+t2.weightValue,
+t_score.assess_date, 
+t_score.plan_assess_date, 
+t_score.version_id, 
+t_score.point_analyze, 
+t_score.improve_act, 
+t_score.responsible_person, 
+t_score.assess_person, 
+t_score.item_description,
+t_score.assess_view1
+from t_app_supplier_access_score as t_score
+left join t_app_supplier_access_basetable as t1
+on t_score.item_id=t1.item_id
+left join t_app_supplier_access_basetable as t2
+on t1.f_id=t2.item_id
+ where 1=1
+ <if test="company_id!=null">
+ and t_score.company_id=#{company_id}
+ </if>
+  <if test="item_fid!=null">
+  and t_score.item_fid=#{item_fid}
+  </if>
+order by t_score.item_id
+</select>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.common.communication.data.AccountCommunDelMapper">
+<insert id="addAccountCommunDel" parameterType="map">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="info_id">
+		SELECT LAST_INSERT_ID() AS info_id
+	</selectKey>
+	insert into t_account_commun_del
+	(
+		commu_id,
+		account_id,
+		account_type,
+		commu_type
+	)
+	values
+	(
+		#{commu_id},
+		#{account_id},
+		#{account_type},
+		#{commu_type}
+	)
+</insert>
+<select id="queryAccountCommunDelCount" resultType="Integer" parameterType="map">
+select count(0)
+from
+ t_account_commun_del
+where
+ commu_id = #{commu_id}
+and account_id = #{account_id}
+and account_type = #{account_type}
+and commu_type = #{commu_type}
+
+</select>
+</mapper>

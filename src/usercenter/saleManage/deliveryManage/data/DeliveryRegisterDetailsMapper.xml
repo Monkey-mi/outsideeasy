@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.deliveryManage.data.DeliveryRegisterDetailsMapper">
+
+
+<select id="getDeliveryRegisterDetailsList" parameterType="map" resultType="usercenter.saleManage.deliveryManage.model.DeliveryRegisterDetails">
+	select
+		t_order_delivery_register_details.detail_id,
+		t_order_delivery_register_details.register_id,
+		t_order_delivery_register_details.order_detail_id,
+		t_order_delivery_register_details.pur_order_id,
+		t_order_delivery_register_details.order_bh,
+		t_order_delivery_register_details.agreement_bh,
+		t_order_delivery_register_details.go_type
+	from
+		t_order_delivery_register_details
+	where 1=1
+	<if test="register_id!=null and register_id!=''">
+	and t_order_delivery_register_details.register_id=#{register_id}
+	</if>
+</select>
+<insert id="addDeliveryRegisterDetails" parameterType="map" keyProperty="detail_id" useGeneratedKeys="true">
+	insert into t_order_delivery_register_details
+	(
+		register_id,
+		order_detail_id,
+		pur_order_id,
+		order_bh,
+		agreement_bh,
+		go_type
+	)
+	values
+	(
+		#{register_id},
+		#{order_detail_id},
+		#{pur_order_id},
+		#{order_bh},
+		#{agreement_bh},
+		#{go_type}
+	)
+</insert>
+<update id="updateDeliveryRegisterDetails" parameterType="map">
+	update t_order_delivery_register_details
+		set
+			detail_id = #{detail_id},
+			register_id = #{register_id},
+			order_detail_id = #{order_detail_id},
+			pur_order_id = #{pur_order_id},
+			order_bh = #{order_bh},
+			agreement_bh = #{agreement_bh},
+			go_type = #{go_type}
+		where detail_id = #{detail_id}
+</update>
+<delete id="deleteDeliveryRegisterDetails" parameterType="map">
+	delete from t_order_delivery_register_details
+	where detail_id = #{detail_id}
+</delete>
+</mapper>

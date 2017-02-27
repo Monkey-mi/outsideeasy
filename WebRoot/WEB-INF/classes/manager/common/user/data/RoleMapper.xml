@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.common.user.data.RoleMapper">
+	 <select id="getRoleList" parameterType="map" resultType="Role">
+        select 
+            role_id,
+            role_name,
+            role_desc,
+            order_seq,
+            creator,
+            ou_code
+        from t_user_role
+        <where>
+            <if test="hasAD=='false'">
+	    		and role_name !='admins'
+	    	</if>
+	    	<if test="role_id!=null and role_id!=''">
+	    		and role_id =#{role_id}
+	    	</if>
+        </where>
+  </select>
+  <insert id="addRole" parameterType="Role">
+        <selectKey keyProperty="role_id" resultType="int" order="BEFORE">
+               select ifnull(max(role_id)+1,1) from t_user_role
+        </selectKey>
+        insert into t_user_role(
+            role_id,
+            role_name,
+            role_desc,
+            order_seq,
+            ou_code
+        ) 
+        values(
+            #{role_id},
+            #{role_name},
+            #{role_desc},
+            #{order_seq},
+            #{ou_code}
+        )
+  </insert>
+  <update id="updateRole" parameterType="Role">
+      update t_user_role 
+      set 
+        role_name=#{role_name},
+        role_desc=#{role_desc},
+        order_seq=#{order_seq}
+      where role_id=#{role_id}
+  </update>
+  <delete id="deleteRole" parameterType="Role">
+        delete from  t_user_role 
+        where role_id=#{role_id}
+  </delete>
+  <select id="getCountUserRoleByRole_id" parameterType="map" resultType="java.lang.Integer">
+		select count(0) from t_user_role_ref
+		where  role_id=#{role_id}
+</select>
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.TaskAllCheckMapper">
+
+
+<select id="getTaskAllCheckList" parameterType="map" resultType="usercenter.externalTask.model.TaskAllCheck">
+	select
+		t_task_all_check.allcheck_id,
+		t_task_all_check.rwdh,
+		t_task_all_check.t_id,
+		t_task_all_check.jldh,
+		t_task_all_check.jlrq,
+		t_task_all_check.jysl,
+		t_task_all_check.hgsl,
+		t_task_all_check.czym,
+		t_task_all_check.bzsm,
+		t_task_all_check.source_type,
+		t_task_all_check.create_dt
+	from
+		t_task_all_check
+	where 1=1
+	<if test="t_id">
+		and t_task_all_check.t_id=#{t_id}
+	</if>
+	<if test="end_date != null and end_date !='' ">
+		and t_task_all_check.jlrq&lt;=#{end_date}
+	</if>
+	<if test="start_date != null and start_date !='' ">
+		and t_task_all_check.jlrq&gt;=#{start_date}
+	</if>
+	<if test="search_text != null and search_text !='' ">
+		and t_task_all_check.jldh  like '%${search_text}%' 
+	</if>
+</select>
+<insert id="addTaskAllCheck" parameterType="map" keyProperty="allcheck_id" useGeneratedKeys="true">
+	insert into t_task_all_check
+	(
+		allcheck_id,
+		rwdh,
+		t_id,
+		jldh,
+		jlrq,
+		jysl,
+		hgsl,
+		czym,
+		bzsm,
+		source_type
+	)
+	values
+	(
+		#{allcheck_id},
+		#{rwdh},
+		#{t_id},
+		#{jldh},
+		#{jlrq},
+		#{checkNum},
+		#{qualifiedNum},
+		#{czym},
+		#{bzsm},
+		#{source_type}
+	)
+</insert>
+<update id="updateTaskAllCheck" parameterType="usercenter.externalTask.model.TaskAllCheck">
+	update t_task_all_check
+		set
+			allcheck_id = #{allcheck_id},
+			rwdh = #{rwdh},
+			t_id = #{t_id},
+			jldh = #{jldh},
+			jlrq = #{jlrq},
+			jysl = #{jysl},
+			hgsl = #{hgsl},
+			czym = #{czym},
+			bzsm = #{bzsm},
+			source_type = #{source_type},
+			create_dt = #{create_dt}
+		where allcheck_id = #{allcheck_id}
+</update>
+<delete id="deleteTaskAllCheck" parameterType="usercenter.externalTask.model.TaskAllCheck">
+	delete from t_task_all_check
+	where allcheck_id = #{allcheck_id}
+</delete>
+<select id="getTaskAllCheckCount" parameterType="map" resultType="usercenter.externalTask.TaskResponse.TaskAllCheckCount">
+	select
+		sum(t_task_all_check.jysl) as checkTotal,
+		sum(t_task_all_check.hgsl) as qualifiedTotal
+	from
+		t_task_all_check
+	where 1=1
+	<if test="t_id">
+		and t_task_all_check.t_id=#{t_id}
+	</if>
+</select>
+</mapper>

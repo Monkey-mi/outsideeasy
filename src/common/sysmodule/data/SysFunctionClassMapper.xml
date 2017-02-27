@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.sysmodule.data.SysFunctionClassMapper">
+
+
+<select id="getSysFunctionClassList" parameterType="map" resultType="common.sysmodule.model.SysFunctionClass">
+	select
+		t_sys_function_class.class_id,
+		t_sys_function_class.class_name,
+		t_sys_function_class.parentId,
+		t_sys_function_class.isvalid,
+		t_sys_function_class.order_seq,
+		t_sys_function_class.isParent,
+		t_sys_function_class.remark
+	from
+		t_sys_function_class
+	where 1=1
+	<if test="node!=null">
+		and t_sys_function_class.parentId=#{node}
+	</if>
+	<if test="nodeIdForGrid!=null">
+		and (t_sys_function_class.parentId=#{nodeIdForGrid} or t_sys_function_class.class_id=#{nodeIdForGrid})
+	</if>
+	<if test="enable!=null">
+		and t_sys_function_class.isvalid=#{enable}
+	</if>
+	order by order_seq
+	
+</select>
+<insert id="addSysFunctionClass" parameterType="common.sysmodule.model.SysFunctionClass" keyProperty="class_id">
+	<!--  <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="class_id">
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+    -->
+    <selectKey keyProperty="class_id" resultType="int" order="BEFORE">
+		select  ifnull(max(class_id)+1,1) from t_sys_function_class 
+	</selectKey>
+	insert into t_sys_function_class
+	(
+		class_id,
+		class_name,
+		parentId,
+		isvalid,
+		order_seq,
+		isParent,
+		remark
+	)
+	values
+	(
+		#{class_id},
+		#{class_name},
+		#{parentId},
+		#{isvalid},
+		#{order_seq},
+		#{isParent},
+		#{remark}
+	)
+</insert>
+<update id="updateSysFunctionClass" parameterType="common.sysmodule.model.SysFunctionClass">
+	update t_sys_function_class
+		set
+			class_id = #{class_id},
+			class_name = #{class_name},
+			parentId = #{parentId},
+			isvalid = #{isvalid},
+			order_seq = #{order_seq},
+			isParent = #{isParent},
+			remark = #{remark}
+		where class_id = #{class_id}
+</update>
+<delete id="deleteSysFunctionClass" parameterType="common.sysmodule.model.SysFunctionClass">
+	delete from t_sys_function_class
+	where class_id = #{class_id}
+</delete>
+<select id="getCountForUpdate" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_sys_function_class where parentId = #{parentId} and class_name = #{class_name} and class_id != #{class_id}
+</select>
+<select id="getSysPageAuthorityList" parameterType="map" resultType="common.sysmodule.model.SysPageAuthority">
+	select
+		t_sys_page_authority.authority_id,
+		t_sys_page_authority.class_id,
+		t_sys_page_authority.page_name,
+		t_sys_page_authority.page_path,
+		t_sys_page_authority.enable,
+		t_sys_page_authority.remark,
+		t_sys_page_authority.is_menu_page,
+		t_sys_page_authority.order_seq
+	from
+		t_sys_page_authority
+	where 1=1
+	<if test="nodeIdForGrid!=null">
+		and t_sys_page_authority.class_id=#{nodeIdForGrid} 
+	</if>
+	<if test="enable!=null">
+		and t_sys_page_authority.enable=#{enable}
+	</if>
+	<if test="class_id!=null">
+		and t_sys_page_authority.class_id=#{class_id}
+	</if>
+	<if test="is_menu_page!=null">
+		and t_sys_page_authority.is_menu_page=#{is_menu_page}
+	</if>
+	<if test="order_seq!=null">
+		order by #{order_seq}
+	</if>
+</select>
+<insert id="addSysPageAuthority" parameterType="common.sysmodule.model.SysPageAuthority">
+	<!--  <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="authority_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+    -->
+     <selectKey keyProperty="authority_id" resultType="int" order="BEFORE">
+		select  ifnull(max(authority_id)+1,1) from t_sys_page_authority 
+	</selectKey>
+	insert into t_sys_page_authority
+	(
+		authority_id,
+		class_id,
+		page_name,
+		page_path,
+		enable,
+		remark,
+		is_menu_page,
+		order_seq
+	)
+	values
+	(
+		#{authority_id},
+		#{class_id},
+		#{page_name},
+		#{page_path},
+		#{enable},
+		#{remark},
+		#{is_menu_page},
+		#{order_seq}
+	)
+</insert>
+<update id="updateSysPageAuthority" parameterType="common.sysmodule.model.SysPageAuthority">
+	update t_sys_page_authority
+		set
+			authority_id = #{authority_id},
+			class_id = #{class_id},
+			page_name = #{page_name},
+			page_path=#{page_path},
+			enable = #{enable},
+			remark = #{remark},
+			is_menu_page=#{is_menu_page},
+			order_seq=#{order_seq}
+		where authority_id = #{authority_id}
+</update>
+<delete id="deleteSysPageAuthority" parameterType="common.sysmodule.model.SysPageAuthority">
+	delete from t_sys_page_authority
+	where authority_id = #{authority_id}
+</delete>
+<delete id="deleteSysRoleAuthorityByclass_id" parameterType="map">
+	delete from t_sys_role_authority
+	where class_id = #{class_id}
+</delete>
+
+<!-- 授权之系统页面功能按钮表开始 -->
+<select id="getSysPageFuncList" parameterType="map" resultType="common.sysmodule.model.SysPageFunc">
+	select
+		t_sys_page_func.f_id,
+		t_sys_page_func.authority_id,
+		t_sys_page_func.code,
+		t_sys_page_func.name,
+		t_sys_page_func.order_seq
+	from
+		t_sys_page_func
+		where 1=1
+	<if test="nodeIdForGrid!=null">
+		and t_sys_page_func.authority_id=#{nodeIdForGrid} 
+	</if>
+	<if test="authority_id!=null">
+		and t_sys_page_func.authority_id=#{authority_id} 
+	</if>
+</select>
+
+<insert id="addSysPageFunc" parameterType="common.sysmodule.model.SysPageFunc" keyProperty="f_id">
+	<!--  <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="f_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+    -->
+     <selectKey keyProperty="f_id" resultType="int" order="BEFORE">
+		select  ifnull(max(f_id)+1,1) from t_sys_page_func 
+	</selectKey>
+	insert into t_sys_page_func
+	(
+		f_id,
+		authority_id,
+		code,
+		name,
+		order_seq
+	)
+	values
+	(
+		#{f_id},
+		#{authority_id},
+		#{code},
+		#{name},
+		#{order_seq}
+	)
+</insert>
+<update id="updateSysPageFunc" parameterType="common.sysmodule.model.SysPageFunc">
+	update t_sys_page_func
+		set
+			f_id = #{f_id},
+			authority_id = #{authority_id},
+			code = #{code},
+			name = #{name},
+			order_seq = #{order_seq}
+		where f_id = #{f_id}
+</update>
+<delete id="deleteSysPageFunc" parameterType="common.sysmodule.model.SysPageFunc">
+	delete from t_sys_page_func
+	where f_id = #{f_id}
+	
+</delete>
+<delete id="deleteSysPageFuncByauthId" parameterType="java.lang.Integer">
+	delete from t_sys_page_func
+	where authority_id = #{authority_id}
+	
+</delete>
+<select id="getSysPageFuncCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+	select
+		count(*) 
+	from
+		t_sys_page_func
+		where 1=1
+	<if test="authority_id!=null">
+		and t_sys_page_func.authority_id=#{authority_id} 
+	</if>
+</select>
+
+<!--授权之系统页面功能按钮表结束  -->
+
+<!-- 组装左侧菜单目录 -->
+<select id="getSysMenusByRole" parameterType="map" resultType="common.sysmodule.model.SysFunctionClass">
+SELECT class_id,class_name,parentId,order_seq,isParent
+ from t_sys_function_class 
+ where isvalid='true' 
+ and parentId=#{parentId} 
+ and class_id IN(SELECT class_id from t_sys_role_authority where FIND_IN_SET(role_id,#{role_id})) 
+ order by order_seq;
+</select>
+<!-- 组装左侧菜单目录下的页面级菜单 -->
+<select id="getSysMenuPagesByRole" parameterType="map" resultType="common.sysmodule.model.SysPageAuthority">
+SELECT * from t_sys_page_authority 
+where enable='true' and  class_id=#{class_id} and is_menu_page=1 and authority_id in (SELECT authority_id from t_sys_role_page where FIND_IN_SET(role_id,#{role_id})) 
+order by order_seq;
+</select>
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.contract.data.PfPurchaseOrderDetailsMapper">
+
+
+<select id="getPfPurchaseOrderDetailsList" parameterType="map" resultType="platform.contract.model.PfPurchaseOrderDetails">
+	select
+		t_purchase_order_detail.order_detail_id,
+		t_purchase_order_detail.pur_order_id,
+		t_purchase_order_detail.product_name,
+		t_purchase_order_detail.product_size,
+		t_purchase_order_detail.unit_price,
+		t_purchase_order_detail.number,
+		t_purchase_order_detail.unit,
+		t_purchase_order_detail.money,
+		t_purchase_order_detail.delivery_date,
+		t_purchase_order_detail.delivery_num,
+		t_purchase_order_detail.no_delivery_num,
+		t_purchase_order_detail.Storage_num,
+		t_purchase_order_detail.htmx,
+		t_purchase_order_detail.product_artno,
+		t_purchase_order_detail.remark
+	from
+		t_purchase_order_detail
+</select>
+<insert id="addPfPurchaseOrderDetails" parameterType="platform.contract.model.PfPurchaseOrderDetails" keyProperty="" useGeneratedKeys="true">
+	insert into t_purchase_order_detail
+	(
+		order_detail_id,
+		pur_order_id,
+		product_name,
+		product_size,
+		unit_price,
+		number,
+		unit,
+		money,
+		delivery_date,
+		delivery_num,
+		no_delivery_num,
+		Storage_num,
+		htmx,
+		product_artno,
+		remark
+	)
+	values
+	(
+		#{order_detail_id},
+		#{pur_order_id},
+		#{product_name},
+		#{product_size},
+		#{unit_price},
+		#{number},
+		#{unit},
+		#{money},
+		#{delivery_date},
+		#{delivery_num},
+		#{no_delivery_num},
+		#{Storage_num},
+		#{htmx},
+		#{product_artno},
+		#{remark}
+	)
+</insert>
+<update id="updatePfPurchaseOrderDetails" parameterType="platform.contract.model.PfPurchaseOrderDetails">
+	update t_purchase_order_detail
+		set
+			order_detail_id = #{order_detail_id},
+			pur_order_id = #{pur_order_id},
+			product_name = #{product_name},
+			product_size = #{product_size},
+			unit_price = #{unit_price},
+			number = #{number},
+			unit = #{unit},
+			money = #{money},
+			delivery_date = #{delivery_date},
+			delivery_num = #{delivery_num},
+			no_delivery_num = #{no_delivery_num},
+			Storage_num = #{Storage_num},
+			htmx = #{htmx},
+			product_artno = #{product_artno},
+			remark = #{remark}
+		where  = #{}
+</update>
+<delete id="deletePfPurchaseOrderDetails" parameterType="platform.contract.model.PfPurchaseOrderDetails">
+	delete from t_purchase_order_detail
+	where  = #{}
+</delete>
+</mapper>

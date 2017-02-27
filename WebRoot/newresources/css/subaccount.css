@@ -1,0 +1,38 @@
+@CHARSET "UTF-8";
+/*===组织账号管理页面表格样式==*/
+.subAccount_table{width:100%; height:auto; border-collapse:collapse;}
+/*.subAccount_table tr:nth-child(odd){ background-color:#f6f6f6;}*/
+.subAccount_table tr:hover{background-color:#f6f6f6;}
+.subAccount_table th{ border-bottom:1px solid #ccc; color:#777; font-weight:normal; text-align:center;padding:4px 0px;}
+.subAccount_table td{word-break: break-all; text-align:center;line-height:40px;}
+.subAccount_table td.left{ text-align:left;}
+.subAccount_table td.right{ text-align:right;}
+.subAccount_table td input[type=checkbox]{margin-top:-1px;}
+.
+.subAccount_table img{ cursor:pointer;}
+
+.subAccount_table label{ margin-right:10px;}
+
+.subAccount_table td a{color:#0072c4; display:inline; text-decoration:none;}
+.subAccount_table td a:hover{}
+
+.sub_pop_inner_div{ width:auto; height:auto; margin:10px;}
+.sub_pop_inner_div .search_wrap{ float:right; width:230px; height:32px; overflow:hidden; background-color:#fff;}
+.sub_pop_inner_div .search_wrap input{ width:190px; border:1px solid #ccc; height:28px; line-height:28px;float:left;}
+.sub_pop_inner_div .search_wrap button{ float:left; width:30px; height:30px; border:1px solid #ccc; cursor:pointer; background: url(../images/icon/search.png) no-repeat 0 0;}
+.sub_pop_inner_div input[type=checkbox]{margin-left:10px; margin-right:10px; padding:0px; float:left; height:30px; line-height:30px;}
+.sub_pop_inner_div span{float:left; height:30px; line-height:30px;}
+
+
+.subAccount_tablelist{ width:100%; height:auto; border-collapse:collapse; border:1px solid #ccc; border-bottom:none;}
+.subAccount_tablelist tr{border-bottom:1px solid #ccc; height:30px;}
+.subAccount_tablelist th{ color:#777;  background-color:#f6f6f6; font-weight:normal; text-align:center; height:38px;}
+.subAccount_tablelist th.left{text-align:left; padding-left:10px;}
+.subAccount_tablelist td{word-break: break-all; text-align:center;line-height:30px;}
+.subAccount_tablelist td.left{ text-align:left; padding-left:10px;}
+.subAccount_tablelist td.center{text-align:center;}
+.subAccount_tablelist td.right{ text-align:right;}
+.subAccount_tablelist td input[type=checkbox]{margin:0px; padding:0px;}
+
+.email_valid_tip{font-size:16px; margin-left:165px; margin-top:40px; margin-bottom:60px; font-weight:bold;}
+.abandon{color:#ccc;}

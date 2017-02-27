@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.AuthUpdateAttchedMapper">
+
+
+<select id="getAuthUpdateAttchedList" parameterType="map" resultType="manager.supplier.model.AuthUpdateAttched">
+	select
+		t_update_register_attched.id,
+		t_update_register_attched.auth_update_id,
+		t_update_register_attched.file_type_id,
+		t_update_register_attched.file_name,
+	
+		t_update_register_attched.create_dt,
+		t_update_register_attched.file_format,
+		
+		t_update_register_attched.remark,
+		
+		t_update_register_attched.object_id,
+		t_update_register_attched.company_id
+	from
+	t_update_register_attched
+	<where>
+			1=1
+			<if test="auth_update_id!=null">
+				and t_update_register_attched.auth_update_id=#{auth_update_id}
+			</if>
+			<if test="id!=null">
+				and t_update_register_attched.id=#{id}
+			</if>
+			<!-- 多个ID组成的字符串检索条件 -->
+			<if test="multi_authupdateId_search!=null and multi_authupdateId_search!=''">
+				and FIND_IN_SET(t_update_register_attched.auth_update_id,#{multi_authupdateId_search})>0
+			</if>
+		</where>
+		
+</select>
+<insert id="addAuthUpdateAttched" parameterType="manager.supplier.model.AuthUpdateAttched" keyProperty="id" useGeneratedKeys="true">
+	insert into t_update_register_attched
+	(
+		
+		auth_update_id,
+		file_type_id,
+		file_name,
+		
+		create_dt,
+		file_format,
+		
+		remark,
+		
+		object_id,
+		company_id
+	)
+	values
+	(
+		
+		#{auth_update_id},
+		#{file_type_id},
+		#{file_name},
+		
+		#{create_dt},
+		#{file_format},
+		
+		#{remark},
+		
+		#{object_id},
+		#{company_id}
+	)
+</insert>
+<update id="updateAuthUpdateAttched" parameterType="manager.supplier.model.AuthUpdateAttched">
+	update t_update_register_attched
+		set
+			
+			auth_update_id = #{auth_update_id},
+			file_type_id = #{file_type_id},
+			file_name = #{file_name},
+			
+			create_dt = #{create_dt},
+			file_format = #{file_format},
+			
+			remark = #{remark},
+			
+			object_id = #{object_id},
+			company_id = #{company_id}
+		where id = #{id}
+</update>
+<delete id="deleteAuthUpdateAttched" parameterType="manager.supplier.model.AuthUpdateAttched">
+	delete from t_update_register_attched
+	where id = #{id}
+</delete>
+</mapper>

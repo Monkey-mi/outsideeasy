@@ -1,0 +1,33 @@
+Ext.define('srm.role.store.RoleConfig',{
+	extend:'Ext.data.Store',
+	model:'srm.role.model.RoleConfig',
+	requires:['srm.role.model.RoleConfig'],
+	proxy:{
+		type:'ajax',
+		actionMethods : {create: 'POST', read: 'POST', update: 'POST', destroy: 'POST'},
+		api:{
+			create:"user/Users.do?method=addRoleCfg",
+			update:"user/Users.do?method=updateRoleCfg",
+			read:"user/Users.do?method=getRoleCfgList",
+			destroy:"user/Users.do?method=deleteRoleCfg"
+		},
+		reader:{
+			type:"json",
+			rootProperty:'data',
+			successProperty:'success',
+			messageProperty:'message'
+		},
+		writer:{
+			type:'json',
+			rootProperty:'data',
+			encode:true,
+			allowSingle:false
+		}
+	},
+	sorters:[
+	         {
+	        	 property:'role_id',
+	        	 direction:"ASC"
+	         }
+	         ]
+});

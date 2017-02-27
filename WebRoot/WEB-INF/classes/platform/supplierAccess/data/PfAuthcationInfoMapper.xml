@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.supplierAccess.data.PfAuthcationInfoMapper">
+
+
+<select id="getPfAuthcationInfoList" parameterType="map" resultType="platform.supplierAccess.model.PfAuthcationInfo">
+	select
+		t_authcation_info.auth_id,
+		t_authcation_info.company_id,
+		t_authcation_info.auth_state,
+		t_authcation_info.auth_opinion,
+		t_authcation_info.create_dt
+	from
+		t_authcation_info
+		<where>
+			<if test="company_id!=null">
+				t_authcation_info.company_id=#{company_id}
+			</if>
+		</where>
+</select>
+<insert id="addPfAuthcationInfo" parameterType="platform.supplierAccess.model.PfAuthcationInfo" keyProperty="auth_id" useGeneratedKeys="true">
+	<selectKey keyProperty="auth_id" resultType="int" order="BEFORE">
+		select  ifnull(max(auth_id),1)+1 from t_authcation_info 		
+	</selectKey>
+	insert into t_authcation_info
+	(
+		auth_id,
+		company_id,
+		auth_state,
+		auth_opinion,
+		create_dt
+	)
+	values
+	(
+		#{auth_id},
+		#{company_id},
+		#{auth_state},
+		#{auth_opinion},
+		#{create_dt}
+	)
+</insert>
+<update id="updatePfAuthcationInfo" parameterType="platform.supplierAccess.model.PfAuthcationInfo">
+	update t_authcation_info
+		set
+			auth_id = #{auth_id},
+			company_id = #{company_id},
+			auth_state = #{auth_state},
+			auth_opinion = #{auth_opinion},
+			create_dt = #{create_dt}
+		where auth_id = #{auth_id}
+</update>
+<delete id="deletePfAuthcationInfo" parameterType="platform.supplierAccess.model.PfAuthcationInfo">
+	delete from t_authcation_info
+	where auth_id = #{auth_id}
+</delete>
+
+<!-- 根据公司ID查询指定状态下最近的一条历史记录信息  -->
+<select id="getPfAuthcationInfoByCompanyId" parameterType="map" resultType="platform.supplierAccess.model.PfAuthcationInfo">
+	select 
+		t_authcation_info.auth_id,
+		t_authcation_info.company_id,
+		t_authcation_info.auth_state,
+		t_authcation_info.auth_opinion,
+		t_authcation_info.create_dt
+	from
+		t_authcation_info
+	where 
+		company_id = #{companyId}
+		and 
+		auth_state = #{state}
+	order by auth_id desc
+	limit 1			
+</select>
+</mapper>

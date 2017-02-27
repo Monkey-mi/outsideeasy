@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.tradeManager.data.PurchaseOrderMapper">
+
+
+<select id="getPurchaseOrderList" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.PurchaseOrder">
+	select
+		t_purchase_order.pur_order_id,
+		t_purchase_order.order_bh,
+		t_purchase_order.agreement_bh,
+		t_purchase_order.order_status,
+		t_purchase_order.create_dt,
+		t_purchase_order.category_id,
+		t_purchase_order.supplier_id,
+		t_purchase_order.sum_money,
+		t_purchase_order.pur_company_id,
+		t_purchase_order.pur_cpyname_cn,
+		t_purchase_order.invoice_title_id,
+		t_purchase_order.delivery_address_id,
+		t_purchase_order.sup_cpyname_cn,
+		t_purchase_order.pur_delete_flag,
+		t_purchase_order.sup_delete_flag,
+		t_purchase_order.lock_agreement,
+		t_purchase_order.delivery_date
+	from
+		t_purchase_order	
+		left join t_purchase_order_operating on t_purchase_order.pur_order_id = t_purchase_order_operating.pur_order_id and t_purchase_order_operating.order_status = '${str_order}'
+	where 1=1
+	   <if test="end_date_v != null and end_date_v !='' ">
+	    and t_purchase_order.create_dt&lt;=#{end_date_v}
+	   </if>
+	   <if test="start_date_v != null and start_date_v !='' ">
+	    and t_purchase_order.create_dt&gt;=#{start_date_v}
+	   </if>
+	   <if test="end_date_o != null and end_date_o !='' ">
+	    and t_purchase_order_operating.opreate_dt&lt;=#{end_date_o}
+	   </if>
+	   <if test="start_date_o != null and start_date_o !='' ">
+	    and t_purchase_order_operating.opreate_dt&gt;=#{start_date_o}
+	   </if>
+	   <if test="search_text != null and search_text !='' ">
+	    and (t_purchase_order.pur_order_id in ( 
+	    select
+		  t_purchase_order_detail.pur_order_id	
+	      from
+		  t_purchase_order_detail
+	      where
+	      t_purchase_order_detail.product_name like '%${search_text}%' 
+	     )
+	    or t_purchase_order.agreement_bh like '%${search_text}%' 
+	    )
+	   </if>
+	   <if test="start_money != null and start_money !='' ">
+	    and t_purchase_order.sum_money&gt;=#{start_money}
+	   </if>
+	   <if test="delete_flag_d != null and delete_flag_d !='' ">
+	    and t_purchase_order.sup_delete_flag = #{delete_flag_d}
+	   </if>
+	   <if test="end_money != null and end_money !='' ">
+	    and t_purchase_order.sum_money&lt;=#{end_money}
+	   </if>
+	   <if test="order_num != null and order_num !='' ">
+	    and t_purchase_order.order_bh like '%${order_num}%'
+	   </if>
+	   <if test="search_company != null and search_company !='' ">
+	    and t_purchase_order.pur_cpyname_cn like '%${search_company}%'
+	   </if>
+	   <if test="status_1 != null and status_1 !='' and status_1 != 0">
+	    and t_purchase_order.order_status = #{status_1}
+	   </if>
+	   <if test="status_2 != null and status_2 !=''">
+	    and (t_purchase_order.order_status = #{status_2} or t_purchase_order.order_status = 60)
+	   </if>
+	   <if test="status_3 != null and status_3 !=''">
+	    and t_purchase_order.sup_delete_flag = #{status_3}
+	   </if>  
+	    and t_purchase_order.sup_company_id = #{company_id}
+	    order by t_purchase_order.create_dt DESC
+</select>
+<select id="getPurchaseOrderListForOut" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.PurchaseOrder">
+	select
+		t_purchase_order.pur_order_id,
+		t_purchase_order.order_bh,
+		t_purchase_order.agreement_bh,
+		t_purchase_order.order_status,
+		t_purchase_order.create_dt,
+		t_purchase_order.category_id,
+		t_purchase_order.supplier_id,
+		t_purchase_order.sum_money,
+		t_purchase_order.pur_company_id,
+		t_purchase_order.pur_cpyname_cn,
+		t_purchase_order.invoice_title_id,
+		t_purchase_order.delivery_address_id,
+		t_purchase_order.sup_cpyname_cn,
+		t_purchase_order.pur_delete_flag,
+		t_purchase_order.sup_delete_flag,
+		t_purchase_order.lock_agreement,
+		t_purchase_order.delivery_date,
+		t_app_sub_account.username as pur_creator_name
+		<!-- t_purchase_order.pur_creator_name -->
+	from
+		t_purchase_order	
+		left join t_purchase_order_operating on t_purchase_order.pur_order_id = t_purchase_order_operating.pur_order_id and t_purchase_order_operating.order_status = '${str_order}'
+		left join t_app_sub_account on t_app_sub_account.sa_id = t_purchase_order.pur_creator_id
+	where 1=1
+	   <if test="end_date_v != null and end_date_v !='' ">
+	    and t_purchase_order.create_dt&lt;=#{end_date_v}
+	   </if>
+	   <if test="start_date_v != null and start_date_v !='' ">
+	    and t_purchase_order.create_dt&gt;=#{start_date_v}
+	   </if>
+	   <if test="end_date_o != null and end_date_o !='' ">
+	    and t_purchase_order_operating.opreate_dt&lt;=#{end_date_o}
+	   </if>
+	   <if test="start_date_o != null and start_date_o !='' ">
+	    and t_purchase_order_operating.opreate_dt&gt;=#{start_date_o}
+	   </if>
+	   <if test="search_text != null and search_text !='' ">
+	    and (t_purchase_order.pur_order_id in ( 
+	    select
+		  t_purchase_order_detail.pur_order_id	
+	      from
+		  t_purchase_order_detail
+	      where
+	      t_purchase_order_detail.product_name like '%${search_text}%' 
+	     )
+	    or t_purchase_order.agreement_bh like '%${search_text}%' )
+	   </if>
+	   <if test="start_money != null and start_money !='' ">
+	    and t_purchase_order.sum_money&gt;=#{start_money}
+	   </if>
+	   <if test="operator_name != null and operator_name !='' ">
+	    and t_purchase_order.pur_creator_name like '%${operator_name}%'
+	   </if>
+	   <if test="delete_flag_d != null and delete_flag_d !='' ">
+	    and t_purchase_order.pur_delete_flag = #{delete_flag_d}
+	   </if>
+	   <if test="end_money != null and end_money !='' ">
+	    and t_purchase_order.sum_money&lt;=#{end_money}
+	   </if>
+	   <if test="order_num != null and order_num !='' ">
+	    and t_purchase_order.order_bh like '%${order_num}%'
+	   </if>
+	   <if test="search_company != null and search_company !='' ">
+	    and t_purchase_order.sup_cpyname_cn like '%${search_company}%'
+	   </if>
+	   <if test="status_1 != null and status_1 !='' and status_1 != 0">
+	    and t_purchase_order.order_status = #{status_1}
+	   </if>
+	   <if test="status_2 != null and status_2 !=''">
+	    and (t_purchase_order.order_status = #{status_2} or t_purchase_order.order_status = 60)
+	   </if>
+	   <if test="status_3 != null and status_3 !=''">
+	    and t_purchase_order.pur_delete_flag = #{status_3}
+	   </if>  
+	    <if test="sa_id != null and sa_id !='' ">
+			and	t_purchase_order.supplier_id in ( 
+			select
+				t_subaccount_supplier_info.supplier_id				
+			from
+				t_subaccount_supplier_info
+			where 
+			    t_subaccount_supplier_info.sa_id = #{sa_id} and t_subaccount_supplier_info.is_delete = 0
+	         )
+	   </if>
+	   <if test="reg_id != null and reg_id !='' ">
+			and	t_purchase_order.supplier_id in (
+			select
+		        t_supplier_regaccount_info.supplier_id		
+	        from
+		        t_supplier_regaccount_info
+		        left join t_supplier_files on t_supplier_regaccount_info.supplier_id = t_supplier_files.supplier_id
+	        where
+	            t_supplier_regaccount_info.reg_id = #{reg_id} and t_supplier_files.file_status = 0
+	         )
+	   </if>
+	    and t_purchase_order.pur_company_id = #{company_id}
+	    order by t_purchase_order.create_dt DESC
+</select>
+<select id="getStatusCount"  parameterType="map" resultType="usercenter.externalTask.TaskResponse.StateCounts">
+select t_purchase_order.order_status,count(t_purchase_order.order_status) as stateCount
+from t_purchase_order
+where 1=1
+     <if test="sa_id != null and sa_id !='' ">
+			and	t_purchase_order.supplier_id in ( 
+			select
+				t_subaccount_supplier_info.supplier_id				
+			from
+				t_subaccount_supplier_info
+			where 
+			    t_subaccount_supplier_info.sa_id = #{sa_id} and t_subaccount_supplier_info.is_delete = 0
+	         )
+	   </if>
+	   <if test="reg_id != null and reg_id !='' ">
+			and	t_purchase_order.supplier_id in (
+			select
+		        t_supplier_regaccount_info.supplier_id		
+	        from
+		        t_supplier_regaccount_info
+		        left join t_supplier_files on t_supplier_regaccount_info.supplier_id = t_supplier_files.supplier_id
+	        where
+	            t_supplier_regaccount_info.reg_id = #{reg_id} and t_supplier_files.file_status = 0
+	         )
+	   </if>
+	   <if test="sup_delete_flag != null">
+	   and t_purchase_order.sup_delete_flag = #{sup_delete_flag}
+	   and t_purchase_order.sup_company_id = #{company_id}
+	   </if>
+	   <if test="pur_delete_flag != null">
+	   and t_purchase_order.pur_delete_flag = #{pur_delete_flag}
+	   and t_purchase_order.pur_company_id = #{company_id}
+	   </if>     
+       GROUP BY t_purchase_order.order_status
+</select>
+<select id="getStatusCountVo"  parameterType="map" resultType="Integer">
+select count(0)
+from t_purchase_order
+where 1=1
+     <if test="sa_id != null and sa_id !='' ">
+			and	t_purchase_order.supplier_id in ( 
+			select
+				t_subaccount_supplier_info.supplier_id				
+			from
+				t_subaccount_supplier_info
+			where 
+			    t_subaccount_supplier_info.sa_id = #{sa_id} and t_subaccount_supplier_info.is_delete = 0
+	         )
+	   </if>
+	   <if test="reg_id != null and reg_id !='' ">
+			and	t_purchase_order.supplier_id in (
+			select
+		        t_supplier_regaccount_info.supplier_id		
+	        from
+		        t_supplier_regaccount_info
+		        left join t_supplier_files on t_supplier_regaccount_info.supplier_id = t_supplier_files.supplier_id
+	        where
+	            t_supplier_regaccount_info.reg_id = #{reg_id} and t_supplier_files.file_status = 0
+	         )
+	   </if>
+	   <if test="sup_delete_flag != null">
+	   and t_purchase_order.sup_delete_flag = #{sup_delete_flag}
+	   and t_purchase_order.sup_company_id = #{company_id}
+	   </if>
+	   <if test="pur_delete_flag != null">
+	   and t_purchase_order.pur_delete_flag = #{pur_delete_flag}
+	   and t_purchase_order.pur_company_id = #{company_id}
+	   </if>      
+</select>
+<select id="getsupplierListID" parameterType="map" resultType="usercenter.saleManage.tradeManager.response.PurchaseOrdersupId">
+  <if test="sa_id != null and sa_id !='' "> 
+			select
+				t_subaccount_supplier_info.supplier_id				
+			from
+				t_subaccount_supplier_info
+			where 
+			    t_subaccount_supplier_info.sa_id = #{sa_id} and t_subaccount_supplier_info.is_delete = 0
+	   </if>
+	   <if test="reg_id != null and reg_id !='' ">
+			select
+		        t_supplier_regaccount_info.supplier_id		
+	        from
+		        t_supplier_regaccount_info
+		        left join t_supplier_files on t_supplier_regaccount_info.supplier_id = t_supplier_files.supplier_id
+	        where
+	            t_supplier_regaccount_info.reg_id = #{reg_id} and t_supplier_files.file_status = 0
+	   </if>
+</select>
+
+<select id="getOrderRemark" parameterType="map"  resultType="usercenter.saleManage.tradeManager.response.PurchaseOrderRemark">
+   select 
+    pur_order_id,
+    sup_memo as  memo
+   from
+	t_purchase_order
+   where
+    pur_order_id = #{pur_order_id}
+</select>
+<select id="getOrderRemarkForOut" parameterType="map"  resultType="usercenter.saleManage.tradeManager.response.PurchaseOrderRemark">
+   select 
+    pur_order_id,
+    pur_memo as  memo
+   from
+	t_purchase_order
+   where
+    pur_order_id = #{pur_order_id}
+</select>
+<update id="updateOrderRemark"  parameterType="map">
+	update t_purchase_order
+	set	
+	  sup_memo = #{sup_memo}
+	where pur_order_id = #{pur_order_id}
+</update>
+<update id="updateOrderRemarkForOut"  parameterType="map">
+	update t_purchase_order
+	set	
+	  pur_memo = #{pur_memo}
+	where pur_order_id = #{pur_order_id}
+</update>
+<update id="deletePurchaseOrder" parameterType="map">
+	update t_purchase_order
+	set	
+	  sup_delete_flag = #{sup_delete_flag}
+	where pur_order_id = #{pur_order_id}
+</update>
+<update id="deletePurchaseOrderForOut" parameterType="map">
+	update t_purchase_order
+	set	
+	  pur_delete_flag = #{pur_delete_flag}
+	where pur_order_id = #{pur_order_id}
+</update>
+<select id="getOrderstatus" parameterType="map"  resultType="usercenter.saleManage.tradeManager.response.PurchaseOrderStatus">
+  select 
+    pur_order_id,
+    order_status as status
+   from
+	t_purchase_order
+   where
+    pur_order_id = #{pur_order_id}
+</select>
+<select id="getOrderFordelete" parameterType="map"  resultType="usercenter.saleManage.tradeManager.response.PurchaseOrderStatus">
+  select 
+    pur_order_id,
+    sup_delete_flag as status 
+   from
+	t_purchase_order
+   where
+    pur_order_id = #{pur_order_id}
+</select>
+<select id="getOrderFordeleteForOut" parameterType="map"  resultType="usercenter.saleManage.tradeManager.response.PurchaseOrderStatus">
+  select 
+    pur_order_id,
+    pur_delete_flag as status 
+   from
+	t_purchase_order
+   where
+    pur_order_id = #{pur_order_id}
+</select>
+
+<select id="getOrderByID" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.PurchaseOrder">
+  select 
+    pur_order_id,
+    sup_company_id,
+    pur_company_id
+   from
+	t_purchase_order
+   where
+    pur_order_id = #{pur_order_id}
+</select>
+<update id="updateOrderStatus" parameterType="map">
+	update t_purchase_order
+	set	
+	  order_status = #{order_status}
+	where pur_order_id = #{pur_order_id}
+</update>
+<select id="getOrderDetailsByIDExcel" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.PurchaseOrder">
+  select
+		t_purchase_order.pur_order_id,
+		t_purchase_order.order_bh,
+		t_purchase_order.agreement_bh,
+		t_purchase_order.order_status,
+		t_purchase_order.create_dt,
+		t_purchase_order.category_id,
+		t_purchase_order.supplier_id,
+		t_purchase_order.sum_money,
+		t_purchase_order.pur_company_id,
+		t_purchase_order.pur_cpyname_cn,
+		t_purchase_order.pur_creator_id,
+		t_purchase_order.pur_creator_name,
+		t_purchase_order.pur_invoice_type,
+		t_purchase_order.pur_invoice_title,
+		t_purchase_order.pur_delivery_address,
+		t_purchase_order.pur_delivery_contact,
+		t_purchase_order.pur_delivery_contact_phone,
+		t_purchase_order.sup_company_id,
+		t_purchase_order.sup_contact,
+		t_purchase_order.sup_contact_phone,
+		t_purchase_order.sup_contact_address,
+		t_purchase_order.sup_memo,
+		t_purchase_order.order_remark,
+		t_purchase_order.source_type,
+		t_purchase_order.invoice_title_id,
+		t_purchase_order.delivery_address_id,
+		t_purchase_order.sup_cpyname_cn,
+		t_purchase_order.pur_delete_flag,
+		t_purchase_order.sup_delete_flag,
+		t_purchase_order.lock_agreement,
+		t_purchase_order.delivery_date
+	from
+		t_purchase_order	
+	where
+	    t_purchase_order.pur_order_id = #{pur_order_id}
+</select>
+<select id="getOrderDetailsByID" parameterType="map" resultType="usercenter.saleManage.tradeManager.response.PurchaseOrderVo">
+  select
+		t_purchase_order.pur_order_id,
+		t_purchase_order.order_bh,
+		t_purchase_order.agreement_bh,
+		t_purchase_order.order_status,
+		t_purchase_order.create_dt,
+		t_purchase_order.category_id,
+		t_purchase_order.supplier_id,
+		t_purchase_order.sum_money,
+		t_purchase_order.pur_company_id,
+		t_purchase_order.pur_cpyname_cn,
+		t_purchase_order.pur_creator_id,
+		t_purchase_order.pur_creator_name,
+		t_purchase_order.pur_invoice_type,
+		t_purchase_order.pur_invoice_title,
+		t_purchase_order.pur_delivery_address,
+		t_purchase_order.pur_delivery_contact,
+		t_purchase_order.pur_delivery_contact_phone,
+		t_purchase_order.sup_company_id,
+		t_purchase_order.sup_contact,
+		t_purchase_order.sup_contact_phone,
+		t_purchase_order.sup_contact_address,
+		t_purchase_order.sup_memo,
+		t_purchase_order.order_remark,
+		t_purchase_order.source_type,
+		t_purchase_order.invoice_title_id,
+		t_purchase_order.delivery_address_id,
+		t_purchase_order.sup_cpyname_cn,
+		t_purchase_order.pur_delete_flag,
+		t_purchase_order.sup_delete_flag,
+		t_purchase_order.lock_agreement,
+		t_purchase_order.delivery_date,
+		pr.opreate_dt as r_opreate_dt,
+		pu.opreate_dt as u_opreate_dt,
+		pe.opreate_dt as e_opreate_dt,
+		t_order_end_record.create_dt as end_create_dt,
+		t_order_cancel_record.create_dt as cancel_create_dt,
+		t_order_end_record.confirm_dt,
+		t_app_area.mergerName
+	from
+		t_purchase_order
+		left join t_app_area on t_app_area.area_id = t_purchase_order.delivery_address_id
+		left join t_purchase_order_operating as pr on t_purchase_order.pur_order_id = pr.pur_order_id and pr.order_status = 20
+		left join t_purchase_order_operating as pu on t_purchase_order.pur_order_id = pr.pur_order_id and pu.order_status = 40
+		left join t_purchase_order_operating as pe on t_purchase_order.pur_order_id = pr.pur_order_id and pe.order_status = 30
+		left join t_order_cancel_record on t_purchase_order.pur_order_id = t_order_cancel_record.pur_order_id 
+		left join t_order_end_record on t_purchase_order.pur_order_id = t_order_end_record.pur_order_id and t_order_end_record.end_status in (0,1)
+	where
+	    t_purchase_order.pur_order_id = #{pur_order_id}
+</select>
+<select id="getOrderDetailsByIDForOut" parameterType="map" resultType="usercenter.saleManage.tradeManager.response.PurchaseOrderVo">
+  select
+		t_purchase_order.pur_order_id,
+		t_purchase_order.order_bh,
+		t_purchase_order.agreement_bh,
+		t_purchase_order.order_status,
+		t_purchase_order.create_dt,
+		t_purchase_order.category_id,
+		t_purchase_order.supplier_id,
+		t_purchase_order.sum_money,
+		t_purchase_order.pur_company_id,
+		t_purchase_order.pur_cpyname_cn,
+		t_purchase_order.pur_creator_id,
+		t_purchase_order.pur_creator_name,
+		t_purchase_order.pur_invoice_type,
+		t_purchase_order.pur_invoice_title,
+		t_purchase_order.pur_delivery_address,
+		t_purchase_order.pur_delivery_contact,
+		t_purchase_order.pur_delivery_contact_phone,
+		t_purchase_order.sup_company_id,
+		t_purchase_order.sup_contact,
+		t_purchase_order.sup_contact_phone,
+		t_purchase_order.sup_contact_address,
+		t_purchase_order.pur_memo,
+		t_purchase_order.order_remark,
+		t_purchase_order.source_type,
+		t_purchase_order.invoice_title_id,
+		t_purchase_order.delivery_address_id,
+		t_purchase_order.sup_cpyname_cn,
+		t_purchase_order.pur_delete_flag,
+		t_purchase_order.sup_delete_flag,
+		t_purchase_order.lock_agreement,
+		t_purchase_order.delivery_date,
+		pr.opreate_dt as r_opreate_dt,
+		pu.opreate_dt as u_opreate_dt,
+		pe.opreate_dt as e_opreate_dt,
+		t_order_end_record.create_dt as end_create_dt,
+		t_order_cancel_record.create_dt as cancel_create_dt,
+		t_order_end_record.confirm_dt,
+		t_app_area.mergerName
+	from
+		t_purchase_order
+		left join t_app_area on t_app_area.area_id = t_purchase_order.delivery_address_id
+		left join t_purchase_order_operating as pr on t_purchase_order.pur_order_id = pr.pur_order_id and pr.order_status = 20
+		left join t_purchase_order_operating as pu on t_purchase_order.pur_order_id = pr.pur_order_id and pu.order_status = 40
+		left join t_purchase_order_operating as pe on t_purchase_order.pur_order_id = pr.pur_order_id and pe.order_status = 30
+		left join t_order_cancel_record on t_purchase_order.pur_order_id = t_order_cancel_record.pur_order_id 
+		left join t_order_end_record on t_purchase_order.pur_order_id = t_order_end_record.pur_order_id and t_order_end_record.end_status in (0,1)
+	where
+	    t_purchase_order.pur_order_id = #{pur_order_id}
+</select>
+<select id="getDeliveryRegisterDetailsVoByID" parameterType="map" resultType="usercenter.saleManage.deliveryManage.response.DeliveryRegisterDetailVo">
+  select
+		t_purchase_order.pur_order_id,
+		t_purchase_order.order_bh,
+		t_purchase_order.agreement_bh
+	from
+		t_purchase_order
+	where
+	t_purchase_order.sup_company_id = #{sup_company_id}
+	and t_purchase_order.order_status=20
+	<if test="search_text1!=null and search_text1!=''">
+	and t_purchase_order.agreement_bh like '%${search_text1}%'
+	</if>	
+	order by t_purchase_order.create_dt desc
+</select>
+<select id="getLastThreeDeliverOrder" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.PurchaseOrder">
+	select
+		t_purchase_order.pur_order_id,
+		t_purchase_order.order_bh,
+		t_purchase_order.agreement_bh,
+		t_purchase_order.order_status,
+		t_purchase_order.create_dt,
+		t_purchase_order.category_id,
+		t_purchase_order.supplier_id,
+		t_purchase_order.sum_money,
+		t_purchase_order.pur_company_id,
+		t_purchase_order.pur_cpyname_cn,
+		t_purchase_order.invoice_title_id,
+		t_purchase_order.delivery_address_id,
+		t_purchase_order.sup_cpyname_cn,
+		t_purchase_order.pur_delete_flag,
+		t_purchase_order.sup_delete_flag,
+		t_purchase_order.lock_agreement,
+		t_purchase_order.delivery_date
+	from
+		t_purchase_order	
+	where 1=1
+		<if test="accept!=null and accept!=''">
+			and t_purchase_order.order_status = 20
+		</if>
+		<if test="deliver!=null and deliver!=''">
+			and t_purchase_order.order_status = 30
+		</if>
+		<if test="exceptional!=null and exceptional!=''">
+			and (t_purchase_order.order_status = 50 or t_purchase_order.order_status = 60)
+		</if>
+	    and t_purchase_order.sup_delete_flag = 0
+	    <if test="sup_company_id!=null and sup_company_id!=''">
+	    and t_purchase_order.sup_company_id = #{sup_company_id}
+	    </if>
+	    <if test="pur_company_id!=null and pur_company_id!=''">
+		and t_purchase_order.pur_company_id = #{pur_company_id}
+		</if>
+	    order by t_purchase_order.create_dt DESC limit 3
+</select>
+<select id="getLastThreeDeliverOrderForOut" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.PurchaseOrder">
+	select
+		t_purchase_order.pur_order_id,
+		t_purchase_order.order_bh,
+		t_purchase_order.agreement_bh,
+		t_purchase_order.order_status,
+		t_purchase_order.create_dt,
+		t_purchase_order.category_id,
+		t_purchase_order.supplier_id,
+		t_purchase_order.sum_money,
+		t_purchase_order.pur_company_id,
+		t_purchase_order.pur_cpyname_cn,
+		t_purchase_order.invoice_title_id,
+		t_purchase_order.delivery_address_id,
+		t_purchase_order.sup_cpyname_cn,
+		t_purchase_order.pur_delete_flag,
+		t_purchase_order.sup_delete_flag,
+		t_purchase_order.lock_agreement,
+		t_purchase_order.delivery_date
+	from
+		t_purchase_order	
+	where 1=1
+		<if test="accept!=null and accept!=''">
+			and t_purchase_order.order_status = 20
+		</if>
+		<if test="deliver!=null and deliver!=''">
+			and t_purchase_order.order_status = 30
+		</if>
+	      <if test="sa_id != null and sa_id !='' ">
+			and	t_purchase_order.supplier_id in ( 
+			select
+				t_subaccount_supplier_info.supplier_id				
+			from
+				t_subaccount_supplier_info
+			where 
+			    t_subaccount_supplier_info.sa_id = #{sa_id} and t_subaccount_supplier_info.is_delete = 0
+	         )
+	   </if>
+	   <if test="reg_id != null and reg_id !='' ">
+			and	t_purchase_order.supplier_id in (
+			select
+		        t_supplier_regaccount_info.supplier_id		
+	        from
+		        t_supplier_regaccount_info
+		        left join t_supplier_files on t_supplier_regaccount_info.supplier_id = t_supplier_files.supplier_id
+	        where
+	            t_supplier_regaccount_info.reg_id = #{reg_id} and t_supplier_files.file_status = 0
+	         )
+	   </if>
+	    <if test="pur_company_id!=null and pur_company_id!=''">
+		and t_purchase_order.pur_company_id = #{pur_company_id}
+		</if>
+	    order by t_purchase_order.create_dt DESC limit 3
+</select>
+</mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.sysmodule.data.WsIdentityMapper">
+
+
+<select id="getWsIdentityList" parameterType="map" resultType="common.sysmodule.model.WsIdentity">
+	select
+		t_app_ws_identity.ws_id,
+		t_app_ws_identity.identify,
+		t_app_ws_identity.psw,
+		t_app_ws_identity.remark,
+		t_app_ws_identity.company_id,
+		t_app_ws_identity.company_name,
+		t_app_ws_identity.enabled
+	from
+		t_app_ws_identity
+	where 1=1
+	<if test="identify!=null and identify!=''">
+		t_app_ws_identity.identify=#{identify}
+	</if>
+	<if test="condition!=null  and condition!=''">
+		and ${condition}
+	</if>
+</select>
+<insert id="addWsIdentity" parameterType="common.sysmodule.model.WsIdentity">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="ws_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_ws_identity
+	(
+		
+		identify,
+		psw,
+		remark,
+		company_id,
+		company_name,
+		enabled
+	)
+	values
+	(
+		
+		#{identify},
+		#{psw},
+		#{remark},
+		#{company_id},
+		#{company_name},
+		#{enabled}
+	)
+</insert>
+<update id="updateWsIdentity" parameterType="common.sysmodule.model.WsIdentity">
+	update t_app_ws_identity
+		set
+			identify = #{identify},
+			psw = #{psw},
+			remark = #{remark},
+			company_id=#{company_id},
+		   company_name=#{company_name},
+			enabled = #{enabled}
+		where ws_id = #{ws_id}
+</update>
+<delete id="deleteWsIdentity" parameterType="common.sysmodule.model.WsIdentity">
+	delete from t_app_ws_identity
+	where ws_id = #{ws_id}
+</delete>
+<select id="getEnabledIdentity" parameterType="java.lang.String" resultType="common.sysmodule.model.WsIdentity">
+	select * from t_app_ws_identity
+	where t_app_ws_identity.identify=#{identify} and enabled=1
+</select>
+</mapper>

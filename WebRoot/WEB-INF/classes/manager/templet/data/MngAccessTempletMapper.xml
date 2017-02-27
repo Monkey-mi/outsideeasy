@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.templet.data.MngAccessTempletMapper">
+
+
+<select id="getMngAccessTempletList" parameterType="map" resultType="manager.templet.model.MngAccessTemplet">
+	select
+		t_access_templet.templet_id,
+		t_access_templet.h_id,
+		t_access_templet.e_id,
+		t_access_templet.is_must,
+		t_access_templet.order_by,
+		t_access_templet.classify_id,
+		t_access_templet.templet_name,
+		t_access_templet.seize_length,
+		t_access_templet.create_dt,
+		t_access_templet_element.e_name,
+		t_templet_classify.classify_name
+	from
+		t_access_templet
+		left join t_access_templet_element on t_access_templet.e_id = t_access_templet_element.e_id	
+		left join t_templet_classify on t_access_templet.classify_id = t_templet_classify.classify_id
+	where
+	     t_access_templet.h_id = #{h_id}	   
+</select>
+<insert id="addMngAccessTemplet" parameterType="manager.templet.model.MngAccessTemplet" keyProperty="templet_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="templet_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_access_templet
+	(
+		h_id,
+		e_id,
+		is_must,
+		order_by,
+		classify_id,
+		templet_name,
+		seize_length
+
+	)
+	values
+	(
+		#{h_id},
+		#{e_id},
+		#{is_must},
+		#{order_by},
+		#{classify_id},
+		#{templet_name},
+		#{seize_length}
+	
+	)
+</insert>
+<update id="updateMngAccessTemplet" parameterType="manager.templet.model.MngAccessTemplet">
+	update t_access_templet
+		set
+			templet_id = #{templet_id},
+			h_id = #{h_id},
+			e_id = #{e_id},
+			is_must = #{is_must},
+			order_by = #{order_by},
+			classify_id = #{classify_id},
+			templet_name = #{templet_name},
+			seize_length = #{seize_length}
+		
+		where templet_id = #{templet_id}
+</update>
+<delete id="deleteMngAccessTemplet" parameterType="manager.templet.model.MngAccessTemplet">
+	delete from t_access_templet
+	where templet_id = #{templet_id}
+</delete>
+</mapper>

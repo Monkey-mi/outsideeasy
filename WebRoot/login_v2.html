@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>登录页面</title>
+<link href="/newresources/css/page.css" rel="stylesheet">
+<script type="text/javascript" src="/newresources/js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="/newresources/js/md5.js"></script>
+<script type="text/javascript" src="/newresources/js/base.js"></script>
+<script type="text/javascript" src="/newresources/js/jquery.placeholder.min.js"></script>
+<script type="text/javascript">
+var loginAccount_flag=false;
+var pwd_flag=false;
+var vcode_flag=true;
+var errorNum = 0;//输入账号密码的错误次数
+$(function(){
+	//设置页面高度
+		var height=$('.midd_wrap').height();
+		if(height<$(window).height()-175)
+		{
+			$('.midd_wrap').height($(window).height()-175);
+		}
+		window.onresize=function(){
+		
+			$('.midd_wrap').height(500);
+			
+			if($('.midd_wrap').height()<$(window).height()-175)
+			{
+			$('.midd_wrap').height($(window).height()-175);
+			}
+			$(".show_Agreen_wrap").height($('.midd_wrap').height()-34);
+		};
+		//默认第一步的颜色变化
+		$('.stepInfo_wrap').find('.step_index').eq(0).css("background-color","#ff9900");
+		//初始化placeholder控件
+		$('input, textarea').placeholder();
+		
+		$("#data_loginAccount").on("blur",function(){
+			var loginAccount=$(this).val();
+			if(loginAccount=="")
+			{
+				$(".reg-explain").css("display","block");
+				$(".reg-explain").html("<img src='/newresources/images/new/er.png' />登录账号不为空");
+				loginAccount_flag=false;
+			}
+			else
+			{
+				$(".reg-explain").css("display","none");
+				loginAccount_flag=true;
+			}
+				
+		});
+		
+		$("#data_pwd").on("blur",function(){
+			var data_pwd=$(this).val();
+			if(data_pwd=="")
+			{
+				$(".reg-explain").css("display","block");
+				$(".reg-explain").html("<img src='/newresources/images/new/er.png' />密码不为空");
+				pwd_flag=false;
+			}
+			else
+			{
+				$(".reg-explain").css("display","none");
+				pwd_flag=true;
+			}
+		});
+		$("#data_vcode").on("blur",function(){
+			var data_vcode=$(this).val();
+			if(data_vcode=="" && errorNum>1)
+			{
+				$(".reg-explain").css("display","block");
+				$(".reg-explain").html("<img src='/newresources/images/new/er.png' />验证码不为空");
+				vcode_flag=false;
+			}
+			else
+			{
+				$(".reg-explain").css("display","none");
+				vcode_flag=true;
+			}
+		});
+});
+//登录方法
+function doLogin()
+{
+	if(!loginAccount_flag&&$("#data_loginAccount").val()=="")
+	{
+		$("#data_loginAccount").focus();
+	}
+	else if(!pwd_flag&&$("#data_pwd").val()=="")
+	{
+		$("#data_pwd").focus();
+	}
+	else if(!vcode_flag)
+	{
+		$("#data_vcode").focus();
+	}
+	else
+	{	
+		var nameOrEmail = $("#data_loginAccount").val();
+		var pwd = $("#data_pwd").val();
+		var vCode = $("#data_vcode").val();
+		//调用后台登录方法
+		$.ajax({
+			type:"post",
+			url:"userInfo/doLogin.do",
+			dataType:"json",
+			data:{
+				 nameOrEmail:nameOrEmail,//用户名或邮箱
+				 password: hex_md5(pwd),
+				 verify_code: vCode,
+				 errorNum:errorNum
+			},
+			success:function(result){
+				if(result.ajaxErrorCode!=200){
+					$(".reg-explain").css("display","block");
+					$(".reg-explain").html("发生错误，代码："+result.ajaxErrorCode);
+			    	getNewVCode();
+			    }else{
+			    	
+			    	if(result.loginName==""||result.loginName==undefined||result.loginName==null)
+			    	{	
+			    		errorNum ++;
+						$(".reg-explain").css("display","block");
+						$(".reg-explain").html(result.message);
+			    		if(errorNum >= 2){//mishengliang 在第二次错误之后显示出验证码校验框 2016-03-04
+			    			$(".login_wrap").css({height:370});
+			    			$("#vCode_change").css({display:'block'});
+			    		}
+			    		return;
+			    	}
+			    	else
+			    	{
+			    		window.location.href="index.jsp";
+					}
+			    }
+			},
+			error:function(){//输出错误需要更改
+	            alert(
+	            	"错误状态码："+XMLHttpRequest.status+";<br/>"
+	            	+"请求状态码："+XMLHttpRequest.readyState+";<br/>"
+	            	+"错误类别："+textStatus
+	            	);			
+			}
+		});
+	}
+}
+function getNewVCode(num){
+		var vcode_img=$("#vCodeImg"+num);
+		if(vcode_img){
+			vcode_img.attr("src","common/getVerifyCode.do?_dc="+new Date().getTime());
+		}
+	}
+</script>
+</head>
+<body class="bg_grey">
+<div class="top_logon_wrap">
+	<div class="div_1024_c_wrap">
+		<div class="f_l"><img src="/newresources/images/new/logo.png" /></div>
+		<div class="f_r top_1_float mt10"><a href="/index.jsp">返回首页</a></div>
+	</div>
+</div>
+<!--中间-->
+<div class="midd_wrap">
+	<div class="login_left_wrap">
+		<img src="/newresources/images/login/denglu.png" />
+	</div>
+	<div class="login_wrap">
+		<div class="login_title">账号登录</div>
+		
+		<div class="logininner_wrap ml30 mt10">
+			<img src="/newresources/images/login/login.png" class="label_img" />
+			<input type="text" class="input_wrap" id="data_loginAccount" placeholder="邮箱账号/用户名" />
+		</div>
+		<div class="logininner_wrap ml30">
+			<img src="/newresources/images/login/pass.png" class="label_img" />
+			<input type="password" class="input_wrap" id="data_pwd" />
+		</div>
+		<div id="vCode_change"  class="vcode_wrap ml30 clearfix" style="display:none;">
+			<p class="p_tip">验证码</p>
+			<input type="text" class="input_vcode" id="data_vcode" />
+			<a href="#" title="如看不清楚,请点击图片更换"  class="vcodeImg_wrap" onclick="getNewVCode(1);"> 
+							<img height="38px" width="100px" id="vCodeImg1" src="common/getVerifyCode.do"/>
+							<img src="/newresources/images/new/refresh.png" />
+						</a>
+		</div>
+		<div class="reg-explain" style="display:none;">
+			<img src="/newresources/images/new/er.png" />验证提示信息
+		</div>
+		<div class="ml30 inn_wrap1">
+			<!-- mishengliang  -->
+			<!-- <span class="checkbox_remember_wrap"> 
+			<input type="checkbox" class="input_checkbox" name="remember_login" id="check_agreen" />记住登录账号 未使用注释掉
+			</span> -->
+			<a class="input_checkbox" href="register.html">企业注册</a><!-- class="maincolor" -->
+			<a class="link_a" href="findPwd.html">忘记密码</a>
+		</div>
+		<div class="mt10 ml30">
+			<input type="button" class="login_button" id="login_button" value="立即登录" onClick="doLogin()" />
+		</div>
+	</div>
+</div>
+<!--底端-->
+<div class="bottom_wrap">
+Copyright  2016-2017 浙江泰普森（控股）集团<br />版权所有  outside.com   <a href="javascript:void(0)">备案编号：浙ICP备15003965号</a>
+</div>
+</body>
+</html>

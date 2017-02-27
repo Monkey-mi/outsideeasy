@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>模板页</title>
+<!-- TemplateEndEditable -->
+<link href="/newresources/css/base.css" rel="stylesheet" />
+<script src="/newresources/js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+	$(function(){
+		getLoginUserInfo();
+	});
+	function getLoginUserInfo()
+		{
+			$.ajax({
+				type: "POST",
+				url: getwebroot()+"common/Users/getLoginInfo.do",
+				dataType:'json',
+				success: function(result){
+					
+					if(result.success)
+					{
+						if(result.data!=""&&result.data.length>0)
+						{
+							$(".dologin").css({display:'none'});
+							$(".doregister").css({display:'none'});
+							$(".haslogin").css({display:'block'});
+							$("#loginName_span").text(result.data[0].login_id);
+							
+						}
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+	                 alert(
+	                 	"错误状态码："+XMLHttpRequest.status+";<br/>"
+	                 	+"请求状态码："+XMLHttpRequest.readyState+";<br/>"
+	                 	+"错误类别："+textStatus
+	                 	);
+	            	} 
+			});
+		}
+	function doLoginOut(){
+			if(confirm("是否确定注销当前账号！"))
+			{
+				var _loginId=$("#loginName_span").text();
+				$.ajax({
+					type: "POST",
+					url: getwebroot()+"common/Users/doLogout.do",
+					dataType:'json',
+					data: {login_id: _loginId},
+					success: function(result){
+						if(result.success)
+						{
+							$(".dologin").css({display:'block'});
+							$(".doregister").css({display:'block'});
+							$(".haslogin").css({display:'none'});
+							window.location.href=getwebroot()+"index.jsp";
+						}
+					},
+					error: function (XMLHttpRequest, textStatus, errorThrown) {
+	                 alert(
+	                 	"错误状态码："+XMLHttpRequest.status+";<br/>"
+	                 	+"请求状态码："+XMLHttpRequest.readyState+";<br/>"
+	                 	+"错误类别："+textStatus
+	                 	);
+	            	} 
+				});
+				return true;
+			}
+			else
+				return false;
+		}
+</script>
+<!-- TemplateBeginEditable name="head" -->
+
+<!-- TemplateEndEditable -->
+</head>
+
+<body>
+<div class="top_1">
+	<div class="top_content_innDiv clearfix">
+		<div class="top_1_content_right">
+			<div class="dologin">
+				<a href="javascript:void(0)" id="doLoginIn">登录</a>
+			</div>
+			<div class="haslogin">
+				<span id="loginName_span"></span>
+				<a href="javascript:void(0)" id="doLoginout"  onclick="return doLoginOut();">注销</a>
+			</div>
+			<div class="doregister">| <a href="/register.html">注册</a></div>
+		</div>
+	</div>
+</div>
+<div class="top_2">
+	<div class="top_content_innDiv clearfix">
+		<div class="top_2_left"><img src="/newresources/images/logo.png" /></div>
+		<div class="top_2_right">
+			<input class="search_text2" id="search_text2" type="text" /><input type="button" value="" class="search_btn2" />
+		</div>
+	</div>
+</div>
+<div class="content_top">
+	<div class="inner_content clearfix">
+	<!-- TemplateBeginEditable name="EditRegion3" -->EditRegion3<!-- TemplateEndEditable -->
+	</div>
+</div>
+<div class="wrap_div">
+
+<!-- TemplateBeginEditable name="EditRegion4" -->EditRegion4<!-- TemplateEndEditable -->
+	
+</div>
+<!--底部-->
+	<div class="div_bottom">
+		Copyright 2015 topsun all rights reserved 浙江泰普森（控股）集团版权所有 浙ICP备09032301号-1	</div>
+</body>
+</html>

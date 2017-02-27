@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfMainCustomerFromErpMapper">
+
+<insert id="addMainCustomerFroERP" parameterType="com.outsideasy.ws.erp.supplier.vo.MainCustomerOut" keyProperty="customer_id" useGeneratedKeys="true">
+	insert into t_access_application_customer
+	(
+		customer_name,
+		record_id
+	)
+	values
+	(
+		#{customer_name},
+		#{record_id}
+	)
+</insert>
+<update id="updateMainCustomerFromERP" parameterType="map">
+	update t_access_application_customer
+		set
+			customer_name = #{customer_name},
+			record_id = #{record_id}
+		where customer_id = #{customer_out_id} and record_id = #{record_id}
+</update>
+<delete id="deleteMainCustomerFromERP" parameterType="map">
+	delete from t_access_application_customer
+	where customer_id = #{customer_out_id} and record_id = #{record_id}
+</delete>
+</mapper>

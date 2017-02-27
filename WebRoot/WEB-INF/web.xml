@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name></display-name>
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+  <listener>  
+      <listener-class>  
+          org.springframework.web.context.ContextLoaderListener  
+      </listener-class>  
+  </listener>  
+  <context-param>  
+      <param-name>contextConfigLocation</param-name>  
+      <param-value>classpath:config/beans.xml,classpath:config/spring-mongodb.xml,classpath:config/spring-ehcache.xml,classpath:config/spring-activemq.xml</param-value>  
+  </context-param> 
+  <listener>
+    <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>util.web.SessionListener</listener-class>
+  </listener>
+  <listener>  
+    <listener-class>util.web.InitDataListener</listener-class>  
+  </listener>
+  
+  <!-- vip登录页面做特殊处理 -->
+  <servlet>
+    <servlet-name>vipLoginPath</servlet-name>
+    <jsp-file>/vip/vipLogin.html</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>vipLoginPath</servlet-name>
+    <url-pattern>/vip</url-pattern>
+  </servlet-mapping> 
+  
+  <servlet>
+    <servlet-name>common</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:config/spring-mvc.xml</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>common</servlet-name>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+    <servlet-mapping>
+    <servlet-name>common</servlet-name>
+    <url-pattern>*.htm</url-pattern>
+  </servlet-mapping>
+  <filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>utf-8</param-value>
+    </init-param>
+  </filter>
+  <filter>
+	  <filter-name>htmlFilter</filter-name>
+	  <filter-class>util.web.HtmlFilter</filter-class>
+	  <init-param>
+	    <param-name>limitAccess</param-name>
+	    <param-value>true</param-value>
+	  </init-param>
+  </filter>
+  <filter>
+    <filter-name>requestFilter</filter-name>
+    <filter-class>util.web.RequestFilter</filter-class>
+    <init-param>
+      <param-name>filterEnabled</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+    <!-- 小于0-不记录日志,0-只记录登录/登出,1-记录登录/登出和数据变更操作,2-记录所有操作 -->
+      <param-name>logLevel</param-name>
+      <param-value>1</param-value>
+    </init-param>
+    <init-param>
+      <param-name>needVCode</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+     <!-- 防XSS攻击-->
+  <filter>  
+    <filter-name>XssSqlFilter</filter-name>  
+    <filter-class>util.web.XSSFilter</filter-class>  
+  </filter>
+	
+  <filter-mapping>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>htmlFilter</filter-name>
+    <!-- <url-pattern>*.html</url-pattern> -->
+    <url-pattern>*.htm</url-pattern>
+    <!-- <url-pattern>/platform/*</url-pattern>
+    <url-pattern>/usercenter/*</url-pattern> -->
+  </filter-mapping>
+	<filter-mapping>  
+	    <filter-name>XssSqlFilter</filter-name>  
+	    <url-pattern>/*</url-pattern>  
+	</filter-mapping>
+  <filter-mapping>
+    <filter-name>requestFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <!-- 配置静态资源不经过spring mvc -->
+  <servlet-mapping>  
+    <servlet-name>default</servlet-name>
+    <url-pattern>/newresources/js/*</url-pattern>  
+    <url-pattern>/newresources/css/*</url-pattern>  
+    <url-pattern>/newresources/images/*</url-pattern>
+  </servlet-mapping> 
+
+  <!-- <security-constraint> 
+       <web-resource-collection > 
+              <web-resource-name >SSL</web-resource-name>
+              <url-pattern>/*</url-pattern>
+       </web-resource-collection>
+                             
+       <user-data-constraint> 
+              <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+       </user-data-constraint> 
+</security-constraint> -->
+</web-app>

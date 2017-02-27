@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.contract.data.PfPurchaseOrderMapper">
+
+
+<select id="getPfPurchaseOrderList" parameterType="map" resultType="platform.contract.model.PfPurchaseOrder">
+	select
+		t_purchase_order.pur_order_id,
+		t_purchase_order.order_bh,
+		t_purchase_order.agreement_bh,
+		t_purchase_order.order_status,
+		t_purchase_order.create_dt,
+		t_purchase_order.category_id,
+		t_purchase_order.supplier_id,
+		t_purchase_order.sum_money,
+		t_purchase_order.pur_company_id,
+		t_purchase_order.pur_cpyname_cn,
+		t_purchase_order.pur_creator_id,
+		t_purchase_order.pur_creator_name,
+		t_purchase_order.invoice_title_id,
+		t_purchase_order.pur_invoice_type,
+		t_purchase_order.pur_invoice_title,
+		t_purchase_order.delivery_address_id,
+		t_purchase_order.pur_delivery_address,
+		t_purchase_order.pur_delivery_contact,
+		t_purchase_order.pur_delivery_contact_phone,
+		t_purchase_order.pur_memo,
+		t_purchase_order.sup_company_id,
+		t_purchase_order.sup_cpyname_cn,
+		t_purchase_order.sup_contact,
+		t_purchase_order.sup_contact_phone,
+		t_purchase_order.sup_contact_address,
+		t_purchase_order.sup_memo,
+		t_purchase_order.order_remark,
+		t_purchase_order.pur_delete_flag,
+		t_purchase_order.sup_delete_flag,
+		t_purchase_order.source_type,
+		t_purchase_order.lock_agreement,
+		t_purchase_order.delivery_date
+	from
+		t_purchase_order
+</select>
+<insert id="addPfPurchaseOrder" parameterType="platform.contract.model.PfPurchaseOrder" keyProperty="pur_order_id" useGeneratedKeys="true">
+	insert into t_purchase_order
+	(
+		pur_order_id,
+		order_bh,
+		agreement_bh,
+		order_status,
+		create_dt,
+		category_id,
+		supplier_id,
+		sum_money,
+		pur_company_id,
+		pur_cpyname_cn,
+		pur_creator_id,
+		pur_creator_name,
+		invoice_title_id,
+		pur_invoice_type,
+		pur_invoice_title,
+		delivery_address_id,
+		pur_delivery_address,
+		pur_delivery_contact,
+		pur_delivery_contact_phone,
+		pur_memo,
+		sup_company_id,
+		sup_cpyname_cn,
+		sup_contact,
+		sup_contact_phone,
+		sup_contact_address,
+		sup_memo,
+		order_remark,
+		pur_delete_flag,
+		sup_delete_flag,
+		source_type,
+		lock_agreement,
+		delivery_date
+	)
+	values
+	(
+		#{pur_order_id},
+		#{order_bh},
+		#{agreement_bh},
+		#{order_status},
+		#{create_dt},
+		#{category_id},
+		#{supplier_id},
+		#{sum_money},
+		#{pur_company_id},
+		#{pur_cpyname_cn},
+		#{pur_creator_id},
+		#{pur_creator_name},
+		#{invoice_title_id},
+		#{pur_invoice_type},
+		#{pur_invoice_title},
+		#{delivery_address_id},
+		#{pur_delivery_address},
+		#{pur_delivery_contact},
+		#{pur_delivery_contact_phone},
+		#{pur_memo},
+		#{sup_company_id},
+		#{sup_cpyname_cn},
+		#{sup_contact},
+		#{sup_contact_phone},
+		#{sup_contact_address},
+		#{sup_memo},
+		#{order_remark},
+		#{pur_delete_flag},
+		#{sup_delete_flag},
+		#{source_type},
+		#{lock_agreement},
+		#{delivery_date}
+	)
+</insert>
+<update id="updatePfPurchaseOrder" parameterType="platform.contract.model.PfPurchaseOrder">
+	update t_purchase_order
+		set
+			pur_order_id = #{pur_order_id},
+			order_bh = #{order_bh},
+			agreement_bh = #{agreement_bh},
+			order_status = #{order_status},
+			create_dt = #{create_dt},
+			category_id = #{category_id},
+			supplier_id = #{supplier_id},
+			sum_money = #{sum_money},
+			pur_company_id = #{pur_company_id},
+			pur_cpyname_cn = #{pur_cpyname_cn},
+			pur_creator_id = #{pur_creator_id},
+			pur_creator_name = #{pur_creator_name},
+			invoice_title_id = #{invoice_title_id},
+			pur_invoice_type = #{pur_invoice_type},
+			pur_invoice_title = #{pur_invoice_title},
+			delivery_address_id = #{delivery_address_id},
+			pur_delivery_address = #{pur_delivery_address},
+			pur_delivery_contact = #{pur_delivery_contact},
+			pur_delivery_contact_phone = #{pur_delivery_contact_phone},
+			pur_memo = #{pur_memo},
+			sup_company_id = #{sup_company_id},
+			sup_cpyname_cn = #{sup_cpyname_cn},
+			sup_contact = #{sup_contact},
+			sup_contact_phone = #{sup_contact_phone},
+			sup_contact_address = #{sup_contact_address},
+			sup_memo = #{sup_memo},
+			order_remark = #{order_remark},
+			pur_delete_flag = #{pur_delete_flag},
+			sup_delete_flag = #{sup_delete_flag},
+			source_type = #{source_type},
+			lock_agreement = #{lock_agreement},
+			delivery_date = #{delivery_date}
+		where pur_order_id = #{pur_order_id}
+</update>
+<delete id="deletePfPurchaseOrder" parameterType="platform.contract.model.PfPurchaseOrder">
+	delete from t_purchase_order
+	where pur_order_id = #{pur_order_id}
+</delete>
+<!-- 供方信息 -->
+<select id="getCampanyInfoBycid" parameterType="map" resultType="platform.company.model.PfCompany">
+    select 
+    t_app_company_info.cpyname_cn,
+    t_app_company_info.reg_addr,
+    t_app_company_info.contacts,
+    t_app_company_info.m_phone,
+    t_app_company_info.contact_addr_code
+    from
+    t_app_company_info
+    where
+      t_app_company_info.company_id = #{company_id}
+</select>
+<select id="getSupplierId" parameterType="map" resultType="int">
+    select 
+       t_supplier_files.supplier_id
+    from    
+       t_supplier_files
+    where    
+        t_supplier_files.company_id = #{company_id}
+</select>
+
+<select id = "getOrderid" parameterType="map" resultType="int">
+    select 
+    t_purchase_order.pur_order_id
+    from 
+    t_purchase_order
+    <where>
+      <if test="order_bh!=null">
+          t_purchase_order.order_bh = #{order_bh}
+      </if>
+    </where>
+</select>
+
+<select id="getOrderDetialId" parameterType="map" resultType="String">
+    select 
+       order_detail_id
+    from 
+        t_purchase_order_detail
+    where    
+        t_purchase_order_detail.pur_order_id = #{pur_order_id}
+        and t_purchase_order_detail.product_name = #{product_name}
+</select>
+<select id="getContractStatus" parameterType="map" resultType="String">
+    select order_status from  t_purchase_order where agreement_bh = #{agreement_bh}
+    ORDER BY pur_order_id desc limit 1
+</select>
+</mapper>

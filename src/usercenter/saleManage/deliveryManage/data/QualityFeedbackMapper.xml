@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.deliveryManage.data.QualityFeedbackMapper">
+<select id="getQualityFeedbackList" parameterType="map" resultType="usercenter.saleManage.deliveryManage.model.QualityFeedback">
+select 
+	t_order_qualitycheck.check_id,
+	t_order_qualitycheck.checkor_id,
+	t_order_qualitycheck.checkor_name,
+	t_order_qualitycheck.check_dt,
+	t_order_qualitycheck.source_type,
+	t_order_qualitycheck.delivery_dt,
+	t_order_qualitycheck.delivery_number,
+	b.cpyname_cn as pur_cpyname_cn,
+	a.cpyname_cn as sup_cpyname_cn
+from t_order_qualitycheck 
+left join t_app_company_info a on a.company_id=t_order_qualitycheck.sup_company_id
+left join t_app_company_info b on b.company_id=t_order_qualitycheck.pur_company_id
+where 1=1
+<if test="sup_company_id!=null and sup_company_id!=''">
+and t_order_qualitycheck.sup_company_id=#{sup_company_id}
+</if>
+<if test="pur_company_id!=null and pur_company_id!=''">
+and t_order_qualitycheck.pur_company_id=#{pur_company_id}
+</if>
+<if test="end_date_v != null and end_date_v !='' ">
+and t_order_qualitycheck.delivery_dt&lt;=#{end_date_v}
+</if>
+<if test="start_date_v != null and start_date_v !='' ">
+and t_order_qualitycheck.delivery_dt&gt;=#{start_date_v}
+</if>
+<if test="end_date_o != null and end_date_o !='' ">
+and t_order_qualitycheck.check_dt&lt;=#{end_date_o}
+</if>
+<if test="start_date_o != null and start_date_o !='' ">
+and t_order_qualitycheck.check_dt&gt;=#{start_date_o}
+</if>
+<if test="search_text != null and search_text !='' ">
+and b.cpyname_cn  like '%${search_text}%' or t_order_qualitycheck.delivery_number like '%${search_text}%'
+</if>
+<if test="search_text1 != null and search_text1 !='' ">
+and a.cpyname_cn  like '%${search_text1}%' or t_order_qualitycheck.delivery_number like '%${search_text1}%'
+</if>
+<if test="search_product_name != null and search_product_name !='' ">
+and t_order_qualitycheck.check_id in(
+   select t_order_check_details.check_id 
+   from
+     t_order_check_details
+     left join t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_check_details.order_detail_id
+   where t_purchase_order_detail.product_name like '%${search_product_name}%' 
+)
+</if>
+<if test="search_product_artno != null and search_product_artno !='' ">
+and t_order_qualitycheck.check_id in(
+   select t_order_check_details.check_id 
+   from
+     t_order_check_details
+     left join t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_check_details.order_detail_id
+   where t_purchase_order_detail.product_artno like '%${search_product_artno}%' 
+)
+</if>
+<if test="search_order_bh != null and search_order_bh !='' ">
+and t_order_qualitycheck.check_id in(
+   select t_order_check_details.check_id 
+   from
+     t_order_check_details
+     left join t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_check_details.order_detail_id
+left join t_purchase_order on t_purchase_order.pur_order_id=t_purchase_order_detail.pur_order_id
+   where t_purchase_order.order_bh like '%${search_order_bh}%' 
+)
+</if>
+<if test="search_agreement_bh != null and search_agreement_bh !='' ">
+and t_order_qualitycheck.check_id in(
+   select t_order_check_details.check_id 
+   from
+     t_order_check_details
+     left join t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_check_details.order_detail_id
+left join t_purchase_order on t_purchase_order.pur_order_id=t_purchase_order_detail.pur_order_id
+   where t_purchase_order.agreement_bh like '%${search_agreement_bh}%' 
+)
+</if>
+<if test="check_detail_id != null and check_detail_id !='' ">
+and t_order_qualitycheck.check_id in(
+   select t_order_check_details.check_id 
+   from
+     t_order_check_details
+   where t_order_check_details.check_detail_id = #{check_detail_id}
+)
+</if>
+order by check_dt desc,check_id desc
+</select>
+<select id="getQualityFeedbackList_count" parameterType="map" resultType="java.lang.Integer">
+select 
+	count(0)
+from t_order_qualitycheck 
+left join t_app_company_info a on a.company_id=t_order_qualitycheck.sup_company_id
+left join t_app_company_info b on b.company_id=t_order_qualitycheck.pur_company_id
+where 1=1
+<if test="sup_company_id!=null and sup_company_id!=''">
+and t_order_qualitycheck.sup_company_id=#{sup_company_id}
+</if>
+<if test="pur_company_id!=null and pur_company_id!=''">
+and t_order_qualitycheck.pur_company_id=#{pur_company_id}
+</if>
+<if test="end_date_v != null and end_date_v !='' ">
+and t_order_qualitycheck.delivery_dt&lt;=#{end_date_v}
+</if>
+<if test="start_date_v != null and start_date_v !='' ">
+and t_order_qualitycheck.delivery_dt&gt;=#{start_date_v}
+</if>
+<if test="end_date_o != null and end_date_o !='' ">
+and t_order_qualitycheck.check_dt&lt;=#{end_date_o}
+</if>
+<if test="start_date_o != null and start_date_o !='' ">
+and t_order_qualitycheck.check_dt&gt;=#{start_date_o}
+</if>
+<if test="search_text != null and search_text !='' ">
+and b.cpyname_cn  like '%${search_text}%' or t_order_qualitycheck.delivery_number like '%${search_text}%'
+</if>
+<if test="search_text1 != null and search_text1 !='' ">
+and a.cpyname_cn  like '%${search_text1}%' or t_order_qualitycheck.delivery_number like '%${search_text1}%'
+</if>
+<if test="search_product_name != null and search_product_name !='' ">
+and t_order_qualitycheck.check_id in(
+   select t_order_check_details.check_id 
+   from
+     t_order_check_details
+     left join t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_check_details.order_detail_id
+   where t_purchase_order_detail.product_name like '%${search_product_name}%' 
+)
+</if>
+<if test="search_product_artno != null and search_product_artno !='' ">
+and t_order_qualitycheck.check_id in(
+   select t_order_check_details.check_id 
+   from
+     t_order_check_details
+     left join t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_check_details.order_detail_id
+   where t_purchase_order_detail.product_artno like '%${search_product_artno}%' 
+)
+</if>
+<if test="search_order_bh != null and search_order_bh !='' ">
+and t_order_qualitycheck.check_id in(
+   select t_order_check_details.check_id 
+   from
+     t_order_check_details
+     left join t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_check_details.order_detail_id
+left join t_purchase_order on t_purchase_order.pur_order_id=t_purchase_order_detail.pur_order_id
+   where t_purchase_order.order_bh like '%${search_order_bh}%' 
+)
+</if>
+<if test="search_agreement_bh != null and search_agreement_bh !='' ">
+and t_order_qualitycheck.check_id in(
+   select t_order_check_details.check_id 
+   from
+     t_order_check_details
+     left join t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_check_details.order_detail_id
+left join t_purchase_order on t_purchase_order.pur_order_id=t_purchase_order_detail.pur_order_id
+   where t_purchase_order.agreement_bh like '%${search_agreement_bh}%' 
+)
+</if>
+<if test="check_detail_id != null and check_detail_id !='' ">
+and t_order_qualitycheck.check_id in(
+   select t_order_check_details.check_id 
+   from
+     t_order_check_details
+   where t_order_check_details.check_detail_id = #{check_detail_id}
+)
+</if>
+order by check_dt desc,check_id desc
+</select>
+<select id="getQualityFeedbackDetailList" parameterType="map" resultType="usercenter.saleManage.deliveryManage.response.QualityFeedbackDetailVo">
+select 
+	t_order_check_details.check_number,
+	t_order_check_details.check_result,
+	t_order_check_details.check_vote,
+	t_purchase_order_detail.product_name,
+	t_purchase_order_detail.product_artno,
+	t_purchase_order_detail.product_size,
+	t_purchase_order_detail.remark,
+	t_purchase_order_detail.unit,
+	t_purchase_order.order_bh,
+	t_purchase_order.agreement_bh
+from
+	t_order_check_details
+left join  t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_check_details.order_detail_id
+left join  t_purchase_order on t_purchase_order_detail.pur_order_id=t_purchase_order.pur_order_id
+where 1=1
+<if test="check_id!=null and check_id!=''">
+and t_order_check_details.check_id=#{check_id}
+</if>
+<if test="search_product_name != null and search_product_name !='' ">
+and t_purchase_order_detail.product_name like '%${search_product_name}%'
+</if>
+<if test="search_product_artno != null and search_product_artno !='' ">
+and t_purchase_order_detail.product_artno like '%${search_product_artno}%'
+</if>
+<if test="search_order_bh != null and search_order_bh !='' ">
+and t_purchase_order.order_bh like '%${search_order_bh}%'
+</if>
+<if test="search_agreement_bh != null and search_agreement_bh !='' ">
+and t_purchase_order.agreement_bh like '%${search_agreement_bh}%'
+</if>
+<if test="check_detail_id != null and check_detail_id !='' ">
+and t_order_check_details.check_detail_id=#{check_detail_id}
+</if>
+</select>
+
+<select id="getLastThreeQualityTest" parameterType="map" resultType="usercenter.saleManage.deliveryManage.model.QualityFeedbackDetail">
+select 
+	t_order_check_details.check_number,
+	t_order_check_details.check_result,
+	t_order_check_details.check_vote,
+	t_order_check_details.check_detail_id,
+	t_order_check_details.check_id,
+	t_order_check_details.order_detail_id,
+	t_order_check_details.create_dt,
+	t_purchase_order_detail.product_name,
+	t_purchase_order_detail.product_artno,
+	t_purchase_order_detail.unit,
+	t_order_qualitycheck.check_dt
+from
+	t_order_check_details
+left join  t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_check_details.order_detail_id
+left join  t_purchase_order on t_purchase_order_detail.pur_order_id=t_purchase_order.pur_order_id
+left join  t_order_qualitycheck on t_order_qualitycheck.check_id=t_order_check_details.check_id
+where 1=1
+<if test="sup_company_id!=null and sup_company_id!=''">
+	and t_purchase_order.sup_company_id=#{sup_company_id}
+</if>
+<if test="pur_company_id!=null and pur_company_id!=''">
+	and t_purchase_order.pur_company_id=#{pur_company_id}
+</if>
+order by check_dt desc,t_order_check_details.check_id desc limit 3
+</select>
+</mapper>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.CheckfactoryReportMapper">
+
+<select id="getCheckfactoryReportList" parameterType="map" resultType="usercenter.saleManage.model.CheckfactoryReport">
+	select
+		t_supplier_checkfactory_report.id,
+		t_supplier_checkfactory_report.file_type_id,
+		t_supplier_checkfactory_report.file_name,
+		t_supplier_checkfactory_report.create_dt,
+		t_supplier_checkfactory_report.remark,
+		t_supplier_checkfactory_report.mogodb_id,
+		t_supplier_checkfactory_report.check_score,
+		t_supplier_checkfactory_report.supplier_id,
+		t_supplier_checkfactory_report.check_factory_dt
+	from
+		t_supplier_checkfactory_report
+		where 1=1
+		<if test="supplier_id!='' and supplier_id!=null">
+			and supplier_id=#{supplier_id}
+		</if>
+		<if test="end_date != null and end_date !='' ">
+			and t_supplier_checkfactory_report.create_dt&lt;=#{end_date}
+		</if>
+		<if test="start_date != null and start_date !='' ">
+			and t_supplier_checkfactory_report.create_dt&gt;=#{start_date}
+		</if>
+		order by create_dt DESC
+		<if test="limit_num != null and limit_num != ''">
+			limit #{limit_num}
+		</if>
+</select>
+<select id="getAllCheckfactoryReportList" parameterType="map" resultType="usercenter.saleManage.model.CheckfactoryReport">
+	select
+		t_supplier_checkfactory_report.id,
+		t_supplier_checkfactory_report.file_type_id,
+		t_supplier_checkfactory_report.file_name,
+		t_supplier_checkfactory_report.create_dt,
+		t_supplier_checkfactory_report.check_factory_dt,
+		t_supplier_checkfactory_report.remark,
+		t_supplier_checkfactory_report.operator_name,
+		t_supplier_checkfactory_report.checkor,
+		t_app_company_info.cpyname_cn as owner_cpyname,
+		t_supplier_checkfactory_report.send_company_id as owner_id,
+		t_supplier_checkfactory_report.mogodb_id,
+		t_supplier_checkfactory_report.check_score,
+		t_supplier_checkfactory_report.supplier_id
+	from
+		t_supplier_checkfactory_report
+		left join t_app_company_info on t_app_company_info.company_id=t_supplier_checkfactory_report.send_company_id
+		where t_supplier_checkfactory_report.supplier_id IN (SELECT supplier_id from t_supplier_files where company_id=#{company_id})
+		order by t_supplier_checkfactory_report.create_dt DESC
+</select>
+<insert id="addCheckfactoryReport" parameterType="usercenter.saleManage.model.CheckfactoryReport" keyProperty="id" useGeneratedKeys="true">
+	insert into t_supplier_checkfactory_report
+	(
+		id,
+		file_type_id,
+		file_name,
+		create_dt,
+		remark,
+		mogodb_id,
+		check_score,
+		supplier_id
+	)
+	values
+	(
+		#{id},
+		#{file_type_id},
+		#{file_name},
+		#{create_dt},
+		#{remark},
+		#{mogodb_id},
+		#{check_score},
+		#{supplier_id}
+	)
+</insert>
+<update id="updateCheckfactoryReport" parameterType="usercenter.saleManage.model.CheckfactoryReport">
+	update t_supplier_checkfactory_report
+		set
+			id = #{id},
+			file_type_id = #{file_type_id},
+			file_name = #{file_name},
+			create_dt = #{create_dt},
+			remark = #{remark},
+			mogodb_id = #{mogodb_id},
+			check_score = #{check_score},
+			supplier_id = #{supplier_id}
+		where id = #{id}
+</update>
+<delete id="deleteCheckfactoryReport" parameterType="usercenter.saleManage.model.CheckfactoryReport">
+	delete from t_supplier_checkfactory_report
+	where id = #{id}
+</delete>
+
+<!-- 获取拥有者的供应商列表信息 -->
+<select id="getCheckfactoryReportAndcheckCycleList" parameterType="map" resultType="map">
+	select
+		tscr.id,
+		tscr.file_type_id,
+		tscr.file_name,
+		tscr.create_dt,
+		tscr.remark,
+		tscr.mogodb_id,
+		tscr.check_score,
+		tscr.supplier_id,
+		tsfci.next_check_dt,
+		tsfci.create_dt cyc_creat_dt,
+		tcfc.factory_cycle_id,
+		tcfc.factory_cycle_name
+	from
+		t_supplier_checkfactory_report tscr
+		left join t_supplier_factory_cycle_info tsfci on tscr.supplier_id = tsfci.supplier_id
+		left join t_check_factory_cycle tcfc on tsfci.factory_cycle_id = tcfc.factory_cycle_id
+		where 1=1
+		<if test="supplier_id!=null and supplier_id!=''">
+			and tscr.supplier_id=#{supplier_id}
+		</if>
+		order by tscr.create_dt DESC
+		<if test="limit_num != null and limit_num!=''">
+			limit #{limit_num}
+		</if>
+</select> 
+<select id="getLastThreeCheckFactory" parameterType="map" resultType="usercenter.saleManage.model.CheckfactoryReport">
+	select
+		t_supplier_checkfactory_report.id,
+		t_supplier_checkfactory_report.file_type_id,
+		t_supplier_checkfactory_report.file_name,
+		t_supplier_checkfactory_report.create_dt,
+		t_supplier_checkfactory_report.check_factory_dt,
+		t_supplier_checkfactory_report.remark,
+		t_supplier_checkfactory_report.operator_name,
+		t_app_company_info.cpyname_cn as owner_cpyname,
+		t_supplier_checkfactory_report.send_company_id as owner_id,
+		t_supplier_checkfactory_report.mogodb_id,
+		t_supplier_checkfactory_report.check_score,
+		t_supplier_checkfactory_report.supplier_id
+	from
+		t_supplier_checkfactory_report
+		left join t_app_company_info on t_app_company_info.company_id=t_supplier_checkfactory_report.send_company_id
+		where t_supplier_checkfactory_report.supplier_id IN (SELECT supplier_id from t_supplier_files where company_id=#{sup_company_id})
+		order by t_supplier_checkfactory_report.create_dt DESC limit 3
+</select>
+<select id="hasCheckFactory" parameterType="map" resultType="java.lang.Integer">
+	select
+		count(0)
+	from
+		t_supplier_checkfactory_report
+		where t_supplier_checkfactory_report.supplier_id=#{supplier_id}
+</select>
+</mapper>

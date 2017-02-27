@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>错误</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="/newresources/css/error.css" />
+<script src="/newresources/js/jquery-1.10.2.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+var c=0;
+$(function(){
+	timeCount(10);
+});
+function timeCount(num)
+{
+	c=num;
+	$("#time_count").html(c);
+	c=c-1;
+	if(c>=0)
+	{
+		setTimeout("timeCount(c)",1000);
+	}
+	else
+	{
+		go_login();
+		
+	}
+}
+function go_login()
+{
+	window.location.href="/login.html";
+}
+</script>
+</head>
+
+<body class="bg_grey">
+	<div class="error_midd_wrap">
+		<p class="p1">
+			<img src="/newresources/images/error/error.png" /><span class="span1">Sorry</span>
+		</p>
+		<p class="p2">该账号已经在其他地方登录……</p>
+		<p class="p3">对不起，出错啦</p>
+		<p class="p4">
+			<button onClick="go_login()">&gt;&nbsp;&nbsp;返回登录</button>
+			<span class="span4">正在返回登录页面……倒计时<span id="time_count" class="count_span">10</span>秒</span>
+		</p>
+	</div>
+</body>
+</html>

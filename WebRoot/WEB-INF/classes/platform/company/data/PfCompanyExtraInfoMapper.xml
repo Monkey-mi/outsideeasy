@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 公司的额外信息获取 -->
+<mapper namespace="platform.company.data.PfCompanyExtraInfoMapper">
+
+	<!-- 通过公司ID查询银行账户 -->
+ 	<select id="getBankAccount" parameterType="java.lang.Integer"
+		resultType="platform.company.model.PfBankAccount">
+		select
+		account_id,
+		account_name,
+		account_sts,
+		default_id,
+		account_code
+		from
+		t_app_bank_account
+		where
+		company_id = #{companyId}
+	</select>
+
+	<!-- 通过公司ID查询发票抬头 -->
+  	<select id="getInvoiceTitleNames" parameterType="java.lang.Integer"
+		resultType="platform.company.model.PfInvoiceTitle">
+		select
+		invoice_title_id,
+		invoice_title_sts,
+		default_id,
+		invoice_title_name
+		from
+		t_app_invoice_title
+		where
+		company_id = #{companyId}
+	</select> 
+
+	<!-- 查询销售条目信息 -->
+ 	<select id="getSaleItemByCompanyId" parameterType="java.lang.Integer"
+		resultType="java.lang.String">
+		select
+		goods_name
+		from
+		t_app_goods
+		where
+		company_id = #{companyId}
+	</select>
+
+	<!-- 查询购买原材料信息 -->
+ 	<select id="getBuyItemByCompanyId" parameterType="java.lang.Integer" resultType="java.lang.String">
+		select
+		material_name
+		from
+		t_app_metarial
+		where
+		company_id = #{companyId}
+	</select>
+	
+	<!-- 查询销售商品对象 -->
+ 	<select id="getSaleModelByCompanyId" parameterType="java.lang.Integer" resultType="platform.company.model.PfGoods">
+		select
+		goods_name,
+		goods_brand
+		from
+		t_app_goods
+		where
+		company_id = #{companyId}
+	</select>
+	
+	<!-- 查询购买材料对象 -->
+  	<select id="getBuyModelByCompanyId" parameterType="java.lang.Integer" resultType="platform.company.model.PfMaterial">
+		select
+		material_name,
+		material_brand
+		from
+		t_app_metarial
+		where
+		company_id = #{companyId}
+	</select> 
+	
+	<!-- 根据companyId获取主要客户信息 -->
+  	<select id="getMainCustomerByCompanyId" parameterType="java.lang.Integer" resultType="platform.company.model.PfMainCustomer">
+	select
+		customer_name
+	from
+		t_app_main_customer
+	where
+		company_id = #{companyId}
+	</select>
+	
+	<!-- 根据companyId获取竞争对手信息 -->
+ 	<select id="getCompetitorByCompanyId" parameterType="java.lang.Integer" resultType="platform.company.model.PfCompetitor">
+	select
+		competitor_name
+	from
+		t_app_competitor
+	where
+		company_id = #{companyId}
+	</select>
+	
+ 	<select id="getDeviceByCompanyId" parameterType="java.lang.Integer" resultType="platform.company.model.PfDevice">
+		select 
+		   device_id,       
+		   device_name,     
+		   specifications,  
+		   place,           
+		   price,          
+		   buy_day,         
+		   advanced,        
+		   device_num
+		from
+			t_app_devicelist
+		where
+			company_id = #{companyId}
+	</select>
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfMainCustomerMapper">
+
+
+<select id="getMainCustomerOutList" parameterType="map" resultType="com.outsideasy.ws.erp.supplier.vo.MainCustomerOut">
+	select
+		t_app_main_customer.customer_id,
+		t_app_main_customer.customer_name,
+		t_app_main_customer.company_id
+	from
+		t_app_main_customer
+		where 1=1
+	<if test="company_id!=null">
+		and t_app_main_customer.company_id=#{company_id}
+	</if>
+</select>
+
+<!-- 根据companyId获取主要客户信息 -->
+<select id="getMainCustomerByCompanyId" parameterType="java.lang.Integer" resultType="platform.company.model.PfMainCustomer">
+select
+	customer_id,
+	customer_name
+from
+	t_app_main_customer
+where
+	company_id = #{companyId}
+</select>
+<!-- 根据companyId获取主要客户信息 -->
+<select id="getMainCustomerMapByCompanyId" parameterType="map" resultType="map">
+select
+	customer_id,
+	customer_name
+from
+	t_app_main_customer
+where
+	company_id = #{companyId}
+</select>
+
+<!-- 更新客户信息 -->
+<update id="updateCustomer" parameterType="map">
+	update
+		t_app_main_customer
+	<set>
+		<if test="customerName != null and customerName != ''">
+			customer_name = #{customerName}
+		</if>
+	</set>
+	where
+		customer_id = #{customerId}
+</update>
+
+<!-- 删除指定客户信息 -->
+<delete id="deleteCustomer" parameterType="map">
+	delete from
+		t_app_main_customer
+	where
+		customer_id = #{customerId}
+</delete>
+<!-- 删除指定客户信息 -->
+<delete id="deleteCustomerByCompanyId" parameterType="map">
+	delete from
+		t_app_main_customer
+	where
+		company_id = #{companyId}
+</delete>
+<!-- 插入客户 -->
+<insert id="addCustomer" parameterType="map" keyProperty="customer_id" useGeneratedKeys="true">
+	insert into
+		t_app_main_customer(customer_name,company_id)
+	values
+		(#{customerName},#{companyId})
+</insert>
+</mapper>

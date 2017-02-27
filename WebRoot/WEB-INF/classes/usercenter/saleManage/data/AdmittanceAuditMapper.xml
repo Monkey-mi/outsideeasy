@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AdmittanceAuditMapper">
+
+
+<select id="getAdmittanceAuditList" parameterType="map" resultType="usercenter.saleManage.model.AdmittanceAudit">
+	select
+		t_admittance_audit.audit_id,
+		t_admittance_audit.record_id,
+		t_admittance_audit.audit_status,
+		t_admittance_audit.audit_opinion,
+		t_admittance_audit.create_dt,
+		t_admittance_audit.apply_submit_dt
+	from
+		t_admittance_audit
+</select>
+<insert id="addAdmittanceAudit" parameterType="map" keyProperty="audit_id" useGeneratedKeys="true">
+	insert into t_admittance_audit
+	(
+		audit_id,
+		record_id,
+		audit_status,
+		audit_opinion,
+		auditor_id,
+		auditor_name,
+		source_type,
+		apply_submit_dt
+	)
+	values
+	(
+		#{audit_id},
+		#{record_id},
+		#{audit_status},
+		#{audit_opinion},
+		#{auditor_id},
+		#{auditor_name},
+		#{source_type},
+		#{apply_submit_dt}
+	)
+</insert>
+<update id="updateAdmittanceAudit" parameterType="map">
+	update t_admittance_audit
+		set
+			audit_id = #{audit_id},
+			record_id = #{record_id},
+			audit_status = #{audit_status},
+			audit_opinion = #{audit_opinion},
+			create_dt = #{create_dt}
+		where audit_id = #{audit_id}
+</update>
+<delete id="deleteAdmittanceAudit" parameterType="map">
+	delete from t_admittance_audit
+	where audit_id = #{audit_id}
+</delete>
+<select id="getAdmittanceAuditById" parameterType="map" resultType="usercenter.saleManage.model.AdmittanceAudit">
+	select
+		t_admittance_audit.audit_id,
+		t_admittance_audit.record_id,
+		t_admittance_audit.audit_status,
+		t_admittance_audit.audit_opinion,
+		t_admittance_audit.create_dt,
+		t_admittance_audit.apply_submit_dt
+	from
+		t_admittance_audit
+		where 
+		record_id = #{record_id}
+		and 
+		audit_status = #{audit_status}
+	order by audit_id desc
+</select>
+</mapper>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.CompetitorMapper">
+
+
+<select id="getCompetitorList" parameterType="map" resultType="manager.supplier.model.Competitor">
+	select
+		t_app_competitor.competitor_id,
+		t_app_competitor.competitor_name,
+		t_app_competitor.company_id
+	from
+		t_app_competitor
+	where 1=1
+	<if test="company_id!=null">
+		and t_app_competitor.company_id=#{company_id}
+	</if>
+</select>
+<insert id="addCompetitor" parameterType="manager.supplier.model.Competitor" keyProperty="competitor_id" useGeneratedKeys="true">
+	<selectKey keyProperty="competitor_id" resultType="int" order="BEFORE">
+		select  ifnull(max(competitor_id)+1,1) from t_app_competitor 		
+	</selectKey>
+	insert into t_app_competitor
+	(
+		competitor_id,
+		competitor_name,
+		company_id
+	)
+	values
+	(
+		#{competitor_id},
+		#{competitor_name},
+		#{company_id}
+	)
+</insert>
+<update id="updateCompetitor" parameterType="manager.supplier.model.Competitor">
+	update t_app_competitor
+		set
+			competitor_id = #{competitor_id},
+			competitor_name = #{competitor_name},
+			company_id = #{company_id}
+		where competitor_id = #{competitor_id}
+</update>
+<delete id="deleteCompetitor" parameterType="manager.supplier.model.Competitor">
+	delete from t_app_competitor
+	where competitor_id = #{competitor_id}
+</delete>
+</mapper>

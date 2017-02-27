@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.CheckfactoryInformMapper">
+
+
+<select id="getCheckfactoryInformList" parameterType="map" resultType="usercenter.saleManage.model.CheckfactoryInform">
+	select
+		t_supplier_checkfactory_inform.checkinform_id,
+		t_supplier_checkfactory_inform.file_type_id,
+		t_supplier_checkfactory_inform.file_name,
+		t_supplier_checkfactory_inform.create_dt,
+		t_supplier_checkfactory_inform.remark,
+		t_supplier_checkfactory_inform.mogodb_id,
+		t_supplier_checkfactory_inform.status,
+		t_supplier_checkfactory_inform.supplier_id
+	from
+		t_supplier_checkfactory_inform
+</select>
+<select id="getAllCheckfactoryInformList" parameterType="map" resultType="usercenter.saleManage.model.CheckfactoryInform">
+	select
+		t_supplier_checkfactory_inform.checkinform_id,
+		t_supplier_checkfactory_inform.file_type_id,
+		t_supplier_checkfactory_inform.file_name,
+		t_supplier_checkfactory_inform.create_dt,
+		t_supplier_checkfactory_inform.plan_check_dt,
+		t_supplier_checkfactory_inform.operator_name,
+		t_supplier_checkfactory_inform.check_man,
+		t_supplier_checkfactory_inform.check_man_phone,
+		t_supplier_checkfactory_inform.remark,
+		t_app_company_info.cpyname_cn as owner_cpyname,
+		t_supplier_checkfactory_inform.send_company_id as owner_id,
+		t_supplier_checkfactory_inform.mogodb_id,
+		t_supplier_checkfactory_inform.status,
+		t_supplier_checkfactory_inform.supplier_id
+	from
+		t_supplier_checkfactory_inform
+		left join t_app_company_info on t_app_company_info.company_id=t_supplier_checkfactory_inform.send_company_id
+		where t_supplier_checkfactory_inform.supplier_id IN (SELECT supplier_id from t_supplier_files where company_id=#{company_id})
+		order by t_supplier_checkfactory_inform.create_dt DESC
+</select>
+<insert id="addCheckfactoryInform" parameterType="usercenter.saleManage.model.CheckfactoryInform" keyProperty="checkinform_id" useGeneratedKeys="true">
+	insert into t_supplier_checkfactory_inform
+	(
+		checkinform_id,
+		file_type_id,
+		file_name,
+		create_dt,
+		remark,
+		mogodb_id,
+		status,
+		supplier_id
+	)
+	values
+	(
+		#{checkinform_id},
+		#{file_type_id},
+		#{file_name},
+		#{create_dt},
+		#{remark},
+		#{mogodb_id},
+		#{status},
+		#{supplier_id}
+	)
+</insert>
+<update id="updateCheckfactoryInform" parameterType="usercenter.saleManage.model.CheckfactoryInform">
+	update t_supplier_checkfactory_inform
+		set
+			checkinform_id = #{checkinform_id},
+			file_type_id = #{file_type_id},
+			file_name = #{file_name},
+			create_dt = #{create_dt},
+			remark = #{remark},
+			mogodb_id = #{mogodb_id},
+			status = #{status},
+			supplier_id = #{supplier_id}
+		where checkinform_id = #{checkinform_id}
+</update>
+<delete id="deleteCheckfactoryInform" parameterType="usercenter.saleManage.model.CheckfactoryInform">
+	delete from t_supplier_checkfactory_inform
+	where checkinform_id = #{checkinform_id}
+</delete>
+<update id="confirmCheckfactoryInform" parameterType="map">
+	update t_supplier_checkfactory_inform
+		set
+			status = #{status},
+			update_dt = now()
+		where checkinform_id = #{checkinform_id}
+</update>
+<select id="getCountForToBeConfirmed" parameterType="map" resultType="java.lang.Integer">
+	select COUNT(0) from t_supplier_checkfactory_inform 
+		left join t_supplier_files on t_supplier_checkfactory_inform.supplier_id=t_supplier_files.supplier_id
+		where 1=1
+		 <if test="sup_company_id!=null and sup_company_id!=''">
+		and t_supplier_checkfactory_inform.supplier_id IN (SELECT supplier_id from t_supplier_files where company_id=#{sup_company_id})
+		</if>
+		<if test="pur_company_id!=null and pur_company_id!=''">
+		and send_company_id = #{pur_company_id}
+		</if>
+		and status=0
+		and is_delete=0
+</select>
+</mapper>

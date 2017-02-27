@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>左侧菜单</title>
+<!--  
+<link href="/newresources/css/purchaseLeftMenu.css" rel="stylesheet" type="text/css" />
+<link href="/newresources/css/common.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/newresources/js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="/newresources/js/base.js"></script>-->
+<script id="evaluationtmpl" type="text/x-dot-template">
+{{ for(var prop in it) { }}
+	<p class="title">{{= it[prop].menu_name }}</p>
+	<ul>
+	{{ for(var child in it[prop].children){ }}
+		{{? it[prop].children[child].id==58}}
+			<li><a onclick="go_skip('{{= it[prop].children[child].menu_path}}')" ><img src="/newresources/images/page/new_buy.png" class="f_l" /><span style="margin-left:-40px;">{{= it[prop].children[child].menu_name}}</span></a></li>
+		{{??}}
+			<li><a onclick="go_skip('{{= it[prop].children[child].menu_path}}')" >{{= it[prop].children[child].menu_name}}</a></li>
+		{{?}}
+	{{ } }}
+	</ul>
+{{ } }}
+</script>
+<script type="text/javascript">
+$(function(){
+var data=getMenuData(16);
+var evalText=doT.template($("#evaluationtmpl").text());
+$("#evaluation").html(evalText(data));
+});
+
+function go_skip(url){
+	addParamsToWindowName(null);
+	window.location.href=getwebroot()+url.slice(1)+".htm";
+}
+</script>
+</head>
+<body>
+<div id="leftMenuPage" class="purchase_leftMenu">
+	<div class="purchase_left_block_title">
+		<span class="ml10">采购</span>
+		<img  class="bg_img" src="/newresources/images/page/buy_bg.png" />
+	</div>
+	<div id="evaluation"></div>
+	<!-- 
+	<p class="title">采购寻源</p>
+	<ul>
+		<li><a href="">寻源发布</a></li>
+		<li><a href="">发布管理</a></li>
+		<li><a href="">报价管理</a></li>
+		
+	</ul>
+	<p class="title">交易管理</p>
+	<ul>
+		<li><a>新增询样</a></li>
+		<li><a href="">新增订单</a></li>
+		<li><a href="">询样单管理</a></li>
+		<li><a href="">订单管理</a></li>
+	</ul>
+	<p class="title">协议采购</p>
+	<ul>
+		<li><a href="/usercenter/outsourceTaskManage/taskList.html"><img src="/newresources/images/page/new_buy.png" class="f_l" /><span style="margin-left:-40px;">外协任务</span></a></li>	
+	</ul>
+	<p class="title">供应商管理</p>
+	<ul>
+		<li><a>准入模板维护</a></li>
+		<li><a >准入审核</a></li>
+		<li><a href="/usercenter/purchaseManage/SupplierManage/offlineFactoryCheck.html">验厂评估</a></li>
+		<li><a href="/usercenter/purchaseManage/SupplierManage/supplierList.html">供应商库</a></li>
+	</ul>
+	
+	<p class="title">采购商品库</p>
+	<ul>
+		<li><a>添加产品</a></li>
+		<li><a>产品库</a></li>
+		<li><a href="/usercenter/purchaseManage/purchaseCategoryManage/purchaseCategoryList.html">采购类目</a></li>
+	</ul>
+	 -->
+</div>
+
+</body>
+</html>

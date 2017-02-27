@@ -1,0 +1,12 @@
+@CHARSET "UTF-8";
+.sale_leftMenu{ width:auto; height:auto;background-color:#fff; overflow:hidden;}
+.sale_left_block_title{ width:100%; height:43px; line-height:40px; color:#fff; font-size:16px; background:#f1af27 url(../images/page/sale_t.png) repeat-x;}
+.sale_left_block_title .bg_img{ float:right; margin-right:10px;}
+
+.sale_leftMenu .title{ height:40px; line-height:40px; border-bottom:1px solid #f1af27; padding-left:10px; font-size:14px;}
+
+.sale_leftMenu ul{ width:100%; height:auto; }
+.sale_leftMenu ul li{ width:100%; height:40px; text-align:center; line-height:40px;}
+.sale_leftMenu ul li a{ float:left; width:99%; height:40px; line-height:40px; text-align:center; color:#777;}
+.sale_leftMenu ul li a:hover{ background-color:#ececec; text-decoration:none;}
+.sale_leftMenu ul li.curr{background-color:#ececec;}

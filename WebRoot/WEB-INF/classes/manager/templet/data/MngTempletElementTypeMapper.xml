@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.templet.data.MngTempletElementTypeMapper">
+
+
+<select id="getMngTempletElementTypeList" parameterType="map" resultType="manager.templet.model.MngTempletElementType">
+	select
+		t_templet_element_type.e_type_id,
+		t_templet_element_type.type_name,
+		t_templet_element_type.create_dt
+	from
+		t_templet_element_type
+</select>
+<insert id="addMngTempletElementType" parameterType="manager.templet.model.MngTempletElementType" keyProperty="e_type_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="e_type_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_templet_element_type
+	(
+		type_name
+	
+	)
+	values
+	(
+		#{type_name}
+	
+	)
+</insert>
+<update id="updateMngTempletElementType" parameterType="manager.templet.model.MngTempletElementType">
+	update t_templet_element_type
+		set
+			e_type_id = #{e_type_id},
+			type_name = #{type_name}
+		
+		where e_type_id = #{e_type_id}
+</update>
+<delete id="deleteMngTempletElementType" parameterType="manager.templet.model.MngTempletElementType">
+	delete from t_templet_element_type
+	where e_type_id = #{e_type_id}
+</delete>
+<select id="getTypeList" parameterType="map" resultType="manager.templet.model.MngTempletElementType">
+	select
+		t_templet_element_type.e_type_id,
+		t_templet_element_type.type_name
+	from
+		t_templet_element_type
+	where
+	     1=1
+		<if test="search!=null and search!=''">
+		  and ( t_templet_element_type.e_type_id like '%${search}%' or	t_templet_element_type.type_name like '%${search}%')
+		</if>
+</select>
+</mapper>

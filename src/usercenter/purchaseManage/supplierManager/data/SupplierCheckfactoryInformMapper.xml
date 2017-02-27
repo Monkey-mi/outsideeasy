@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.purchaseManage.supplierManager.data.SupplierCheckfactoryInformMapper">
+
+
+<select id="getSupplierCheckfactoryInformList" parameterType="map" resultType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryInform">
+	select
+		t_supplier_checkfactory_inform.checkinform_id,
+		t_supplier_checkfactory_inform.file_name,
+		t_supplier_checkfactory_inform.create_dt,
+		t_supplier_checkfactory_inform.remark,
+		t_supplier_checkfactory_inform.mogodb_id,
+		t_supplier_checkfactory_inform.status,
+		t_supplier_checkfactory_inform.supplier_id,
+		t_supplier_checkfactory_inform.update_dt,
+		t_supplier_checkfactory_inform.plan_check_dt,
+		t_supplier_checkfactory_inform.operator_id,
+		t_supplier_checkfactory_inform.operator_name,
+		t_supplier_checkfactory_inform.send_company_id,
+		t_supplier_checkfactory_inform.check_man,
+		t_supplier_checkfactory_inform.check_man_phone
+	from
+		t_supplier_checkfactory_inform
+</select>
+<insert id="addSupplierCheckfactoryInform" parameterType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryInform" keyProperty="checkinform_id" useGeneratedKeys="true">
+	insert into t_supplier_checkfactory_inform
+	(
+		checkinform_id,
+		file_name,
+		create_dt,
+		remark,
+		mogodb_id,
+		status,
+		supplier_id,
+		update_dt,
+		plan_check_dt,
+		operator_id,
+		operator_name,
+		send_company_id,
+		check_man,
+		check_man_phone
+	)
+	values
+	(
+		#{checkinform_id},
+		#{file_name},
+		#{create_dt},
+		#{remark},
+		#{mogodb_id},
+		#{status},
+		#{supplier_id},
+		#{update_dt},
+		#{plan_check_dt},
+		#{operator_id},
+		#{operator_name},
+		#{send_company_id},
+		#{check_man},
+		#{check_man_phone}
+	)
+</insert>
+
+<!-- 通知供应商 -->
+<insert id="notifySupplier" parameterType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryInform" keyProperty="checkinform_id" useGeneratedKeys="true">
+	insert into t_supplier_checkfactory_inform
+	(
+		file_name,
+		mogodb_id
+	)
+	values
+	(
+		#{file_name},
+		#{mogodb_id}
+	)
+</insert>
+
+<update id="updateSupplierCheckfactoryInform" parameterType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryInform">
+	update t_supplier_checkfactory_inform
+		set
+			checkinform_id = #{checkinform_id},
+			file_name = #{file_name},
+			create_dt = #{create_dt},
+			remark = #{remark},
+			mogodb_id = #{mogodb_id},
+			status = #{status},
+			supplier_id = #{supplier_id},
+			update_dt = #{update_dt},
+			plan_check_dt = #{plan_check_dt},
+			operator_id = #{operator_id},
+			operator_name = #{operator_name},
+			send_company_id = #{send_company_id},
+			check_man = #{check_man},
+			check_man_phone = #{check_man_phone}
+		where checkinform_id = #{checkinform_id}
+</update>
+
+<!-- 更新验厂通知，即上传的通知报告与供应商相关联-->
+<update id="updateNotifySupplier" parameterType="map">
+	update t_supplier_checkfactory_inform
+		set
+			create_dt = #{createDt},
+			status = #{status},
+			supplier_id = #{supplierId},
+			update_dt = #{updateDt},
+			plan_check_dt = #{planCheckDt},
+			operator_id = #{operatorId},
+			operator_name = #{operatorName},
+			send_company_id = #{sendCompanyId},
+			check_man = #{checkMan},
+			check_man_phone = #{checkManPhone}
+		where 
+			checkinform_id = #{checkinformId}
+</update>
+
+<delete id="deleteSupplierCheckfactoryInform" parameterType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryInform">
+	delete from t_supplier_checkfactory_inform
+	where checkinform_id = #{checkinform_id}
+</delete>
+
+<!-- 获取待通知供应商 -->
+<select id="getWaitNotifySuppliers" parameterType="map" resultType ="usercenter.purchaseManage.supplierManager.model.WaitNotifySupplier">
+	SELECT
+		tsf.*,
+		taci.reg_addr,
+<!-- 		taci.contact_addr,
+		taci.contact_addr_code,
+		taci.m_phone, -->
+		(SELECT content from t_access_application_info taai1 where e_id = 14 and tsf.supplier_id = taai1.supplier_id) as m_phone,
+		(SELECT content from t_access_application_info taai2 where e_id = 52 and tsf.supplier_id = taai2.supplier_id) as contact_addr_code,
+		(SELECT content from t_access_application_info taai3 where e_id = 13 and tsf.supplier_id = taai3.supplier_id) as contact_addr,
+		taci.corporation,
+		tsfci.next_check_dt,
+		tcfc.cycle_value
+	FROM
+		t_supplier_files tsf
+		<if test="regId != null and regId != 0">
+		INNER JOIN t_supplier_regaccount_info tsri on tsri.supplier_id = tsf.supplier_id and tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+		INNER JOIN t_subaccount_supplier_info tssi on tssi.supplier_id = tsf.supplier_id  and tssi.is_delete = 0 and tssi.sa_id = #{saId}
+		</if>
+		INNER JOIN t_supplier_owner_info tsoi on tsoi.supplier_id = tsf.supplier_id and tsoi.company_id = #{companyId}
+		INNER JOIN t_app_company_info taci on taci.company_id = tsf.company_id
+		LEFT JOIN t_supplier_factory_cycle_info tsfci on tsfci.supplier_id = tsf.supplier_id
+		LEFT JOIN t_check_factory_cycle tcfc on tcfc.factory_cycle_id = tsfci.factory_cycle_id
+	WHERE
+	(	
+		(
+			tsfci.next_check_dt is NULL
+			OR
+			<![CDATA[DATE_ADD(tsfci.next_check_dt,INTERVAL -#{beforeDate} DAY) < NOW()]]><!-- 在提示时间内 -->
+		)
+		AND
+		(
+			(<!-- 还未提醒 -->
+				SELECT tsci.status
+				FROM t_supplier_checkfactory_inform tsci
+				WHERE tsci.supplier_id = tsf.supplier_id
+				ORDER BY tsci.create_dt DESC
+				LIMIT 1	
+			)  is null
+			or
+			(<!-- 还未提醒 -->
+				(
+					SELECT tsci.status
+					FROM t_supplier_checkfactory_inform tsci
+					WHERE tsci.supplier_id = tsf.supplier_id
+					ORDER BY tsci.create_dt DESC
+					LIMIT 1	
+				)  in (2)
+			)
+			or
+			(<!-- 到期验厂 -->
+				(
+					SELECT tsci.status
+					FROM t_supplier_checkfactory_inform tsci
+					WHERE tsci.supplier_id = tsf.supplier_id
+					ORDER BY tsci.create_dt DESC
+					LIMIT 1	
+				)  in (1)
+				and
+				<![CDATA[DATE_ADD(tsfci.next_check_dt,INTERVAL -#{beforeDate} DAY) < NOW()]]><!-- 在提示时间内 -->
+			)
+		)
+	)
+	AND
+	tsf.no_check = 0<!-- 0:需要验厂 -->
+	AND
+	tsf.file_status = 0
+	<if test="mulParams != null and mulParams != ''">
+	AND(
+		taci.m_phone like CONCAT("%",#{mulParams},"%")
+		or
+		taci.corporation like CONCAT("%",#{mulParams},"%")
+		or
+		taci.reg_addr like CONCAT("%",#{mulParams},"%")
+		or
+		tsf.supplier_cpyname like CONCAT("%",#{mulParams},"%")
+	)
+	</if>
+	<choose>
+		<when test="checkFacType == 1"><!-- 初次验厂 -->
+		AND tsfci.next_check_dt is NULL
+		</when>
+		<when test="checkFacType == 2"><!-- 复检 -->
+		AND tsfci.next_check_dt is not NULL
+		</when>
+	</choose>
+			<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+			and(
+				<if test="provinceCodes != null and cityCodes == null">
+				FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+				(FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				)or(
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+				)	
+				</if>
+			)
+			</if>
+	ORDER BY tsf.auth_dt DESC
+	limit #{start},#{limit}
+</select>
+
+<!-- 获取待通知供应商总数 -->
+<select id="getWaitNotifySuppliersTotal" parameterType="map" resultType ="Integer">
+	SELECT
+		count(*)
+	FROM
+		t_supplier_files tsf
+		<if test="regId != null and regId != 0">
+		INNER JOIN t_supplier_regaccount_info tsri on tsri.supplier_id = tsf.supplier_id and tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+		INNER JOIN t_subaccount_supplier_info tssi on tssi.supplier_id = tsf.supplier_id and tssi.is_delete = 0 and tssi.sa_id = #{saId}
+		</if>
+		INNER JOIN t_supplier_owner_info tsoi on tsoi.supplier_id = tsf.supplier_id and tsoi.company_id = #{companyId}
+		INNER JOIN t_app_company_info taci on taci.company_id = tsf.company_id
+		LEFT JOIN t_supplier_factory_cycle_info tsfci on tsfci.supplier_id = tsf.supplier_id
+		LEFT JOIN t_check_factory_cycle tcfc on tcfc.factory_cycle_id = tsfci.factory_cycle_id
+	WHERE
+		(	
+			(
+				tsfci.next_check_dt is NULL
+				OR
+				<![CDATA[DATE_ADD(tsfci.next_check_dt,INTERVAL -#{beforeDate} DAY) < NOW()]]><!-- 在提示时间内 -->
+			)
+			AND
+			(
+				(<!-- 还未提醒 -->
+					SELECT tsci.status
+					FROM t_supplier_checkfactory_inform tsci
+					WHERE tsci.supplier_id = tsf.supplier_id
+					ORDER BY tsci.create_dt DESC
+					LIMIT 1	
+				)  is null
+				or
+				(<!-- 还未提醒 -->
+					(
+						SELECT tsci.status
+						FROM t_supplier_checkfactory_inform tsci
+						WHERE tsci.supplier_id = tsf.supplier_id
+						ORDER BY tsci.create_dt DESC
+						LIMIT 1	
+					<!-- )  in (1,2) -->
+					)  in (2)
+				)
+				or
+				(<!-- 到期验厂 -->
+					(
+						SELECT tsci.status
+						FROM t_supplier_checkfactory_inform tsci
+						WHERE tsci.supplier_id = tsf.supplier_id
+						ORDER BY tsci.create_dt DESC
+						LIMIT 1	
+					)  in (1)
+					and
+					<![CDATA[DATE_ADD(tsfci.next_check_dt,INTERVAL -#{beforeDate} DAY) < NOW()]]><!-- 在提示时间内 -->
+				)		
+			)
+		)
+		AND
+		tsf.no_check = 0<!-- 0:需要验厂 -->
+		AND
+	    tsf.file_status = 0
+		<!-- AND
+		taar.access_status = 3 --><!-- 3表示审核通过 -->
+		<if test="mulParams != null and mulParams != ''">
+		AND(
+			taci.m_phone like CONCAT("%",#{mulParams},"%")
+			or
+			taci.corporation like CONCAT("%",#{mulParams},"%")
+			or
+			taci.reg_addr like CONCAT("%",#{mulParams},"%")
+			or
+			tsf.supplier_cpyname like CONCAT("%",#{mulParams},"%")
+		)
+		</if>
+		<choose>
+			<when test="checkFacType == 1"><!-- 初次验厂 -->
+			AND tsfci.next_check_dt is NULL
+			</when>
+			<when test="checkFacType == 2"><!-- 复检 -->
+			AND tsfci.next_check_dt is not NULL
+			</when>
+		</choose>
+			<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+			and(
+				<if test="provinceCodes != null and cityCodes == null">
+				FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+				(FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				)or(
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+				)	
+				</if>
+			)
+			</if>		
+</select>
+
+<!-- 获取已通知供应商 -->
+<select id="getNotifiedSuppliers" parameterType="map" resultType="usercenter.purchaseManage.supplierManager.model.SupplierCheckfactoryInform"> 
+	select
+		tsci.checkinform_id,
+		tsci.file_name,
+		tsci.create_dt,
+		tsci.remark,
+		tsci.mogodb_id,
+		tsci.status,
+		tsci.supplier_id,
+		tsci.update_dt,
+		tsci.plan_check_dt,
+		tsci.operator_id,
+		tsci.operator_name,
+		tsci.send_company_id,
+		tsci.check_man,
+		tsci.check_man_phone,
+		tsf.supplier_cpyname,
+		tsf.company_id
+	FROM
+		<if test="regId != null and regId != 0">
+			t_supplier_regaccount_info tsri,
+		</if>
+		<if test="saId != null and saId != 0">
+			t_subaccount_supplier_info tssi,
+		</if>
+		t_supplier_files tsf,
+		t_supplier_checkfactory_inform tsci,
+		t_access_application_record taar,
+		t_app_company_info taci
+	WHERE
+		<!-- tsci.send_company_id = #{companyId}
+		and -->
+		tsf.supplier_id = tsci.supplier_id
+		AND
+		taci.company_id = tsf.company_id
+		AND
+		tsf.supplier_id in (
+			select 
+			supplier_id
+			from 
+			t_supplier_owner_info
+			where
+			company_id = #{companyId}
+		)
+		<if test="regId != null and regId != 0">
+			AND
+			tsri.supplier_id = tsf.supplier_id
+			AND
+			tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+			AND
+			tssi.supplier_id = tsf.supplier_id
+			AND
+			tssi.is_delete = 0
+			AND
+			tssi.sa_id = #{saId}
+		</if>
+		AND
+		tsf.file_status = 0
+		AND
+		tsf.is_delete = 0
+		AND
+		taar.record_id = tsf.record_id
+		AND
+		taar.access_status = 3<!-- 已通過状态  -->
+		<if test="mulParams != null and mulParams != ''">
+		AND(
+			supplier_cpyname like CONCAT("%",#{mulParams},"%")
+			or
+			check_man_phone like CONCAT("%",#{mulParams},"%")
+			or
+			check_man like CONCAT("%",#{mulParams},"%")
+		)
+		</if>
+		<if test="(startDate != null and startDate != '') or (endDate != null and endDate != '')">
+			<choose>
+				<when test="dateType == 1"><!-- 通知日期-->
+					<if test="startDate != null and startDate != ''"><![CDATA[and tsci.create_dt >= #{startDate}]]></if>
+					<if test="endDate != null and endDate != ''"><![CDATA[and tsci.create_dt <= #{endDate}]]></if>
+				</when>
+				<when test="dateType == 2"><!-- 计划验厂日期 -->
+					<if test="startDate != null and startDate != ''"><![CDATA[and tsci.plan_check_dt >= #{startDate}]]></if>
+					<if test="endDate != null and endDate != ''"><![CDATA[and tsci.plan_check_dt <= #{endDate}]]></if>
+				</when>
+			</choose>
+		</if>
+		<if test="status != 3">
+			and tsci.status = #{status}
+		</if>
+		<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+		and(
+			<if test="provinceCodes != null and cityCodes == null">
+			FLOOR(taci.contact_addr_code / 10000)*10000
+			in
+			<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			</if>
+			<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+			FLOOR(taci.contact_addr_code / 100)*100
+			in
+			<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			</if>
+			<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+			(FLOOR(taci.contact_addr_code / 10000)*10000
+			in
+			<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			)or(
+			FLOOR(taci.contact_addr_code / 100)*100
+			in
+			<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+			)	
+			</if>
+		)
+		</if>
+	ORDER BY tsci.create_dt DESC
+	limit #{start},#{limit}
+</select>
+
+<!-- 获取已通知供应商总数 -->
+<select id="getNotifiedSuppliersTotal" parameterType="map" resultType="Integer"> 
+	select
+		count(*)
+	from
+		<if test="regId != null and regId != 0">
+			t_supplier_regaccount_info tsri,
+		</if>
+		<if test="saId != null and saId != 0">
+			t_subaccount_supplier_info tssi,
+		</if>
+		t_supplier_files tsf,
+		t_supplier_checkfactory_inform tsci,
+		t_access_application_record taar,
+		t_app_company_info taci
+	WHERE
+		<!-- tsci.send_company_id = #{companyId}
+		and -->
+		tsf.supplier_id = tsci.supplier_id
+		AND
+		taci.company_id = tsf.company_id
+		AND
+		tsf.supplier_id in (
+			select 
+			supplier_id
+			from 
+			t_supplier_owner_info
+			where
+			company_id = #{companyId}
+		)
+		<if test="regId != null and regId != 0">
+			AND
+			tsri.supplier_id = tsf.supplier_id
+			AND
+			tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+			AND
+			tssi.supplier_id = tsf.supplier_id
+			AND
+			tssi.is_delete = 0
+			AND
+			tssi.sa_id = #{saId}
+		</if>
+		AND
+		tsf.file_status = 0
+		AND
+		tsf.is_delete = 0
+		AND
+		taar.record_id = tsf.record_id
+		AND
+		taar.access_status = 3<!-- 已通過状态  -->
+		<if test="mulParams != null and mulParams != ''">
+		AND(
+			supplier_cpyname like CONCAT("%",#{mulParams},"%")
+			or
+			check_man_phone like CONCAT("%",#{mulParams},"%")
+			or
+			check_man like CONCAT("%",#{mulParams},"%")
+		)
+		</if>
+		<if test="(startDate != null and startDate != '') or (endDate != null and endDate != '')">
+			<choose>
+				<when test="dateType == 1"><!-- 通知日期-->
+					<if test="startDate != null and startDate != ''"><![CDATA[and tsci.create_dt >= #{startDate}]]></if>
+					<if test="endDate != null and endDate != ''"><![CDATA[and tsci.create_dt <= #{endDate}]]></if>
+				</when>
+				<when test="dateType == 2"><!-- 计划验厂日期 -->
+					<if test="startDate != null and startDate != ''"><![CDATA[and tsci.plan_check_dt >= #{startDate}]]></if>
+					<if test="endDate != null and endDate != ''"><![CDATA[and tsci.plan_check_dt <= #{endDate}]]></if>
+				</when>
+			</choose>
+		</if>
+		<if test="status != 3"><!-- 全部通知排除在外 -->
+			and tsci.status = #{status}
+		</if>
+		<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+		and(
+			<if test="provinceCodes != null and cityCodes == null">
+			FLOOR(taci.contact_addr_code / 10000)*10000
+			in
+			<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			</if>
+			<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+			FLOOR(taci.contact_addr_code / 100)*100
+			in
+			<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			</if>
+			<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+			(FLOOR(taci.contact_addr_code / 10000)*10000
+			in
+			<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>	
+			)or(
+			FLOOR(taci.contact_addr_code / 100)*100
+			in
+			<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+			)	
+			</if>
+		)
+		</if>
+</select>
+
+<!-- 取消验厂通知 -->
+<update id="cancelNotifyToCheckFac">
+	UPDATE
+		t_supplier_regaccount_info tsri,
+		t_supplier_checkfactory_inform tsci
+	SET
+		status = 2,
+		update_dt = #{updateDt}
+	WHERE
+		tsri.supplier_id = tsci.supplier_id
+		AND
+		tsri.supplier_id in 
+		<foreach collection="supplierIds" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		AND
+		tsri.reg_id = #{regId}
+		AND
+		tsci.status = 0
+</update>
+
+<select id="getToBeInformSupplierCount" parameterType="map" resultType="Integer">
+	SELECT
+		count(0)
+	FROM
+		t_supplier_files tsf
+		INNER JOIN t_supplier_regaccount_info tsri on tsri.supplier_id = tsf.supplier_id and tsri.reg_id = #{regId}
+		INNER JOIN t_app_company_info taci on taci.company_id = tsf.company_id
+		INNER JOIN t_access_application_record taar on taar.record_id = tsf.record_id
+		LEFT JOIN t_supplier_factory_cycle_info tsfci on tsfci.supplier_id = tsf.supplier_id
+		LEFT JOIN t_check_factory_cycle tcfc on tcfc.factory_cycle_id = tsfci.factory_cycle_id
+	WHERE
+	(	
+		(
+			tsfci.next_check_dt is NULL
+			OR
+			<![CDATA[DATE_ADD(tsfci.next_check_dt,INTERVAL -#{beforeDate} DAY) < NOW()]]><!-- 在提示时间内 -->
+		)
+		AND
+		(
+			(<!-- 还未提醒 -->
+				SELECT tsci.status
+				FROM t_supplier_checkfactory_inform tsci
+				WHERE tsci.supplier_id = tsf.supplier_id
+				ORDER BY tsci.create_dt DESC
+				LIMIT 1	
+			)  is null
+			or
+			(<!-- 还未提醒 -->
+				(
+					SELECT tsci.status
+					FROM t_supplier_checkfactory_inform tsci
+					WHERE tsci.supplier_id = tsf.supplier_id
+					ORDER BY tsci.create_dt DESC
+					LIMIT 1	
+				)  in (1,2)
+			)
+		)
+	)
+	AND
+	tsf.no_check = 0<!-- 0:需要验厂 -->
+	AND
+	taar.access_status = 3<!-- 3表示审核通过 -->
+</select>
+<!-- 获取待通知供应商总数 -->
+<select id="getNeedCheckFactoryCount" parameterType="map" resultType ="Integer">
+	SELECT
+		count(*)
+	FROM
+		t_supplier_files tsf
+		<if test="regId != null and regId != 0">
+		INNER JOIN t_supplier_regaccount_info tsri on tsri.supplier_id = tsf.supplier_id and tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+		INNER JOIN t_subaccount_supplier_info tssi on tssi.supplier_id = tsf.supplier_id and tssi.is_delete = 0 and tssi.sa_id = #{saId}
+		</if>
+		INNER JOIN t_supplier_owner_info tsoi on tsoi.supplier_id = tsf.supplier_id and tsoi.company_id = #{companyId}
+		INNER JOIN t_app_company_info taci on taci.company_id = tsf.company_id
+		<!-- INNER JOIN t_access_application_record taar on taar.record_id = tsf.record_id -->
+		LEFT JOIN t_supplier_factory_cycle_info tsfci on tsfci.supplier_id = tsf.supplier_id
+		LEFT JOIN t_check_factory_cycle tcfc on tcfc.factory_cycle_id = tsfci.factory_cycle_id
+	WHERE
+		(	
+			(
+				tsfci.next_check_dt is NULL
+				OR
+				<![CDATA[DATE_ADD(tsfci.next_check_dt,INTERVAL -#{beforeDate} DAY) < NOW()]]><!-- 在提示时间内 -->
+			)
+			AND
+			(
+				(<!-- 还未提醒 -->
+					SELECT tsci.status
+					FROM t_supplier_checkfactory_inform tsci
+					WHERE tsci.supplier_id = tsf.supplier_id
+					ORDER BY tsci.create_dt DESC
+					LIMIT 1	
+				)  is null
+				or
+				(<!-- 还未提醒 -->
+					(
+						SELECT tsci.status
+						FROM t_supplier_checkfactory_inform tsci
+						WHERE tsci.supplier_id = tsf.supplier_id
+						ORDER BY tsci.create_dt DESC
+						LIMIT 1	
+					<!-- )  in (1,2) -->
+					)  in (2)
+				)
+				or
+				(<!-- 到期验厂 -->
+					(
+						SELECT tsci.status
+						FROM t_supplier_checkfactory_inform tsci
+						WHERE tsci.supplier_id = tsf.supplier_id
+						ORDER BY tsci.create_dt DESC
+						LIMIT 1	
+					)  in (1)
+					and
+					<![CDATA[DATE_ADD(tsfci.next_check_dt,INTERVAL -#{beforeDate} DAY) < NOW()]]><!-- 在提示时间内 -->
+				)		
+			)
+		)
+		AND
+		tsf.no_check = 0<!-- 0:需要验厂 -->
+		AND
+	    tsf.file_status = 0
+		<!-- AND
+		taar.access_status = 3 --><!-- 3表示审核通过 -->
+		<choose>
+			<when test="checkFacType == 1"><!-- 初次验厂 -->
+			AND tsfci.next_check_dt is NULL
+			</when>
+			<when test="checkFacType == 2"><!-- 复检 -->
+			AND tsfci.next_check_dt is not NULL
+			</when>
+		</choose>
+</select>
+</mapper>

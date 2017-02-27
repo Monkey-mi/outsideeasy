@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.contract.data.PfOrderDeliveryRegisterMapper">
+
+
+<select id="getPfOrderDeliveryRegisterList" parameterType="map" resultType="platform.contract.model.PfOrderDeliveryRegister">
+	select
+		t_order_delivery_register.register_id,
+		t_order_delivery_register.delivery_number,
+		t_order_delivery_register.create_dt,
+		t_order_delivery_register.creator_id,
+		t_order_delivery_register.creator_name,
+		t_order_delivery_register.send_company_id,
+		t_order_delivery_register.send_cpyname_cn,
+		t_order_delivery_register.receive_company_id,
+		t_order_delivery_register.receive_cpyname_cn,
+		t_order_delivery_register.is_get
+	from
+		t_order_delivery_register
+		<where>
+			1=1
+			<if test="register_id!=null">
+				and register_id=#{register_id}
+			</if>
+			<if test="receive_company_id!=null">
+				and receive_company_id=#{receive_company_id}
+			</if>
+			and is_get=0
+		</where>
+</select>
+<insert id="addPfOrderDeliveryRegister" parameterType="platform.contract.model.PfOrderDeliveryRegister" keyProperty="register_id" useGeneratedKeys="true">
+	insert into t_order_delivery_register
+	(
+		register_id,
+		delivery_number,
+		create_dt,
+		creator_id,
+		creator_name,
+		send_company_id,
+		send_cpyname_cn,
+		receive_company_id,
+		receive_cpyname_cn,
+		is_get
+	)
+	values
+	(
+		#{register_id},
+		#{delivery_number},
+		#{create_dt},
+		#{creator_id},
+		#{creator_name},
+		#{send_company_id},
+		#{send_cpyname_cn},
+		#{receive_company_id},
+		#{receive_cpyname_cn},
+		#{is_get}
+	)
+</insert>
+<update id="updatePfOrderDeliveryRegisterIsGet" parameterType="platform.contract.model.PfOrderDeliveryRegister">
+	update t_order_delivery_register
+		set
+			is_get = 1
+	where is_get = 0
+	<if test="receive_company_id!=null">
+		and receive_company_id=#{receive_company_id}
+	</if>
+
+</update>
+<delete id="deletePfOrderDeliveryRegister" parameterType="platform.contract.model.PfOrderDeliveryRegister">
+	delete from t_order_delivery_register
+	where register_id = #{register_id}
+</delete>
+</mapper>

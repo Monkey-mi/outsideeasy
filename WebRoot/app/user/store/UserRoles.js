@@ -1,0 +1,26 @@
+Ext.define('srm.user.store.UserRoles',{
+    extend:'Ext.data.Store',
+    model:'srm.user.model.UserRole',
+    proxy:{
+		type:'ajax',
+		actionMethods : {create: 'POST', read: 'POST', update: 'POST', destroy: 'POST'},
+		api:{
+			create:"user/Users.do?method=addUserRole",
+			read:"user/Users.do?method=getUserRoleList",
+			destroy:"user/Users.do?method=deleteUserRole"
+		},
+		reader:{
+			type:"json",
+			rootProperty:'data',
+			successProperty:'success',
+			messageProperty:'message'
+		},
+		writer:{
+			type:'json',
+			rootProperty:'data',
+			encode:true,
+			writeAllFields:true,
+			allowSingle:false
+		}
+	} 
+});

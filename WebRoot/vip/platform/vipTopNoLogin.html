@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>顶部</title>
+<link href="/vip/resources/css/viptop.css" rel="stylesheet" type="text/css" />
+<script  type="text/javascript">
+function go_index_top(url)
+{
+	window.location.href=getwebroot() + "vip";/* vipLogin */
+}
+</script>
+</head>
+<body class="bg_grey">
+<div id="topPage">
+	<div class="vip_top_wrap">
+		<div class="div_1024_c_wrap clearfix">
+			<div class="vip_top_float f_l clearfix">
+				<div class="f_l" style="color:#365c88;line-height:30px;"><img src="/vip/resources/images/VIP.png"><!-- <span style="font-size:18px;font-style:italic;" class="mr10">Vip</span> --><span class="ml5">专属通道</span></div>
+			</div>
+			<div class="vip_top_float f_r">
+				<div class="dologin">
+					<a id="doLoginIn" href="/vip">登录</a><!-- vipLogin -->
+				</div>
+				<!-- 
+				<div class="doregister"><a href="/userInfo/vipregister.htm">免费注册</a></div>
+				<a href="/helpCenter/newUser/registerAndLogin.html">帮助</a>
+				-->
+			</div>
+		</div>
+	</div>
+	<div class="vip_top_logon_wrap">
+		<div class="div_1024_c_wrap">
+			<div class="logo_img_wrap" style="width:310px;height:70px;line-height:70px;">
+				<img src="/newresources/images/logo/logo_main.png" style="cursor:pointer" onclick="go_index_top()"/>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.MetarialMapper">
+
+
+<select id="getMetarialList" parameterType="map" resultType="manager.supplier.model.Metarial">
+	select
+		t_app_metarial.material_id,
+		t_app_metarial.material_name,
+		t_app_metarial.material_brand,
+		t_app_metarial.company_id
+	from
+		t_app_metarial
+		where 1=1
+	<if test="company_id!=null">
+		and t_app_metarial.company_id=#{company_id}
+	</if>
+</select>
+<insert id="addMetarial" parameterType="manager.supplier.model.Metarial" keyProperty="material_id" useGeneratedKeys="true">
+	<selectKey keyProperty="material_id" resultType="int" order="BEFORE">
+		select  ifnull(max(material_id)+1,1) from t_app_metarial 		
+	</selectKey>
+	insert into t_app_metarial
+	(
+		material_id,
+		material_name,
+		material_brand,
+		company_id
+	)
+	values
+	(
+		#{material_id},
+		#{material_name},
+		#{material_brand},
+		#{company_id}
+	)
+</insert>
+<update id="updateMetarial" parameterType="manager.supplier.model.Metarial">
+	update t_app_metarial
+		set
+			material_id = #{material_id},
+			material_name = #{material_name},
+			material_brand = #{material_brand},
+			company_id = #{company_id}
+		where material_id = #{material_id}
+</update>
+<delete id="deleteMetarial" parameterType="manager.supplier.model.Metarial">
+	delete from t_app_metarial
+	where material_id = #{material_id}
+</delete>
+</mapper>

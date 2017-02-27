@@ -1,0 +1,122 @@
+Ext.define('srm.basicdata.regAccount.view.MngRegCompanyInfo',{
+	extend:'srm.ux.Window',
+	alias:'widget.mngRegCompanyInfo',
+	width:1100,
+    height:900,
+    modal : true,
+	initComponent:function(){
+		var me=this;
+		Ext.apply(me,{
+			title:"企业信息",
+			layout:{		
+				type:'border',
+    			padding :2				
+			},
+			items:[{
+				region:'center',
+				xtype:'form',
+				title:me.ac_titie,
+				bodyPadding: 10,
+				itemId:'gridCompany',
+				store:me.regCompanyInfostore,
+				layout: 'column',
+				defaults:{labelWidth : 100,
+					xtype:'textfield',
+					labelStyle : 'font-weight:nomal;text-align:left;color:#000',
+					padding:'0 4 4 4',
+					msgTarget : 'side',
+					readOnly:true,
+					autoFitErrors : true},
+				items:
+				[	
+                    {fieldLabel:'公司名称',name:'cpyname_cn',columnWidth:0.5},
+					{fieldLabel:'公司编号',name:'company_id',columnWidth:0.5},
+					{fieldLabel:'行业类目',name:'class_id',columnWidth:0.25,hidden:true},
+					{fieldLabel:'行业类目',name:'class_name',columnWidth:0.25},
+					{fieldLabel:'企业类型',name:'nature_id',columnWidth:0.25,hidden:true},
+					{fieldLabel:'企业类型',name:'nature_name',columnWidth:0.25},
+					{fieldLabel:'申请状态',name:'apply_sts',columnWidth:0.25,
+					xtype:'combo',			
+ 					store:[[4,'已保存'],[5,'已提交'],[15,'已通过'],[20,'未通过']]},
+					{fieldLabel:'公司英文名称',name:'cpyname_en',columnWidth:0.25},					
+					{fieldLabel:'注册地址（地区编号）',name:'reg_addr_code',hidden:true,columnWidth:0.25},			
+					{fieldLabel:'注册地址',name:'reg_addr',columnWidth:1/3},
+					{fieldLabel:'联系地址（地区编号）',name:'contact_addr_code',columnWidth:1/3},
+					{fieldLabel:'联系地址',name:'contact_addr',columnWidth:1/3},
+					{fieldLabel:'经营模式编号',name:'industry_id',columnWidth:0.25,hidden:true},
+	 			    {fieldLabel:'经营模式',name:'industry_name',columnWidth:0.25},	  
+	 			    {fieldLabel:'固定电话',name:'f_phone',columnWidth:0.25},
+	 			    {fieldLabel:'法人代表',name:'corporation',columnWidth:0.25},
+		 			{fieldLabel:'联系人',name:'contacts',columnWidth:0.25},
+		 			{fieldLabel:'联系人手机号',name:'m_phone',columnWidth:0.25},
+		 			{fieldLabel:'传真',name:'fax',columnWidth:0.25},
+		 			{fieldLabel:'Email',name:'email',columnWidth:0.25},
+		 			{fieldLabel:'联系邮件',name:'contact_email',columnWidth:0.25},
+		 			{fieldLabel:'营业执照号',name:'bus_license',columnWidth:0.25},
+		 			{fieldLabel:'税籍编号',name:'tax_no',columnWidth:0.25},
+		 			{fieldLabel:'注册资金',name:'reg_fund',columnWidth:0.25},
+		 			{fieldLabel:'纳税人类别编号',name:'taxman_id',columnWidth:0.25},
+		 			{fieldLabel:'纳税人类别',name:'taxman_name',columnWidth:0.25},
+		 			{fieldLabel:'币种id',name:'currency_id',columnWidth:0.25,hidden:true},
+		 			{fieldLabel:'币种',name:'currency_name',columnWidth:0.25},
+		 			{fieldLabel:'成立日期',name:'establish_dt',columnWidth:0.25,xtype: 'datefield',format:'Y-m-d'},
+		 			{fieldLabel:'公司总人数',name:'emplyees',columnWidth:0.25},
+		 			{fieldLabel:'本科以上学历人数',name:'college_num',columnWidth:0.25},		 			
+		 			{fieldLabel:'专科',name:'diploma_num',columnWidth:0.25},		 			
+		 			{fieldLabel:'专科以下',name:'diploma_down_num',columnWidth:0.25},
+		 			{fieldLabel:'操作工',name:'op_num',columnWidth:0.25},
+		 			{fieldLabel:'研发人员',name:'tech_num',columnWidth:0.25},
+		 			{fieldLabel:'专职检验',name:'qc_num',columnWidth:0.25},
+		 			{fieldLabel:'间接员工',name:'staff_num',columnWidth:0.25},
+		 			{fieldLabel:'内审人员',name:'internal_auditor_num',columnWidth:0.25},
+		 			{fieldLabel:'质量体系内审员资格',name:'qe_num',columnWidth:0.25},
+		 			{fieldLabel:'公司面积',name:'company_area',columnWidth:0.25},
+		 			{fieldLabel:'厂房面积',name:'factory_area',columnWidth:0.25},
+		 			{fieldLabel:'租赁/自建',name:'factory_owner',columnWidth:0.25},
+		 			{fieldLabel:'使用起始日期',name:'use_begintime',columnWidth:0.25,xtype: 'datefield',format:'Y-m-d'},
+		 			{fieldLabel:'使用结束日期',name:'use_endtime',columnWidth:0.25,xtype: 'datefield'},
+		 			{fieldLabel:'营业额',name:'turnover',columnWidth:0.25},
+		 			{fieldLabel:'营业额币种',name:'turnover_currency_id',columnWidth:0.25},
+		 			{fieldLabel:'出口额',name:'import_num',columnWidth:0.25},
+		 			{fieldLabel:'出口额币种',name:'import_currency_id',columnWidth:0.25},		 			
+		 			{fieldLabel:'进口额',name:'export_num',columnWidth:0.25},
+		 			{fieldLabel:'进口额币种',name:'export_currency_id',columnWidth:0.25},
+		 			{fieldLabel:'认证体系',name:'certification_system',columnWidth:0.25},
+		 			{fieldLabel:'申请日期',name:'create_dt',columnWidth:0.25},
+		 			{fieldLabel:'申请IP',name:'ip_addr',columnWidth:0.25},
+		 			{fieldLabel:'最新审核通过日期',name:'checked_date',columnWidth:0.25,xtype: 'datefield',format:'Y-m-d'},
+		 			{fieldLabel:'最新版本编号',name:'version',columnWidth:0.25},
+		 			{fieldLabel:'经度',name:'lng',columnWidth:0.25},
+		 			{fieldLabel:'纬度',name:'lat',columnWidth:0.25},
+		 			{fieldLabel:'质量控制',name:'quality_control',columnWidth:0.25},
+		 			{fieldLabel:'OEM',name:'is_oem',columnWidth:0.25,
+		 				xtype:'combo',			
+	 					store:[[false,'不是'],[true,'是']]},
+		 			{fieldLabel:'主营业务',name:'key_remark',columnWidth:0.25},
+		 			{fieldLabel:'归档',name:'is_archive',columnWidth:0.25},
+		 			{fieldLabel:'逻辑删除',name:'is_delete',columnWidth:0.25,
+		 				xtype:'combo',			
+	 					store:[[false,'不是'],[true,'是']]},
+		 			{fieldLabel:'操作员',name:'operator',columnWidth:0.25},
+		 			{fieldLabel:'操作时间',name:'operater_dt',columnWidth:0.25,xtype: 'datefield',format:'Y-m-d'},
+		 			{fieldLabel:'审核员',name:'auditor',columnWidth:0.25},
+		 			{fieldLabel:'审核时间',name:'audit_dt',columnWidth:0.25,xtype: 'datefield',format:'Y-m-d'},
+		 			
+		 			{fieldLabel:'校企合作',name:'school_coop',columnWidth:0.25},
+		 			{fieldLabel:'是否为注册时添加的公司',name:'is_main',columnWidth:0.25,
+		 				xtype:'combo',			
+	 					store:[[0,'不是'],[1,'是']]}	,
+	 				{fieldLabel:'企业简介',name:'company_introduction',columnWidth:1}
+				]
+			}
+			]
+			});
+		me.callParent(arguments);
+		
+	},
+	loadData:function(rec){
+		var me=this;
+		me.down("form").loadRecord(rec);
+	}
+
+});

@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 公司的一般信息获取 -->
+<mapper namespace="platform.company.data.PfCompanyMapper">
+
+<!-- 获取公司的简略信息  -->
+<select id="getCompanySimpleInfo" parameterType="map" resultType="platform.company.model.PfCompanySimpleInfo">
+	SELECT 
+		company_id, 
+		cpyname_cn, 
+		contact_addr,
+		f_phone,
+		email,
+		fax, 
+		key_remark,
+		apply_sts,
+		lng,
+		lat,
+		company_introduction
+	FROM
+		t_app_company_info
+	WHERE
+	1=1
+	<if test="tradeClassOrCompanyName != '' and tradeClassOrCompanyName != null"><!-- find_in_set  -->
+	AND	(cpyname_cn LIKE CONCAT('%',#{tradeClassOrCompanyName},'%')
+	OR
+		class_id in
+		<foreach collection="classString" item="classString" index="index" 
+             open="(" separator=", " close=")">
+        #{classString}
+    	</foreach>)
+	</if>
+	AND
+		floor(contact_addr_code/#{addrNum}) = 1
+	AND
+		<![CDATA[ contact_addr_code % #{addrNum} < #{regionCode} ]]>
+	LIMIT #{start},#{limit}	
+</select>
+
+<!-- 查询行业信息  -->
+<select id="getTradeClassByCompanyId" parameterType="java.lang.Integer" resultType="java.lang.String">
+	select 
+		tc.class_name
+	from
+		t_trade_class tc,
+		t_app_company_info sf
+	where
+		sf.class_id = tc.class_id
+		and
+		sf.company_id = #{companyId}
+</select>
+
+<!-- 根据条件查询公司总数 -->
+<select id="getTotalNum" parameterType="map" resultType="java.lang.Integer">
+	SELECT 
+		count(*)
+	FROM
+		t_app_company_info
+	WHERE
+		(cpyname_cn LIKE CONCAT('%',#{tradeClassOrCompanyName},'%')
+	OR
+		class_id in
+		<foreach collection="classString" item="classString" index="index" 
+             open="(" separator=", " close=")">
+        #{classString}
+    	</foreach>)
+	AND
+		floor(contact_addr_code/#{addrNum}) = 1
+	AND
+		<![CDATA[ contact_addr_code % #{addrNum} < #{regionCode} ]]>
+</select>
+
+<!-- 通过公司ID查询公司基础信息 -->
+<select id="getCompanyBaseInfo" parameterType="java.lang.Integer" resultType="platform.company.model.PfCompanySimpleInfo">
+	SELECT 
+		tsf.cpyname_cn,
+		tsf.key_remark,
+		tsf.contact_addr,
+		tsf.contact_addr_code,
+		tsf.f_phone,
+		tsf.contacts,
+		tsf.m_phone,
+		tsf.email,
+		tsf.fax,
+		tsf.apply_sts,
+	 	tsf.corporation,
+		tsf.establish_dt,
+		tsf.reg_fund,
+		tsf.reg_addr,
+		tsf.company_introduction,
+		tsf.class_id,
+		tsf.nature_id,
+		tsf.industry_id,
+		tsf.currency_id,
+		tc.currency_name,
+		tsf.emplyees,
+		tsf.tech_num,
+		tsf.op_num,
+		tsf.qc_num,
+		tsf.staff_num,
+		tsf.internal_auditor_num,
+		tsf.college_num,
+		tsf.diploma_num,
+		tsf.diploma_down_num,
+		tsf.certification_system,
+		tsf.quality_control,
+		tsf.is_oem,
+		tsf.turnover,
+		tsf.turnover_currency_id,
+		tsf.import_num,
+		tsf.import_currency_id,
+		tsf.export_num,
+		tsf.export_currency_id,
+		tsf.company_area,
+		tsf.factory_area,
+		tsf.factory_owner,
+		tsf.use_begintime,
+		tsf.use_endtime,
+		tsf.school_coop,
+		tsf.lng,
+		tsf.lat,
+		tsf.audit_dt
+		<!-- ta.reg_date,
+		ta.reg_phone -->
+	FROM 
+		t_app_company_info tsf
+	LEFT JOIN t_currency tc on tsf.currency_id=tc.currency_id
+	<!-- LEFT JOIN t_app_reg_accout ta on ta.company_id=tsf.company_id -->
+	WHERE
+		tsf.company_id = #{companyId}
+</select>
+
+<select id="getIsSupplier" parameterType="map" resultType="Integer">
+select 
+	count(*)
+from
+	t_supplier_regaccount_info tsri,
+	t_supplier_files tsf
+where
+	tsri.supplier_id = tsf.supplier_id
+and
+	tsri.reg_id = #{accountId}
+ 	and 
+	tsf.company_id = #{companyId}
+</select>
+
+<!-- 通过公司ID查询公司附加信息 -->
+<select id="getCompanyExtraInfo" parameterType="java.lang.Integer" resultType="platform.company.model.PfCompanyExtraInfo">
+SELECT 
+	tc.class_name,
+	cc.nature_name,
+	c.currency_name,
+	ic.industry_id,
+	ic.industry_name
+FROM
+	t_trade_class tc,
+	t_currency c,
+	t_company_class cc,
+	t_industry_class ic,
+	t_app_company_info sf
+WHERE
+	sf.nature_id = cc.nature_id
+	AND sf.class_id = tc.class_id
+	AND sf.currency_id = c.currency_id
+	AND sf.industry_id = ic.industry_id
+	AND	sf.company_id = #{companyId}
+</select>
+
+<!-- 更新用户基础信息 -->
+<update id="updateSupplierInfo" parameterType="map">
+	update t_app_company_info
+		<trim prefix="SET" suffixOverrides=",">  
+			<if test="classId != null">
+			class_id = #{classId},
+			</if>
+			<if test="natureId != null">
+			nature_id = #{natureId},
+			</if>
+			<if test="applySts != null">
+			apply_sts = #{applySts},
+			</if>
+			<if test="cpynameEn != null">
+			cpyname_en = #{cpynameEn},
+			</if>
+			<if test="cpynameCn != null">
+			cpyname_cn = #{cpynameCn},
+			</if>
+			<if test="regAddrCode != null">
+			reg_addr_code = #{regAddrCode},
+			</if>
+			<if test="regAddr != null">
+			reg_addr = #{regAddr},
+			</if>
+			<if test="contactAddrCode != null">
+			contact_addr_code = #{contactAddrCode},
+			</if>
+			<if test="industryId != null">
+			industry_id = #{industryId},
+			</if>
+			<if test="contactAddr != null">
+			contact_addr = #{contactAddr},
+			</if>
+			<if test="fPhone != null">
+			f_phone = #{fPhone},
+			</if>
+			<if test="corporation != null">
+			corporation = #{corporation},
+			</if>
+			<if test="contacts != null">
+			contacts = #{contacts},
+			</if>
+			<if test="mPhone != null">
+			m_phone = #{mPhone},
+			</if>
+			<if test="fax != null ">
+			fax = #{fax},
+			</if>
+			<if test="email != null">
+			email = #{email},
+			</if>
+			<if test="contactEmail != null">
+			contact_email = #{contactEmail},
+			</if>
+			<if test="busLicense != null">
+			bus_license = #{busLicense},
+			</if>
+			<if test="taxNo != null">
+			tax_no = #{taxNo},
+			</if>
+			<if test="regFund != null and regFund != ''">
+			reg_fund = #{regFund},
+			</if>
+			<if test="taxmanId != null">
+			taxman_id = #{taxmanId},
+			</if>
+			<if test="currencyId != null">
+			currency_id = #{currencyId},
+			</if>
+			<if test="establishDt != null and establishDt != ''">
+			establish_dt = #{establishDt},
+			</if>
+			<if test="emplyees != null">
+			emplyees = #{emplyees},
+			</if>
+			<if test="collegeNum != null">
+			college_num = #{collegeNum},
+			</if>
+			<if test="diplomaNum != null">
+			diploma_num = #{diplomaNum},
+			</if>
+			<if test="diplomaDownNum != null">
+			diploma_down_num = #{diplomaDownNum},
+			</if>
+			<if test="opNum != null">
+			op_num = #{opNum},
+			</if>
+			<if test="techNum != null">
+			tech_num = #{techNum},
+			</if>
+			<if test="qcNum != null">
+			qc_num = #{qcNum},
+			</if>
+			<if test="staffNum != null">
+			staff_num = #{staffNum},
+			</if>
+			<if test="internalAuditorNum != null">
+			internal_auditor_num = #{internalAuditorNum},
+			</if>
+			<if test="qeNum != null">
+			qe_num = #{qeNum},
+			</if>
+			<if test="companyArea != null">
+			company_area = #{companyArea},
+			</if>
+			<if test="factoryArea != null">
+			factory_area = #{factoryArea},
+			</if>
+			<if test="factoryOwner != null">
+			factory_owner = #{factoryOwner},
+			</if>
+			<if test="useBegintime != null and useBegintime!=''">
+			use_begintime = #{useBegintime},
+			</if>
+			<if test="useEndtime != null and useEndtime!=''">
+			use_endtime = #{useEndtime},
+			</if>
+			<if test="turnover != null ">
+			turnover = #{turnover},
+			</if>
+			<if test="turnoverCurrencyId != null ">
+			turnover_currency_id = #{turnoverCurrencyId},
+			</if>
+			<if test="importNum != null">
+			import_num = #{importNum},
+			</if>
+			<if test="importCurrencyId != null ">
+			import_currency_id = #{importCurrencyId},
+			</if>
+			<if test="exportNum != null">
+			export_num= #{exportNum},
+			</if>
+			<if test="exportCurrencyId != null">
+			export_currency_id = #{exportCurrencyId},
+			</if>
+			<if test="certificationSystem != null">
+			certification_system = #{certificationSystem},
+			</if>
+			<if test="createDt != null">
+			create_dt = #{createDt},
+			</if>
+			<if test="ipAddr != null">
+			ip_addr = #{ipAddr},
+			</if>
+			<if test="checkedDate != null">
+			checked_date = #{checkedDate},
+			</if>
+			<if test="version != null">
+			version = #{version},
+			</if>
+			<if test="lng != null">
+			lng = #{lng},
+			</if>
+			<if test="lat != null">
+			lat = #{lat},
+			</if>
+			<if test="isOem != null">
+			is_oem = #{isOem},
+			</if>
+			<if test="qualityControl != null">
+			quality_control = #{qualityControl},
+			</if>
+			<if test="keyRemark != null">
+			key_remark = #{keyRemark},
+			</if>
+			<if test="isArchive != null">
+			is_archive = #{isArchive},
+			</if>
+			<if test="isDelete != null">
+			is_delete = #{isDelete},
+			</if>
+			<if test="operator != null">
+			operator = #{operator},
+			</if>
+			<if test="operaterDt != null">
+			operater_dt = #{operaterDt},
+			</if>
+			<if test="auditDt != null">
+			audit_dt = #{auditDt},
+			</if>
+			<if test="auditor != null">
+			auditor = #{auditor},
+			</if>
+			<if test="isChinese != null">
+			is_chinese = #{isChinese},
+			</if>
+			<if test="mcId1 != null">
+			mc_id_1 = #{mcId1},
+			</if>
+			<if test="mcName1 != null">
+			mc_name_1 = #{mcName1},
+			</if>
+			<if test="mcId2 != null">
+			mc_id_2 = #{mcId2},
+			</if>
+			<if test="mcName2 != null">
+			mc_name_2 = #{mcName2},
+			</if>
+			<if test="mcId3 != null">
+			mc_id_3 = #{mcId3},
+			</if>
+			<if test="mcName3 != null">
+			mc_name_3 = #{mcName3},
+			</if>
+			<if test="companyIntroduction != null">
+			company_introduction = #{companyIntroduction},
+			</if>
+			<if test="schoolCoop != null">
+			school_coop = #{schoolCoop},
+			</if>
+			<if test="applySys != null">
+			apply_sts = #{applySys}
+			</if>
+		</trim>
+		where 
+			company_id = #{companyId}
+</update>
+
+<!-- 根据公司ID获取企业信息表中的申请状态 -->
+<select id="getApplyStsByCompanyId" parameterType="Integer" resultType="Integer">
+	select 
+		apply_sts
+	from
+		t_app_company_info
+	where
+		company_id = #{companyId}	
+</select>
+<!-- 根据申请状态获取所有的供应商名称、id -->
+<select id="getSupplierNameList" parameterType="map" resultType="platform.company.model.PfCompanySimpleInfo">
+	select 
+		t_app_company_info.company_id,
+		t_app_company_info.cpyname_cn
+	from
+		t_app_company_info
+	<where>
+		1=1
+		<if test="apply_sts!=null">
+			and t_app_company_info.apply_sts=#{apply_sts}
+		</if>
+		<if test="is_delete!=null">
+			and t_app_company_info.is_delete=#{is_delete}
+		</if>
+	</where>
+</select>
+
+<select id="getCompanyListByRegId" parameterType="map" resultType="platform.company.model.CompanyInfoVo">
+	select 
+		t_app_company_info.company_id,
+		t_app_company_info.cpyname_cn,
+		t_app_company_info.apply_sts,
+		(select  t_authcation_update.state from  t_authcation_update where  t_authcation_update.company_id=t_app_company_info.company_id ORDER BY t_authcation_update.created_dt desc limit 1) as state
+	from
+		t_app_company_info
+	<where>
+		1=1
+		<if test="pass=='true'">
+			and t_app_company_info.apply_sts=15
+		</if>
+		<if test="pass=='false'">
+			and t_app_company_info.apply_sts!=15
+		</if>
+		<if test="reg_id!=null">
+			and t_app_company_info.company_id IN
+			(select t_reg_accout_company_info.company_id  from t_reg_accout_company_info where t_reg_accout_company_info.reg_id=#{reg_id}  ) 
+		</if>
+		<if test="sa_id!=null">
+			and t_app_company_info.company_id IN
+			(select t_app_subacc_company_authority.company_id  from t_app_subacc_company_authority where t_app_subacc_company_authority.sa_id=#{sa_id}  and t_app_subacc_company_authority.is_delete=0) 
+		</if>
+	</where>
+</select>
+<insert id="addSupplierInfo" parameterType="map" keyProperty="company_id" useGeneratedKeys="true">
+	insert into t_app_company_info
+	(
+		class_id,
+		nature_id,
+		apply_sts,
+		cpyname_en,
+		cpyname_cn,
+		reg_addr_code,
+		reg_addr,
+		contact_addr_code,
+		industry_id,
+		contact_addr,
+		f_phone,
+		corporation,
+		contacts,
+		m_phone,
+		fax,
+		email,
+		contact_email,
+		bus_license,
+		tax_no,
+		<if test="regFund!='' and regFund!=null">
+		reg_fund,
+		</if>
+		taxman_id,
+		currency_id,
+		<if test="establishDt!='' and establishDt!=null">
+		establish_dt,
+		</if>
+		emplyees,
+		college_num,
+		diploma_num,
+		diploma_down_num,
+		op_num,
+		tech_num,
+		qc_num,
+		staff_num,
+		internal_auditor_num,
+		qe_num,
+		company_area,
+		factory_area,
+		factory_owner,
+		<if test="useBegintime!='' and useBegintime!=null">
+		use_begintime,
+		</if>
+		<if test="useEndtime!='' and useEndtime!=null">
+		use_endtime,
+		</if>
+		turnover,
+		turnover_currency_id,
+		import_num,
+		import_currency_id,
+		export_num,
+		export_currency_id,
+		certification_system,
+		ip_addr,
+		checked_date,
+		version,
+		lng,
+		lat,
+		quality_control,
+		is_oem,
+		key_remark,
+		is_archive,
+		operator,
+		operater_dt,
+		auditor,
+		audit_dt,
+		company_introduction,
+		school_coop
+	)
+	values
+	(
+		#{classId},
+		#{natureId},
+		#{applySts},
+		#{cpynameEn},
+		#{cpynameCn},
+		#{regAddrCode},
+		#{regAddr},
+		#{contactAddrCode},
+		#{industryId},
+		#{contactAddr},
+		#{fPhone},
+		#{corporation},
+		#{contacts},
+		#{mPhone},
+		#{fax},
+		#{email},
+		#{contactEmail},
+		#{busLicense},
+		#{taxNo},
+		<if test="regFund!='' and regFund!=null">
+		#{regFund},
+		</if>
+		#{taxmanId},
+		#{currencyId},
+		<if test="establishDt!='' and establishDt!=null">
+		#{establishDt},
+		</if>
+		#{emplyees},
+		#{collegeNum},
+		#{diplomaNum},
+		#{diplomaDownNum},
+		#{opNum},
+		#{techNum},
+		#{qcNum},
+		#{staffNum},
+		#{internalAuditorNum},
+		#{qeNum},
+		#{companyArea},
+		#{factoryArea},
+		#{factoryOwner},
+		<if test="useBegintime!='' and useBegintime!=null">
+		#{useBegintime},
+		</if>
+		<if test="useEndtime!='' and useEndtime!=null">
+		#{useEndtime},
+		</if>
+		#{turnover},
+		#{turnoverCurrencyId},
+		#{import_num},
+		#{importCurrencyId},
+		#{export_num},
+		#{exportCurrencyId},
+		#{certification_system},
+		#{ipAddr},
+		#{checkedDate},
+		#{version},
+		#{lng},
+		#{lat},
+		#{qualityControl},
+		#{isOem},
+		#{keyRemark},
+		#{isArchive},
+		#{operator},
+		#{operaterDt},
+		#{auditor},
+		#{auditDt},
+		#{companyIntroduction},
+		#{schoolCoop}
+	)
+</insert>
+<select id="getSupplierByName" parameterType="map" resultType="platform.company.model.PfCompanySimpleInfo">
+	select 
+		t_app_company_info.company_id,
+		t_app_company_info.cpyname_cn
+	from
+		t_app_company_info
+	<where>
+		1=1
+		<if test="companyName!=null">
+			and t_app_company_info.cpyname_cn=#{companyName}
+		</if>
+			and t_app_company_info.apply_sts=15
+	</where>
+</select>
+<select id="getCompanyFromDictionary" parameterType="map" resultType="platform.company.model.PfCompanySimpleInfo">
+	select 
+		t_app_company_info.company_id,
+		t_app_company_info.cpyname_cn
+	from
+		t_app_company_info
+		where t_app_company_info.company_id=(select dictionary_value from t_dictionary_info where dictionary_key='TPS_purchaser' limit 1)
+		limit 1
+</select>
+<select id="getCompanyNameByCompanyId" parameterType="map" resultType="String">
+	select 
+		t_app_company_info.cpyname_cn
+	from
+		t_app_company_info
+	where
+		company_id = #{companyId}	
+</select>
+<select id="getCompanyByName" parameterType="map" resultType="platform.company.model.PfCompanySimpleInfo">
+	select 
+		t_app_company_info.company_id,
+		t_app_company_info.cpyname_cn
+	from
+		t_app_company_info
+	<where>
+		1=1
+		<if test="companyName!=null">
+			and t_app_company_info.cpyname_cn=#{companyName}
+		</if>
+	</where>
+</select>
+</mapper>

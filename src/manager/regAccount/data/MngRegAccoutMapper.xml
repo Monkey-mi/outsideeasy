@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.regAccount.data.MngRegAccoutMapper">
+
+
+<select id="getMngRegAccoutList" parameterType="map" resultType="manager.regAccount.model.MngRegAccout">
+	select
+		t_app_reg_accout.reg_id,
+		t_app_reg_accout.role_id,
+		t_app_reg_accout.company_id,
+		t_app_reg_accout.acc_name,
+		t_app_reg_accout.password,
+		t_app_reg_accout.reg_email,
+		t_app_reg_accout.reg_phone,
+		t_app_reg_accout.reg_date,
+		t_app_reg_accout.enabled,
+		t_app_reg_accout.update_date,
+		t_app_reg_accout.email_valid,
+		t_sys_role.role_name,
+		t_app_company_info.cpyname_cn,
+		t_app_reg_accout.last_login_ip
+	from
+		t_app_reg_accout
+	    left join t_sys_role on t_app_reg_accout.role_id = t_sys_role.role_id
+	    left join t_app_company_info on t_app_reg_accout.company_id = t_app_company_info.company_id
+	where 1=1
+	    <if test="condition != null and condition != ''">	
+         and (t_app_reg_accout.acc_name like '%${condition}%' or t_app_company_info.cpyname_cn like '%${condition}%')
+        </if>
+        <if test="apply_sts != null and apply_sts != ''">	
+         and t_app_reg_accout.enabled = #{apply_sts}
+        </if>
+        order by t_app_reg_accout.reg_date desc
+</select>
+<insert id="addMngRegAccout" parameterType="map" keyProperty="reg_id" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="reg_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_reg_accout
+	(	
+		role_id,
+		company_id,
+		acc_name,
+		password,
+		reg_email,
+		reg_phone,
+		reg_date,
+		enabled,
+		update_date,
+		email_valid,
+		last_login_ip
+	)
+	values
+	(
+		#{role_id},
+		#{company_id},
+		#{acc_name},
+		#{password},
+		#{reg_email},
+		#{reg_phone},
+		#{reg_date},
+		#{enabled},
+		#{update_date},
+		#{email_valid},
+		#{last_login_ip}
+	)
+</insert>
+<update id="updateMngRegAccout" parameterType="manager.regAccount.model.MngRegAccout">
+	update t_app_reg_accout
+		set		
+			role_id = #{role_id},
+			company_id = #{company_id},
+			acc_name = #{acc_name},
+			password = #{password},
+			reg_email = #{reg_email},
+			reg_phone = #{reg_phone},
+			reg_date = #{reg_date},
+			enabled = #{enabled},
+			update_date = #{update_date},
+			email_valid = #{email_valid},
+			last_login_ip = #{last_login_ip}
+		where reg_id = #{reg_id}
+</update>
+<update id="updateMngRegAccoutForID" parameterType="map">
+	update t_app_reg_accout
+		set					
+			enabled = #{enabled}		
+		where 
+            reg_id in
+        <foreach collection="reg_id" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+</update>
+<delete id="deleteMngRegAccout" parameterType="manager.regAccount.model.MngRegAccout">
+	delete from t_app_reg_accout
+	where reg_id = #{reg_id}
+</delete>
+
+<select id="getRegaccountForSupplier" parameterType="map" resultType="manager.regAccount.model.MngdSupplierFiles">
+select 
+  t_supplier_files.supplier_id,
+  t_supplier_files.supplier_cpyname
+  
+from
+  t_supplier_files
+  left join t_supplier_regaccount_info on t_supplier_regaccount_info.supplier_id = t_supplier_files.supplier_id
+where 
+  t_supplier_regaccount_info.reg_id = #{reg_id}
+  and t_supplier_files.file_status = 0
+</select> 
+<select id="getRegForCompany" parameterType="map" resultType="manager.supplier.model.SupplierFile">
+select 
+     t_app_company_info.company_id,
+     t_app_company_info.cpyname_cn
+from t_app_company_info
+     left join t_reg_accout_company_info on t_reg_accout_company_info.company_id = t_app_company_info.company_id
+where 
+     t_reg_accout_company_info.reg_id = #{reg_id}
+</select>
+<select id="getRolelist" parameterType="map"  resultType="manager.regAccount.model.MngSysRole">
+select
+    t_sys_role.role_id,
+    t_sys_role.role_name
+from t_sys_role 
+where 1=1
+	<if test="role_id!=null and role_id!='' and role_id==5 ">
+	and t_sys_role.role_type = 11
+	</if>
+	<if test="role_id!=null and role_id!='' and role_id==1 ">
+	and t_sys_role.role_type = 10
+	</if>
+    
+</select>
+<select id="getSubRolelist" parameterType="map" resultType="manager.regAccount.model.MngSysRole">
+select 
+    t_sys_role_account_ref.role_id
+from t_sys_role_account_ref
+where
+     t_sys_role_account_ref.account_id = #{sa_id}
+     and t_sys_role_account_ref.account_type = 1
+</select>
+<delete id="deleteSubRole" parameterType="map" >
+delete from t_sys_role_account_ref
+where t_sys_role_account_ref.account_id = #{sa_id}
+      and t_sys_role_account_ref.account_type = 1
+      and t_sys_role_account_ref.role_id = #{role_id}
+</delete>
+<insert id="addSubaccountRole" parameterType="map" keyProperty="ID" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="ID" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_sys_role_account_ref
+	(
+		account_id,
+		role_id,
+		account_type	
+	)
+	values
+	(
+		#{sa_id},
+		#{role_id},
+		#{account_type}
+	)
+</insert>
+<select id="getOrganizelist" parameterType="map" resultType="manager.regAccount.model.MngOrganization">
+select 
+    t_app_organization.name,
+    t_app_organization.org_id
+from t_app_organization
+where
+     t_app_organization.reg_id = #{reg_id}
+     order by  org_id
+</select>
+<select id="getOrganizeCount" parameterType="map" resultType="Integer">
+select 
+     count(0)
+from t_app_organization
+where
+     t_app_organization.parentId = #{org_id}
+</select>
+<insert id="addOrganization" parameterType="manager.regAccount.model.MngOrganization">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="org_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_organization
+	(
+		
+		reg_id,
+		name,
+		parentId,
+		isvalid,
+		isParent
+	)
+	values
+	(
+		
+		#{reg_id},
+		#{name},
+		#{parentId},
+		#{isvalid},
+		#{isParent}
+	)
+</insert>
+<select id="getMngCompanyInfoList" parameterType="map" resultType="manager.regAccount.model.MngCompanyInfo">
+	select
+		t_app_company_info.company_id,
+		t_app_company_info.class_id,
+		t_app_company_info.nature_id,
+		t_app_company_info.apply_sts,
+		t_app_company_info.cpyname_en,
+		t_app_company_info.cpyname_cn,
+		t_app_company_info.reg_addr_code,
+		t_app_company_info.reg_addr,
+		t_app_company_info.contact_addr_code,
+		t_app_company_info.industry_id,
+		t_app_company_info.contact_addr,
+		t_app_company_info.f_phone,
+		t_app_company_info.corporation,
+		t_app_company_info.contacts,
+		t_app_company_info.m_phone,
+		t_app_company_info.fax,
+		t_app_company_info.email,
+		t_app_company_info.contact_email,
+		t_app_company_info.bus_license,
+		t_app_company_info.tax_no,
+		t_app_company_info.reg_fund,
+		t_app_company_info.taxman_id,
+		t_app_company_info.currency_id,
+		t_app_company_info.establish_dt,
+		t_app_company_info.emplyees,
+		t_app_company_info.college_num,
+		t_app_company_info.diploma_num,
+		t_app_company_info.diploma_down_num,
+		t_app_company_info.op_num,
+		t_app_company_info.tech_num,
+		t_app_company_info.qc_num,
+		t_app_company_info.staff_num,
+		t_app_company_info.internal_auditor_num,
+		t_app_company_info.qe_num,
+		t_app_company_info.company_area,
+		t_app_company_info.factory_area,
+		t_app_company_info.factory_owner,
+		t_app_company_info.use_begintime,
+		t_app_company_info.use_endtime,
+		t_app_company_info.turnover,
+		t_app_company_info.turnover_currency_id,
+		t_app_company_info.import_num,
+		t_app_company_info.import_currency_id,
+		t_app_company_info.export_num,
+		t_app_company_info.export_currency_id,
+		t_app_company_info.certification_system,
+		t_app_company_info.create_dt,
+		t_app_company_info.ip_addr,
+		t_app_company_info.checked_date,
+		t_app_company_info.version,
+		t_app_company_info.lng,
+		t_app_company_info.lat,
+		t_app_company_info.quality_control,
+		t_app_company_info.is_oem,
+		t_app_company_info.key_remark,
+		t_app_company_info.is_archive,
+		t_app_company_info.is_delete,
+		t_app_company_info.operator,
+		t_app_company_info.operater_dt,
+		t_app_company_info.auditor,
+		t_app_company_info.audit_dt,
+		t_app_company_info.company_introduction,
+		t_app_company_info.school_coop,
+		t_app_company_info.is_main,
+		t_company_class.nature_name,
+		t_trade_class.class_name,
+		t_industry_class.industry_name,
+		t_taxman_class.taxman_name,
+		t_currency.currency_name
+		
+	from
+		t_app_company_info
+	    left join t_reg_accout_company_info as t on	t.company_id = 	t_app_company_info.company_id
+	    left join t_company_class on t_company_class.nature_id = t_app_company_info.nature_id
+	    left join t_trade_class on  t_trade_class.class_id = t_app_company_info.class_id
+	    left join t_industry_class on t_industry_class.industry_id = t_app_company_info.industry_id
+	    left join t_taxman_class on t_taxman_class.taxman_id = t_app_company_info.taxman_id
+	    left join t_currency on t_currency.currency_id = t_app_company_info.currency_id
+	where
+		t.reg_id = #{reg_id}
+</select>
+<select id="checkRegName" parameterType="map" resultType="Integer">
+select  count(0)
+from    t_app_reg_accout
+where 
+        t_app_reg_accout.acc_name = #{acc_name}
+        and t_app_reg_accout.reg_id != #{reg_id}
+</select>
+</mapper>

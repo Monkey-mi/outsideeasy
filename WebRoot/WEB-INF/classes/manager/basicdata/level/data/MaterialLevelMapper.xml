@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.basicdata.level.data.MaterialLevelMapper">
+
+
+<select id="getMaterialLevelList" parameterType="map" resultType="manager.basicdata.level.model.MaterialLevel">
+	select
+		t_app_material_level.level_id,
+		t_app_material_level.level_name
+	from
+		t_app_material_level
+</select>
+<insert id="addMaterialLevel" parameterType="manager.basicdata.level.model.MaterialLevel" keyProperty="level_id" useGeneratedKeys="true">
+	<selectKey keyProperty="level_id" resultType="int" order="BEFORE">
+		select  ifnull(max(level_id)+1,1) from t_app_material_level 		
+	</selectKey>
+	insert into t_app_material_level
+	(
+		level_id,
+		level_name
+	)
+	values
+	(
+		#{level_id},
+		#{level_name}
+	)
+</insert>
+<update id="updateMaterialLevel" parameterType="manager.basicdata.level.model.MaterialLevel">
+	update t_app_material_level
+		set
+			level_id = #{level_id},
+			level_name = #{level_name}
+		where level_id = #{level_id}
+</update>
+<delete id="deleteMaterialLevel" parameterType="manager.basicdata.level.model.MaterialLevel">
+	delete from t_app_material_level
+	where level_id = #{level_id}
+</delete>
+
+<select id="getCountForAdd" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_material_level where  level_name=#{level_name}
+</select>
+
+<select id="getCountForUpdate" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_material_level where  level_name=#{level_name} and level_id != #{level_id}
+</select>
+</mapper>

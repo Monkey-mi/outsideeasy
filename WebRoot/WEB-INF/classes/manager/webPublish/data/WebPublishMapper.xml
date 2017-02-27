@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.webPublish.data.WebPublishMapper">
+
+
+<select id="getWebPublishList" parameterType="map" resultType="manager.webPublish.model.WebPublish">
+	select
+		t_web_content.web_id,
+		t_web_content.web_title,
+		t_web_content.content,
+		t_web_content.content_type,
+		t_web_content.module_id,
+		t_web_content_module.module_name,
+		t_web_content.abstract as content_abstract,
+		t_web_content.creator,
+		t_web_content.signed_release,
+		t_web_content.create_dt,
+		t_web_content.update_dt
+	from
+		t_web_content
+		left join t_web_content_module on t_web_content_module.module_id=t_web_content.module_id
+		where 1=1
+		<if test="content_type!=null">
+		and FIND_IN_SET(t_web_content.content_type,#{content_type})
+		</if>
+		<if test="web_id!=null">
+		and t_web_content.web_id=#{web_id}
+		</if>
+		<if test="condition!=null">
+		and (t_web_content.web_title  like  '%${condition}%'
+		or t_web_content.creator  like  '%${condition}%')
+		</if>
+		order by t_web_content.create_dt desc
+</select>
+<insert id="addWebPublish" parameterType="map" keyProperty="web_id" useGeneratedKeys="true">
+<selectKey keyProperty="web_id" resultType="int" order="BEFORE">
+		select  ifnull(max(web_id)+1,1) from t_web_content 
+	</selectKey>
+	insert into t_web_content
+	(
+		web_id,
+		content,
+		web_title,
+		abstract,
+		content_type,
+		module_id,
+		creator,
+		signed_release
+	)
+	values
+	(
+		#{web_id},
+		#{content},
+		#{web_title},
+		#{content_abstract},
+		#{content_type},
+		#{module_id},
+		#{creator},
+		#{signed_release}
+	)
+</insert>
+<update id="updateWebPublish" parameterType="map">
+	update t_web_content
+		set
+			web_id = #{web_id},
+			content = #{content},
+			creator = #{creator},
+			signed_release = #{signed_release},
+			abstract=#{content_abstract},
+			update_dt = #{update_dt},
+			web_title = #{web_title},
+			content_type=#{content_type},
+			module_id=#{module_id}
+		where  web_id= #{web_id}
+</update>
+<delete id="deleteWebPublish" parameterType="map">
+	delete from t_web_content
+	where  web_id= #{web_id}
+</delete>
+</mapper>

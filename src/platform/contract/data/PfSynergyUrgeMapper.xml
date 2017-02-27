@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.contract.data.PfSynergyUrgeMapper">
+<!-- 获取供方平台id -->
+<select id="getPfSup_company_idAndSupplier_idList" parameterType="map" resultType="platform.contract.model.PfOrderDeliveryNotice">
+	select supplier_id,company_id as sup_company_id from t_supplier_files
+	where record_id=#{record_id} 
+</select>
+<!-- 新增质检明细 -->
+<insert id="addPfOrderCheckDetails" parameterType="platform.contract.model.PfOrderCheckDetails" keyProperty="check_detail_id" useGeneratedKeys="true">
+	insert into t_order_check_details
+	(
+		check_detail_id,
+		check_id,
+		order_detail_id,
+		check_number,
+		check_result,
+		check_vote,
+		create_dt
+	)
+	values
+	(
+		#{check_detail_id},
+		#{check_id},
+		#{order_detail_id},
+		#{check_number},
+		#{check_result},
+		#{check_vote},
+		#{create_dt}
+	)
+</insert>
+<!-- 新增质检信息 -->
+<insert id="addPfOrderQualitycheck" parameterType="platform.contract.model.PfOrderQualitycheck" keyProperty="check_id" useGeneratedKeys="true">
+	insert into t_order_qualitycheck
+	(
+		check_id,
+		checkor_id,
+		checkor_name,
+		check_dt,
+		source_type,
+		delivery_dt,
+		delivery_number,
+		pur_company_id,
+		sup_company_id,
+		supplier_id
+	)
+	values
+	(
+		#{check_id},
+		#{checkor_id},
+		#{checkor_name},
+		#{check_dt},
+		#{source_type},
+		#{delivery_dt},
+		#{delivery_number},
+		#{pur_company_id},
+		#{sup_company_id},
+		#{supplier_id}
+	)
+</insert>
+<!-- 更新订单明细数量等 -->
+<update id="updatePfOrderDetailSync" parameterType="platform.contract.model.PfPurchaseOrderDetails">
+	update t_purchase_order_detail
+		set
+			delivery_num = #{delivery_num},
+			no_delivery_num = #{no_delivery_num},
+			Storage_num = #{Storage_num}
+		where  order_detail_id= #{order_detail_id} and pur_order_id=#{pur_order_id}
+</update>
+<!-- 获取通知单明细 -->
+<select id="getPfOrderDeliveryNoticedetailsList" parameterType="map" resultType="platform.contract.model.PfOrderDeliveryNoticedetails">
+	select
+		t_order_delivery_noticedetails.details_id,
+		t_order_delivery_noticedetails.delivery_notice_id,
+		t_order_delivery_noticedetails.order_detail_id,
+		t_order_delivery_noticedetails.notice_delivery_time,
+		t_order_delivery_noticedetails.confirm_delivery_time,
+		t_order_delivery_noticedetails.number,
+		t_order_delivery_noticedetails.pur_order_id,
+		t_order_delivery_noticedetails.htmx,
+		t_purchase_order.sup_cpyname_cn as csmc,
+		t_purchase_order_detail.product_name as clmc,
+		t_purchase_order_detail.product_size as cltx1,
+		t_purchase_order_detail.unit_price as cgdj,
+		t_purchase_order_detail.unit as jldw,
+		t_purchase_order_detail.product_artno as clhh,
+		t_purchase_order.agreement_bh as htbh,
+		t_order_delivery_noticedetails.htxh,
+		t_order_delivery_noticedetails.is_edit
+	from
+		t_order_delivery_noticedetails
+		LEFT OUTER JOIN t_purchase_order on t_purchase_order.pur_order_id=t_order_delivery_noticedetails.pur_order_id
+		LEFT OUTER JOIN t_purchase_order_detail on t_purchase_order_detail.order_detail_id=t_order_delivery_noticedetails.order_detail_id
+		<where>
+			1=1
+			<if test="delivery_notice_id!=null">
+				and delivery_notice_id=#{delivery_notice_id}
+			</if>
+		</where>
+</select>
+<!-- 新增通知单明细 -->
+<insert id="addPfOrderDeliveryNoticedetails" parameterType="platform.contract.model.PfOrderDeliveryNoticedetails" keyProperty="details_id" useGeneratedKeys="true">
+	insert into t_order_delivery_noticedetails
+	(
+		details_id,
+		delivery_notice_id,
+		order_detail_id,
+		notice_delivery_time,
+		confirm_delivery_time,
+		number,
+		pur_order_id,
+		htmx,
+		is_edit,
+		htbh,
+		htxh,
+		clhh
+	)
+	values
+	(
+		#{details_id},
+		#{delivery_notice_id},
+		#{order_detail_id},
+		#{notice_delivery_time},
+		#{confirm_delivery_time},
+		#{number},
+		#{pur_order_id},
+		#{htmx},
+		#{is_edit},
+		#{htbh},
+		#{htxh},
+		#{clhh}
+	)
+</insert>
+<!-- 查询通知单 -->
+<select id="getPfOrderDeliveryNoticeList" parameterType="map" resultType="platform.contract.model.PfOrderDeliveryNotice">
+	select
+		t_order_delivery_notice.delivery_notice_id,
+		t_order_delivery_notice.delivery_notice_bh,
+		t_order_delivery_notice.notice_dt,
+		t_order_delivery_notice.notice_status,
+		t_order_delivery_notice.source_type,
+		t_order_delivery_notice.creator_id,
+		t_order_delivery_notice.creator_name
+	from
+		t_order_delivery_notice
+		<where>
+			1=1
+			<if test="delivery_notice_id!=null">
+				and delivery_notice_id=#{delivery_notice_id}
+			</if>
+			<if test="notice_status!=null">
+				and notice_status&lt;&gt;#{notice_status}
+			</if>
+			<if test="login_id!=null">
+				and t_order_delivery_notice.creator_id=#{login_id}
+			</if>
+			<if test="pur_company_id!=null">
+				and EXISTS (
+					select 1 from t_order_delivery_noticedetails 
+					LEFT OUTER JOIN t_purchase_order on t_purchase_order.pur_order_id=t_order_delivery_noticedetails.pur_order_id
+					where t_order_delivery_notice.delivery_notice_id =t_order_delivery_noticedetails.delivery_notice_id
+					and t_purchase_order.pur_company_id=#{pur_company_id}
+					<if test="companymc!=null">
+						and t_purchase_order.sup_cpyname_cn like '%${companymc}%'
+					</if>
+				)
+			</if>
+		</where>
+		order by notice_dt desc 
+</select>
+<!-- 新增通知单 -->
+<insert id="addPfOrderDeliveryNotice" parameterType="platform.contract.model.PfOrderDeliveryNotice" keyProperty="delivery_notice_id" useGeneratedKeys="true">
+	insert into t_order_delivery_notice
+	(
+		delivery_notice_id,
+		delivery_notice_bh,
+		notice_dt,
+		notice_status,
+		source_type,
+		creator_id,
+		creator_name,
+		pur_company_id,
+		sup_company_id,
+		supplier_id
+	)
+	values
+	(
+		#{delivery_notice_id},
+		#{delivery_notice_bh},
+		#{notice_dt},
+		#{notice_status},
+		#{source_type},
+		#{creator_id},
+		#{creator_name},
+		#{pur_company_id},
+		#{sup_company_id},
+		#{supplier_id}
+	)
+</insert>
+<!-- 修改通知单 -->
+<update id="updatePfOrderDeliveryNotice" parameterType="map">
+	update t_order_delivery_notice
+		set
+			notice_status = #{notice_status}
+		where delivery_notice_id = #{delivery_notice_id}
+</update>
+</mapper>

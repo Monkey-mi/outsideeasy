@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfApplicationInfoFromErpMapper">
+
+<select id="getEID" parameterType="map" resultType="Integer">
+  select e_id from t_access_templet_element where related_basis = #{related_basis} 
+</select>
+
+<update id="updateAccessApplicationInfoFromErp" parameterType="usercenter.saleManage.model.AccessApplicationInfo">
+  update t_access_application_info set content = #{content} 
+    where record_id = #{record_id} and e_id = #{e_id}
+</update>
+</mapper>

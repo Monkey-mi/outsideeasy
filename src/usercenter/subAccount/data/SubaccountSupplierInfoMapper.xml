@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.subAccount.data.SubaccountSupplierInfoMapper">
+
+
+<select id="getSubaccountSupplierInfoList" parameterType="map" resultType="usercenter.subAccount.model.SubaccountSupplierInfo">
+	select
+		t_subaccount_supplier_info.subaccount_supplier_id,
+		t_subaccount_supplier_info.supplier_id,
+		t_subaccount_supplier_info.create_dt,
+		t_subaccount_supplier_info.is_delete,
+		t_subaccount_supplier_info.sa_id
+	from
+		t_subaccount_supplier_info
+	where 
+	    t_subaccount_supplier_info.sa_id = #{sa_id} and t_subaccount_supplier_info.is_delete = 0
+</select>
+<select id="getSubaccountInforsea" parameterType="map" resultType="usercenter.supplierFiles.response.SupplierRegaccountInfoVo">
+	select
+		t_subaccount_supplier_info.supplier_id,
+		t_supplier_files.supplier_cpyname,
+		t_supplier_files.company_id	
+	from
+		t_subaccount_supplier_info
+		left join t_supplier_files on t_subaccount_supplier_info.supplier_id = t_supplier_files.supplier_id
+	where 
+	    t_subaccount_supplier_info.sa_id = #{sa_id} and t_subaccount_supplier_info.is_delete = 0
+</select>
+<insert id="addSubaccountSupplierInfo" parameterType="usercenter.subAccount.model.SubaccountSupplierInfo" keyProperty="subaccount_supplier_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="subaccount_supplier_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_subaccount_supplier_info
+	(
+		supplier_id,
+		is_delete,
+		sa_id
+	)
+	values
+	(
+		#{supplier_id},
+		#{is_delete},
+		#{sa_id}
+	)
+</insert>
+<select id="getSubpplierInfoList" parameterType="map" resultType="usercenter.subAccount.model.SubaccountSupplierInfo">
+	select
+		t_subaccount_supplier_info.subaccount_supplier_id,
+		t_subaccount_supplier_info.supplier_id,
+		t_subaccount_supplier_info.create_dt,
+		t_subaccount_supplier_info.is_delete,
+		t_subaccount_supplier_info.sa_id
+	from
+		t_subaccount_supplier_info
+	where 
+	    t_subaccount_supplier_info.sa_id = #{sa_id}
+</select>
+<update id="updateSubaccountSupplierInfo" parameterType="usercenter.subAccount.model.SubaccountSupplierInfo">
+update t_subaccount_supplier_info
+		set	
+			is_delete = #{is_delete}				
+		where 
+		t_subaccount_supplier_info.sa_id = #{sa_id} and t_subaccount_supplier_info.supplier_id = #{supplier_id}
+</update>
+</mapper>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.AttchedMapper">
+
+
+<select id="getAttchedList" parameterType="map" resultType="manager.supplier.model.Attched">
+	select
+		t_app_register_attched.id,
+		t_app_register_attched.company_id,
+		t_app_register_attched.file_type_id,
+		t_app_register_attched.file_name,
+		t_app_register_attched.file_path,
+		t_app_register_attched.create_dt,
+		t_app_register_attched.file_format,
+		case when t_app_register_attched.ismust=1 then 'true' else 'false' END as ismust,
+		t_app_register_attched.remark,
+		case when t_app_register_attched.iscustom=1 then 'true' else 'false' END as iscustom,
+		t_app_register_attched.mogodb_id
+	from
+		t_app_register_attched
+		where 1=1
+		<if test="nohas_mogodb_id">
+			and t_app_register_attched.mogodb_id is null
+		</if>
+		
+	<if test="company_id!=null">
+		and t_app_register_attched.company_id=#{company_id}
+	</if>
+	<if test="file_type_id!=null">
+		and t_app_register_attched.file_type_id=#{file_type_id}
+	</if>
+	<if test="id!=null">
+		and t_app_register_attched.id=#{id}
+	</if>
+	<!--检索供应商认证相关的公司证照附件 -->
+	<if test="is_license!=null">
+		and (t_app_register_attched.file_type_id=18 or t_app_register_attched.file_type_id=19 or t_app_register_attched.file_type_id=20 or t_app_register_attched.file_type_id=21)
+	</if>
+	<!-- 是否是自定义上传 -->
+	<if test="iscustom!=null">
+		and t_app_register_attched.iscustom=#{iscustom}
+	</if>	
+</select>
+<insert id="addAttched" parameterType="manager.supplier.model.Attched" keyProperty="id" useGeneratedKeys="true">
+	<selectKey keyProperty="id" resultType="int" order="BEFORE">
+		select  ifnull(max(id)+1,1) from t_app_register_attched 
+	</selectKey>
+	insert into t_app_register_attched
+	(
+		company_id,
+		file_name,
+		file_type_id,
+		file_path,
+		create_dt,
+		file_format,
+		ismust,
+		remark,
+		mogodb_id,
+		iscustom
+	)
+	values
+	(
+		#{company_id},
+		#{file_name},
+		#{file_type_id},
+		#{file_path},
+		#{create_dt},
+		#{file_format},
+		<if test="ismust==true">
+			1,
+		</if>
+		<if test="ismust==false">
+			0,
+		</if>
+		#{remark},
+		#{mogodb_id},
+		<if test="iscustom==true">
+			1
+		</if>
+		<if test="iscustom==false">
+			0
+		</if>
+	)
+</insert>
+<update id="updateAttched" parameterType="manager.supplier.model.Attched">
+	update t_app_register_attched
+		set
+			company_id = #{company_id},
+			file_name = #{file_name},
+			file_path = #{file_path},
+			create_dt = #{create_dt},
+			file_format = #{file_format},
+			file_type_id=#{file_type_id},
+			remark=#{remark},
+			mogodb_id=#{mogodb_id},
+			<if test="ismust==true">
+				ismust=1,
+			</if>
+			<if test="ismust==false">
+				ismust=0,
+			</if>
+			remark = #{remark},
+			<if test="iscustom==true">
+				iscustom=1
+			</if>
+			<if test="iscustom==false">
+				iscustom=0
+			</if>
+		where id=#{id}
+</update>
+<update id="updateAttched1" parameterType="map">
+	update t_app_register_attched
+		set
+			mogodb_id=#{mogodb_id},
+			file_name=#{file_name}
+		where id=#{id}
+</update>
+<delete id="deleteAttched" parameterType="manager.supplier.model.Attched">
+	delete from t_app_register_attched
+	where id= #{id}
+</delete>
+<select id="getAttchedList1" parameterType="map" resultType="manager.supplier.model.Attched">
+	select
+		t_app_register_attched.id,
+		t_app_register_attched.company_id,
+		t_app_register_attched.file_type_id,
+		t_app_register_attched.file_name,
+		t_app_register_attched.file_path,
+		t_app_register_attched.create_dt,
+		t_app_register_attched.file_format,
+		case when t_app_register_attched.ismust=1 then 'true' else 'false' END as ismust,
+		t_app_register_attched.remark,
+		case when t_app_register_attched.iscustom=1 then 'true' else 'false' END as iscustom,
+		t_app_register_attched.mogodb_id
+	from
+		t_app_register_attched
+		where 1=1
+		and t_app_register_attched.company_id=#{companyId}
+		and t_app_register_attched.file_type_id in(24,25,26,27,30)
+</select>
+<insert id="addAttched1" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+	<selectKey keyProperty="id" resultType="int" order="BEFORE">
+		select  ifnull(max(id)+1,1) from t_app_register_attched 
+	</selectKey>
+	insert into t_app_register_attched
+	(
+		company_id,
+		file_name,
+		file_type_id,
+		create_dt,
+		file_format,
+		remark,
+		mogodb_id
+	)
+	values
+	(
+		#{company_id},
+		#{file_name},
+		#{file_type_id},
+		#{create_dt},
+		#{file_format},
+		#{remark},
+		#{mogodb_id}
+	)
+</insert>
+<select id="getSupplierFileAttchedList" parameterType="map" resultType="usercenter.saleManage.model.AccessApplicationAttched">
+select
+		t_app_register_attched.id,
+		t_app_register_attched.company_id,
+		t_app_register_attched.file_name,
+		t_app_register_attched.file_type_id,
+		t_app_register_attched.file_path,
+		t_app_register_attched.mogodb_id,
+		t_app_register_attched.file_format,
+		t_base_file_type.type_name
+	from
+		t_app_register_attched
+		left outer join t_base_file_type on t_base_file_type.ft_id=t_app_register_attched.file_type_id
+		where  t_app_register_attched.file_type_id in (18,19,20,21)
+			and t_app_register_attched.company_id=(select company_id from t_supplier_files where supplier_id=#{supplier_id} limit 1)
+	union all
+	select
+		t_access_application_attched.id,
+		t_access_application_attched.record_id,
+		t_access_application_attched.file_name,
+		t_access_application_attched.file_type_id,
+		"" as file_path,
+		t_access_application_attched.mogodb_id,
+		t_access_application_attched.file_format,
+		t_base_file_type.type_name
+	from
+		t_access_application_attched
+		left outer join t_base_file_type on t_base_file_type.ft_id=t_access_application_attched.file_type_id
+		where  t_access_application_attched.supplier_id=#{supplier_id}
+</select>
+</mapper>

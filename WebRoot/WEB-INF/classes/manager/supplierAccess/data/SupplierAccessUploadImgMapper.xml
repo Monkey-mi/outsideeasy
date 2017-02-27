@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplierAccess.data.SupplierAccessUploadImgMapper">
+
+
+<select id="getSupplierAccessUploadImgList" parameterType="map" resultType="manager.supplierAccess.model.SupplierAccessUploadImg">
+	select
+		t_supplier_access_uploadImg.file_id,
+		t_supplier_access_uploadImg.score_id,
+		t_supplier_access_uploadImg.file_path,
+		t_supplier_access_uploadImg.create_dt
+	from
+		t_supplier_access_uploadImg
+	where 1=1
+	<if test="score_id!=null">
+		and t_supplier_access_uploadImg.score_id=#{score_id}
+	</if>
+</select>
+<insert id="addSupplierAccessUploadImg" parameterType="manager.supplierAccess.model.SupplierAccessUploadImg" keyProperty="id" useGeneratedKeys="true">
+	<selectKey keyProperty="file_id" resultType="int" order="BEFORE">
+		select  ifnull(max(file_id)+1,1) from t_supplier_access_uploadImg 		
+	</selectKey>
+	insert into t_supplier_access_uploadImg
+	(
+		file_id,
+		score_id,
+		file_path,
+		create_dt
+	)
+	values
+	(
+		#{file_id},
+		#{score_id},
+		#{file_path},
+		#{create_dt}
+	)
+</insert>
+<update id="updateSupplierAccessUploadImg" parameterType="manager.supplierAccess.model.SupplierAccessUploadImg">
+	update t_supplier_access_uploadImg
+		set
+			file_id = #{file_id},
+			score_id = #{score_id},
+			file_path = #{file_path},
+			create_dt = #{create_dt}
+		where file_id = #{file_id}
+</update>
+<delete id="deleteSupplierAccessUploadImg" parameterType="manager.supplierAccess.model.SupplierAccessUploadImg">
+	delete from t_supplier_access_uploadImg
+	where file_id = #{file_id}
+</delete>
+</mapper>

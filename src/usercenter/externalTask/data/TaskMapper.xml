@@ -1,0 +1,886 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.TaskMapper">
+
+<select id="queryTaskProduct" parameterType="map" resultType="usercenter.externalTask.model.Task">
+select
+		t_app_task.t_id	
+		,t_app_task.producers_company_name
+		,t_app_task.receive_company	
+	from
+		t_app_task	
+	where 	
+		t_app_task.send_company = #{company_id}	
+		and t_app_task.is_delete = 0
+</select>
+<select id="queryTaskList" parameterType="map" resultType="usercenter.externalTask.model.Task">
+	select
+		t_app_task.*
+		,(select COUNT(0) from t_task_deliver_goods	where t_app_task.t_id=t_task_deliver_goods.t_id and t_task_deliver_goods.deliver_state = 5   and t_task_deliver_goods.is_delete =0 and t_task_deliver_goods.shipping_id is not null )as unReceivedlogisticsCount
+		,(select COUNT(0) from t_task_deliver_goods	where t_app_task.t_id=t_task_deliver_goods.t_id and t_task_deliver_goods.is_delete =0 and t_task_deliver_goods.shipping_id is not null  ) as logisticsCount
+		,rc.cpyname_cn as receive_company_name
+		,sc.cpyname_cn as send_company_name
+	from
+		t_app_task
+	left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	left join t_supplier_files as ts on ts.company_id = t_app_task.receive_company
+    left join t_subaccount_supplier_info as tu on tu.supplier_id = ts.supplier_id
+	where 1=1
+	<if test="state!=0 and state!=30">
+		and t_app_task.state=#{state}
+	</if>
+	<if test="state==30">
+		and t_app_task.state in (30,40)
+	</if>
+	<if test="plan_start_flag==true and plan_start_1!=null">
+		and t_app_task.plan_start&gt;=#{plan_start_1}
+	</if>
+	<if test="plan_start_flag==true and plan_start_2!=null">
+		and t_app_task.plan_start&lt;=#{plan_start_2}
+	</if>
+	<if test="send_time_flag==true and send_time_1!=null">
+		and t_app_task.send_time&gt;=#{send_time_1}
+	</if>
+	<if test="send_time_flag==true and send_time_2!=null">
+		and t_app_task.send_time&lt;=#{send_time_2}
+	</if>
+	<if test="receive_time_flag==true and receive_time_1!=null">
+		and t_app_task.receive_time&gt;=#{receive_time_1}
+	</if>
+	<if test="receive_time_flag==true and receive_time_2!=null">
+		and t_app_task.receive_time&lt;=#{receive_time_2}
+	</if>
+	<if test="search_text!=null and search_text!=''">
+		and (
+		t_app_task.product_name like '%${search_text}%' 
+		or rc.cpyname_cn like '%${search_text}%' 
+		or t_app_task.rwdh like '%${search_text}%'
+		or t_app_task.scdh like '%${search_text}%'
+		or t_app_task.serial_no like '%${search_text}%'
+		or t_app_task.ddh like '%${search_text}%' 
+		)
+	</if>	
+		and t_app_task.send_company = #{company_id}	
+		and tu.is_delete = 0
+        and tu.sa_id = #{sa_id}
+        and t_app_task.is_delete = 0
+	<if test="order_partten==null or order_partten==''">
+	    order by t_app_task.czsj DESC
+	</if>
+	<if test="order_partten != null and order_partten != '' ">
+	    <if test=" order_partten == 'plan_time'">
+	      order by t_app_task.plan_start ${order_flag}
+	    </if>
+	    <if test=" order_partten == 'out_partten'">
+	      order by CONVERT(receive_company_name USING gbk) , bzmc ${order_flag} 
+	    </if>
+	</if>
+</select>
+<select id="queryTaskList_count" parameterType="map" resultType="java.lang.Integer">
+	select
+		count(0)
+	from
+		t_app_task
+	left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	left join t_supplier_files on t_supplier_files.company_id = t_app_task.receive_company
+    left join t_subaccount_supplier_info on t_subaccount_supplier_info.supplier_id = t_supplier_files.supplier_id
+	where 1=1
+	<if test="state!=0 and state!=30">
+		and t_app_task.state=#{state}
+	</if>
+	<if test="state==30">
+		and t_app_task.state in (30,40)
+	</if>
+	<if test="plan_start_flag==true and plan_start_1!=null">
+		and t_app_task.plan_start&gt;=#{plan_start_1}
+	</if>
+	<if test="plan_start_flag==true and plan_start_2!=null">
+		and t_app_task.plan_start&lt;=#{plan_start_2}
+	</if>
+	<if test="send_time_flag==true and send_time_1!=null">
+		and t_app_task.send_time&gt;=#{send_time_1}
+	</if>
+	<if test="send_time_flag==true and send_time_2!=null">
+		and t_app_task.send_time&lt;=#{send_time_2}
+	</if>
+	<if test="receive_time_flag==true and receive_time_1!=null">
+		and t_app_task.receive_time&gt;=#{receive_time_1}
+	</if>
+	<if test="receive_time_flag==true and receive_time_2!=null">
+		and t_app_task.receive_time&lt;=#{receive_time_2}
+	</if>
+	<if test="search_text!=null and search_text!=''">
+		and (
+		t_app_task.product_name like '%${search_text}%' 
+		or rc.cpyname_cn like '%${search_text}%' 
+		or t_app_task.rwdh like '%${search_text}%'
+		or t_app_task.scdh like '%${search_text}%'
+		or t_app_task.serial_no like '%${search_text}%'
+		or t_app_task.ddh like '%${search_text}%' 
+		)
+	</if>	
+		and t_app_task.send_company = #{company_id}	
+		and t_subaccount_supplier_info.is_delete = 0
+        and t_subaccount_supplier_info.sa_id = #{sa_id}
+        and t_app_task.is_delete = 0
+	    order by t_app_task.czsj desc
+</select>
+<select id="getTaskList" parameterType="map" resultType="usercenter.externalTask.model.Task">
+	select
+		t_app_task.*
+		,(select COUNT(0) from t_task_deliver_goods	where t_app_task.t_id=t_task_deliver_goods.t_id and t_task_deliver_goods.deliver_state = 5   and t_task_deliver_goods.is_delete =0 and t_task_deliver_goods.shipping_id is not null )as unReceivedlogisticsCount
+		,(select COUNT(0) from t_task_deliver_goods	where t_app_task.t_id=t_task_deliver_goods.t_id and t_task_deliver_goods.is_delete =0 and t_task_deliver_goods.shipping_id is not null  ) as logisticsCount
+		,rc.cpyname_cn as receive_company_name
+		,sc.cpyname_cn as send_company_name
+	from
+		t_app_task
+	left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	where 1=1
+	<if test="state!=0 and state!=30">
+		and t_app_task.state=#{state}
+	</if>
+	<if test="state==30">
+		and t_app_task.state in (30,40)
+	</if>
+	<if test="plan_start_flag==true and plan_start_1!=null">
+		and t_app_task.plan_start&gt;=#{plan_start_1}
+	</if>
+	<if test="plan_start_flag==true and plan_start_2!=null">
+		and t_app_task.plan_start&lt;=#{plan_start_2}
+	</if>
+	<if test="send_time_flag==true and send_time_1!=null">
+		and t_app_task.send_time&gt;=#{send_time_1}
+	</if>
+	<if test="send_time_flag==true and send_time_2!=null">
+		and t_app_task.send_time&lt;=#{send_time_2}
+	</if>
+	<if test="receive_time_flag==true and receive_time_1!=null">
+		and t_app_task.receive_time&gt;=#{receive_time_1}
+	</if>
+	<if test="receive_time_flag==true and receive_time_2!=null">
+		and t_app_task.receive_time&lt;=#{receive_time_2}
+	</if>
+	<if test="search_text!=null and search_text!=''">
+		and (
+		t_app_task.product_name like '%${search_text}%' 
+		or rc.cpyname_cn like '%${search_text}%' 
+		or t_app_task.rwdh like '%${search_text}%'
+		or t_app_task.scdh like '%${search_text}%'
+		or t_app_task.serial_no like '%${search_text}%'
+		or t_app_task.ddh like '%${search_text}%' 
+		)
+	</if>	
+		and t_app_task.send_company = #{company_id}	
+		and t_app_task.is_delete = 0
+	<if test="order_partten==null or order_partten==''">
+	    order by t_app_task.czsj DESC
+	</if>
+	<if test="order_partten != null and order_partten != '' ">
+	    <if test=" order_partten == 'plan_time'">
+	      order by t_app_task.plan_start ${order_flag}
+	    </if>
+	    <if test=" order_partten == 'out_partten'">
+	      order by CONVERT(receive_company_name USING gbk),bzmc  ${order_flag}
+	    </if>
+	</if>
+</select>
+<select id="getTaskList_count" parameterType="map" resultType="java.lang.Integer">
+	select
+		count(0)
+	from
+		t_app_task
+	left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	where 1=1
+	<if test="state!=0 and state!=30">
+		and t_app_task.state=#{state}
+	</if>
+	<if test="state==30">
+		and t_app_task.state in (30,40) 
+	</if>
+	<if test="plan_start_flag==true and plan_start_1!=null">
+		and t_app_task.plan_start&gt;=#{plan_start_1}
+	</if>
+	<if test="plan_start_flag==true and plan_start_2!=null">
+		and t_app_task.plan_start&lt;=#{plan_start_2}
+	</if>
+	<if test="send_time_flag==true and send_time_1!=null">
+		and t_app_task.send_time&gt;=#{send_time_1}
+	</if>
+	<if test="send_time_flag==true and send_time_2!=null">
+		and t_app_task.send_time&lt;=#{send_time_2}
+	</if>
+	<if test="receive_time_flag==true and receive_time_1!=null">
+		and t_app_task.receive_time&gt;=#{receive_time_1}
+	</if>
+	<if test="receive_time_flag==true and receive_time_2!=null">
+		and t_app_task.receive_time&lt;=#{receive_time_2}
+	</if>
+	<if test="search_text!=null and search_text!=''">
+		and (
+		t_app_task.product_name like '%${search_text}%' 
+		or rc.cpyname_cn like '%${search_text}%' 
+		or t_app_task.rwdh like '%${search_text}%'
+		or t_app_task.scdh like '%${search_text}%'
+		or t_app_task.serial_no like '%${search_text}%'
+		or t_app_task.ddh like '%${search_text}%' 
+		)
+	</if>
+		and t_app_task.send_company = #{company_id}
+		and t_app_task.is_delete = 0
+	    order by t_app_task.czsj desc
+</select>
+
+<select id="getTaskListForProducer" parameterType="map" resultType="usercenter.externalTask.model.Task">
+	select
+		t_app_task.*
+		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company!=t_app_task_logistics.send_company and t_app_task_logistics.confirm_state=0) as unReceivedlogisticsCount
+		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company=t_app_task_logistics.send_company and t_app_task_logistics.confirm_state=0) as unReceivedlogisticsVoCount
+		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company=t_app_task_logistics.send_company and t_app_task_logistics.confirm_state=1) as ReceivedlogisticsVoCount
+		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company!=t_app_task_logistics.send_company ) as logisticsCount
+		,rc.cpyname_cn as receive_company_name
+		,sc.cpyname_cn as send_company_name
+	from
+		t_app_task
+	left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	where 1=1
+	<if test="state!=0">
+		and t_app_task.state=#{state}
+	</if>
+	<if test="plan_start_flag==true and plan_start_1!=null">
+		and t_app_task.plan_start&gt;=#{plan_start_1}
+	</if>
+	<if test="plan_start_flag==true and plan_start_2!=null">
+		and t_app_task.plan_start&lt;=#{plan_start_2}
+	</if>
+		<if test="send_time_flag==true and send_time_1!=null">
+		and t_app_task.send_time&gt;=#{send_time_1}
+	</if>
+	<if test="send_time_flag==true and send_time_2!=null">
+		and t_app_task.send_time&lt;=#{send_time_2}
+	</if>
+	<if test="receive_time_flag==true and receive_time_1!=null">
+		and t_app_task.receive_time&gt;=#{receive_time_1}
+	</if>
+	<if test="receive_time_flag==true and receive_time_2!=null">
+		and t_app_task.receive_time&lt;=#{receive_time_2}
+	</if>
+	<if test="search_text!=null and search_text!=''">
+		and (
+		t_app_task.product_name like '%${search_text}%' 
+		or sc.cpyname_cn like '%${search_text}%' 
+		or t_app_task.rwdh like '%${search_text}%'
+		or t_app_task.scdh like '%${search_text}%'
+		or t_app_task.serial_no like '%${search_text}%'
+		or t_app_task.ddh like '%${search_text}%' 
+		)
+	</if>
+		and t_app_task.receive_company =  #{company_id} 
+	    and t_app_task.state  in (10,15,20,25,40)
+	    and t_app_task.is_delete = 0
+	   
+	<if test="order_partten==null or order_partten==''">
+	      order by t_app_task.send_time DESC 
+	</if>
+	<if test="order_partten != null and order_partten != '' ">
+	    <if test=" order_partten == 'plan_time'">
+	      order by t_app_task.plan_start ${order_flag}
+	    </if>
+	    <if test=" order_partten == 'out_partten'">
+	      order by CONVERT(send_company_name USING gbk)   ${order_flag}
+	    </if>
+	</if>
+</select>
+
+<select id="getTaskListForProducer_count" parameterType="map" resultType="java.lang.Integer">
+	select count(0)
+	from
+		t_app_task
+	left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	where 1=1
+	<if test="state!=0">
+		and t_app_task.state=#{state}
+	</if>
+	<if test="plan_start_flag==true and plan_start_1!=null">
+		and t_app_task.plan_start&gt;=#{plan_start_1}
+	</if>
+	<if test="plan_start_flag==true and plan_start_2!=null">
+		and t_app_task.plan_start&lt;=#{plan_start_2}
+	</if>
+		<if test="send_time_flag==true and send_time_1!=null">
+		and t_app_task.send_time&gt;=#{send_time_1}
+	</if>
+	<if test="send_time_flag==true and send_time_2!=null">
+		and t_app_task.send_time&lt;=#{send_time_2}
+	</if>
+	<if test="receive_time_flag==true and receive_time_1!=null">
+		and t_app_task.receive_time&gt;=#{receive_time_1}
+	</if>
+	<if test="receive_time_flag==true and receive_time_2!=null">
+		and t_app_task.receive_time&lt;=#{receive_time_2}
+	</if>
+	<if test="search_text!=null and search_text!=''">
+		and (
+		t_app_task.product_name like '%${search_text}%' 
+		or sc.cpyname_cn like '%${search_text}%' 
+		or t_app_task.serial_no like '%${search_text}%'
+		or t_app_task.rwdh like '%${search_text}%'
+		or t_app_task.scdh like '%${search_text}%'
+		or t_app_task.serial_no like '%${search_text}%'
+		or t_app_task.ddh like '%${search_text}%' 
+		)
+	</if>
+		and t_app_task.receive_company = #{company_id} 
+		and t_app_task.is_delete = 0
+	    and t_app_task.state  in (10,15,20,25,40)
+</select>
+
+<select id="getTaskListForShipping" parameterType="map" resultType="usercenter.externalTask.model.Task">
+	select
+		t_app_task.t_id
+		,t_app_task.product_name
+		,t_app_task.serial_no
+		,t_app_task.state
+		,t_app_task.send_company
+		,t_app_task.receive_company
+		,t_app_task.total_qty
+		,t_app_task.produced_qty
+		,t_app_task.confirmed_qty
+		,t_app_task.confirmed_qtyVo
+		,t_app_task.qualified_qty
+		,t_app_task.sendout_qty
+		,t_app_task.receive_time
+		,t_app_task.product_pic
+		,t_app_task.return_send_qtyVo
+		,t_app_task.return_qtyVo
+		,t_app_task.ddh
+		,t_app_task.scdh
+		,t_app_task.rwdh
+		,t_app_task.bzmc
+		,rc.cpyname_cn as receive_company_name
+		,sc.cpyname_cn as send_company_name
+	from
+		t_app_task
+	    left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	    left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	where 1=1
+	<if test="search_product != null and search_product != ''">
+		and t_app_task.product_name like '%${search_product}%'
+	</if>
+	<if test="search_rwdh != null and search_rwdh != ''">
+		and (
+			t_app_task.rwdh like '%${search_rwdh}%'
+			or t_app_task.ddh like '%${search_rwdh}%'
+			or t_app_task.scdh like '%${search_rwdh}%'
+			or t_app_task.serial_no like '%${search_rwdh}%'
+		    )
+	</if>
+	<if test="search_company != null and search_company != ''">
+		and sc.cpyname_cn like '%${search_company}%'
+	</if>	
+	<if test="send_company != null and send_company != '' and send_company != 0">
+		and t_app_task.send_company = #{send_company}
+	</if>	
+	<if test="list != null and list != ''">
+		and  t_app_task.t_id not in
+	    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</if>	
+		and t_app_task.receive_company =  #{company_id} 
+	    and t_app_task.state  in (15,20)
+	    and t_app_task.is_delete = 0
+	    order by t_app_task.send_time desc 
+</select>
+
+<select id="getTaskListForShipping_count" parameterType="map" resultType="Integer">
+	select
+		count(0)
+	from
+		t_app_task
+	    left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	    left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	where 1=1
+	<if test="search_product != null and search_product != ''">
+		and t_app_task.product_name like '%${search_product}%'
+	</if>
+	<if test="search_rwdh != null and search_rwdh != ''">
+		and (
+			t_app_task.rwdh like '%${search_rwdh}%'
+			or t_app_task.ddh like '%${search_rwdh}%'
+			or t_app_task.scdh like '%${search_rwdh}%'
+			or t_app_task.serial_no like '%${search_rwdh}%'
+		    )
+	</if>
+	<if test="search_company != null and search_company != ''">
+		and sc.cpyname_cn like '%${search_company}%'
+	</if>	
+	<if test="send_company != null and send_company != '' and send_company != 0">
+		and t_app_task.send_company = #{send_company}
+	</if>	
+	<if test="list != null and list != ''">
+		and  t_app_task.t_id not in
+	    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</if>	
+		and t_app_task.receive_company =  #{company_id} 
+	    and t_app_task.state  in (15,20)
+	    and t_app_task.is_delete = 0
+</select>
+
+<select id="getTaskListForShipping_counts" parameterType="map" resultType="java.lang.Integer">
+	SELECT COUNT(DISTINCT t_app_task.send_company ) 
+	from 
+		   t_app_task left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company 
+		   left join t_app_company_info as sc on sc.company_id=t_app_task.send_company 
+	where 1=1 
+		 <if test="search_product != null and search_product != ''">
+		    and t_app_task.product_name like '%${search_product}%'
+		</if>
+		<if test="search_rwdh != null and search_rwdh != ''">
+		    and (
+			t_app_task.rwdh like '%${search_rwdh}%'
+			or t_app_task.ddh like '%${search_rwdh}%'
+			or t_app_task.scdh like '%${search_rwdh}%'
+			or t_app_task.serial_no like '%${search_rwdh}%'
+		    )
+	    </if>
+		<if test="search_company != null and search_company != ''">
+			and sc.cpyname_cn like '%{search_company}%'
+		</if>
+		<if test="send_company != null and send_company != '' and send_company != 0">
+			and t_app_task.send_company = #{send_company}
+		</if>	
+		<if test="list != null and list != ''">
+		    and t_app_task.t_id not in
+	    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	    </if>		
+		   and t_app_task.receive_company =  #{company_id} 
+		   and t_app_task.state in (15,20) 
+		   and t_app_task.is_delete = 0 	 
+</select>
+<select id="RegCompanyForOne" parameterType="map" resultType="java.lang.Integer">
+    SELECT COUNT(DISTINCT t_app_task.send_company ) 
+	from 
+		  t_app_task  		  
+	where t_app_task.t_id in 
+		<foreach collection="arr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+</select>
+<select id="getTaskSendCompany" parameterType="map" resultType="Integer">
+  select
+     count(*)
+  from
+     t_app_task
+   where
+     send_company = #{send_company} and t_id = #{t_id}
+     and t_app_task.is_delete = 0
+</select>
+
+<select id="getTaskCompanyidVo" parameterType="map" resultType="usercenter.externalTask.TaskResponse.RexAccountVo"> 
+      <if test="reg_id != null and reg_id != ''">	
+	  select
+		t_reg_accout_company_info.company_id
+	  from
+		t_reg_accout_company_info
+		left join t_app_company_info on t_reg_accout_company_info.company_id = t_app_company_info.company_id
+	  where
+	    t_reg_accout_company_info.reg_id = #{reg_id} and t_app_company_info.apply_sts = 15 and t_app_company_info.is_delete = 0
+	</if>
+	<if test="sa_id != null and sa_id != ''">
+	  select
+		t_app_subacc_company_authority.company_id
+	  from
+		t_app_subacc_company_authority
+	  where 
+		t_app_subacc_company_authority.sa_id = #{sa_id} and t_app_subacc_company_authority.is_delete = 0
+	</if>
+</select>
+<select id="queryTaskCountOfAllState" parameterType="map" resultType="usercenter.externalTask.TaskResponse.StateCount">
+  	select state,COUNT(state) as stateCount
+	from 
+	 t_app_task
+	 left join t_supplier_files as ts on ts.company_id = t_app_task.receive_company
+     left join t_subaccount_supplier_info as tu on tu.supplier_id = ts.supplier_id
+	where 1=1
+	 and tu.is_delete = 0
+     and tu.sa_id = #{sa_id}
+	 and t_app_task.send_company = #{company_id}
+	 and t_app_task.is_delete = 0	 
+	 GROUP BY state
+</select>
+<select id="getTaskCountOfAllState" parameterType="map" resultType="usercenter.externalTask.TaskResponse.StateCount">
+  	select state,COUNT(state) as stateCount
+	from t_app_task
+	where 1=1
+	and t_app_task.send_company = #{company_id}	
+	and t_app_task.is_delete = 0 
+	GROUP BY state
+</select>
+
+<select id="getProducerTaskCountOfAllState" parameterType="map" resultType="usercenter.externalTask.TaskResponse.StateCount">
+  	select state,COUNT(state) as stateCount
+	from t_app_task
+	where 1=1
+	and t_app_task.receive_company = #{company_id}	
+	and t_app_task.is_delete = 0  
+	GROUP BY state
+</select>
+<update id="updateTaskState2Stop" parameterType="map">
+	update t_app_task
+		set
+			stopreason=#{reason},
+			stop_time=#{stop_time},
+			state = #{state}
+		where t_id = #{t_id}
+</update>
+<update id="updateTaskState2Send" parameterType="map">
+	update t_app_task
+		set
+			state = #{state},
+			send_time=#{send_time}
+		where t_id = #{t_id}
+</update>
+<update id="updateTaskState2toBeSend" parameterType="map">
+	update t_app_task
+		set
+			state = #{state},
+			send_time=null
+		where t_id = #{t_id}
+</update>
+<update id="updateTaskPlanDate" parameterType="map">
+	update t_app_task
+		set
+			plan_start = #{plan_start},
+			plan_complete=#{plan_complete}
+		where t_id = #{t_id}
+</update>
+<update id="updateTaskRemark" parameterType="map">
+	update t_app_task
+		set
+			remark=#{remark}
+		where t_id = #{t_id}
+</update>
+<update id="updateTaskreceive_company" parameterType="map">
+	update t_app_task
+		set
+			receive_company=#{receive_company}
+		where t_id = #{t_id}
+</update>
+<update id="updateTaskqc_type" parameterType="map">
+	update t_app_task
+		set
+			qc_type=#{qc_type}
+		where t_id = #{t_id}
+</update>
+<update id="updateTasktotal_qty" parameterType="map">
+	update t_app_task
+		set
+			total_qty=#{total_qty}
+		where t_id = #{t_id}
+</update>
+<update id="updateTaskState2producting" parameterType="map">
+	update t_app_task
+		set
+			state = #{state},
+			receive_time=#{receive_time}
+		where t_id = #{t_id}
+</update>
+<update id="updateTaskState" parameterType="map">
+	update t_app_task
+		set
+			state = #{state}
+		where t_id = #{t_id}
+</update>
+<select id="getTaskByT_id" parameterType="map" resultType="usercenter.externalTask.model.Task">
+  	select t_app_task.*
+     	,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.receive_company=t_app_task_logistics.send_company and t_app_task_logistics.confirm_state=0) as unReceivedlogisticsCount
+  		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company=t_app_task_logistics.send_company and t_app_task_logistics.confirm_state=0) as unReceivedlogisticsVoCount
+  		,(select count(0) from t_app_logistics_item where t_app_task.t_id=t_app_logistics_item.t_id and t_app_logistics_item.qc_state=0) as unReceivedqcCount
+  		,rc.cpyname_cn as receive_company_name
+		,sc.cpyname_cn as send_company_name
+		,t_task_end_record.create_dt as endTaskTime
+	from t_app_task
+		left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+		left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+		left join t_task_end_record  on t_task_end_record.t_id = t_app_task.t_id  and t_task_end_record.end_status = 1
+	where t_app_task.t_id = #{t_id}
+	and t_app_task.is_delete = 0	
+</select>
+<select id ="getTaskStateByID" parameterType="map"  resultType="Integer">
+select t_app_task.state
+from t_app_task		
+where t_app_task.t_id = #{t_id}
+	  and t_app_task.is_delete = 0
+</select>
+<select id="getFileCount" parameterType="map" resultType="Integer">
+  select
+     count(*)
+  from
+     t_app_task_file
+   where
+     file_type = #{file_type} and t_id = #{t_id}
+</select>
+<update id="updateproduct_pic" parameterType="map">
+	update t_app_task
+		set
+			product_pic = #{mongo_file_name}
+		where t_id = #{t_id}
+</update>
+<update id="updateproduced_qty" parameterType="map">
+	update t_app_task
+		set
+			produced_qty = #{produced_qty}
+		where t_id = #{t_id}
+</update>
+<select id="getTaskQcType" parameterType="Integer" resultType="String">
+select
+    t_app_task.qc_type
+  from
+     t_app_task
+   where
+     t_app_task.t_id = #{t_id}
+</select>
+<update id="updateTaskProducted" parameterType="usercenter.externalTask.model.Task">
+      update t_app_task
+		set
+			confirmed_qty = #{confirmed_qty},
+			qualified_qty = #{qualified_qty}
+		where t_id = #{t_id}
+</update>
+<select id="getTotalQty" parameterType="Integer" resultType="usercenter.externalTask.model.Task">
+select
+    t_app_task.t_id,
+    t_app_task.total_qty
+  from
+     t_app_task
+   where
+     t_id = #{t_id}
+</select>
+
+<insert id="addTaskEndRecord" parameterType="map" keyProperty="task_end_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="task_end_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_task_end_record
+	(
+		t_id,
+		end_description,
+		end_status
+	)
+	values
+	(
+		#{t_id},
+		#{end_description},
+		#{end_status}
+	)
+</insert>
+<select id="getTaskEndRecord" parameterType="map" resultType="usercenter.externalTask.model.TaskEndRecord">
+select
+      t_id,
+	  end_description
+  from
+      t_task_end_record
+   where
+      t_id = #{t_id}
+      and end_status = #{end_status}
+      limit 1
+</select>
+<select id="getTaskToaleProductCount" parameterType="map" resultType="usercenter.externalTask.model.Task">
+select
+    t_app_task.t_id,
+    t_app_task.total_qty,
+     t_app_task.produced_qty
+  from
+     t_app_task
+   where
+     t_id = #{t_id}
+</select>
+<select id="getTaskToaleConfirmed_qtyVo" parameterType="map" resultType="usercenter.externalTask.model.Task">
+select   
+     t_app_task.t_id,
+     t_app_task.confirmed_qtyVo
+  from
+     t_app_task
+   where
+     t_id = #{t_id}
+</select>
+<update id="updateTaskToaleConfirmed_qtyVo" parameterType="map">
+	update t_app_task
+		set
+			confirmed_qtyVo = #{confirmed_qtyVo}
+		where t_id = #{t_id}
+</update>
+<update id="updateTaskState2Complete" parameterType="map">
+	update t_app_task
+		set
+			state = #{state},
+			finish_product_time = #{finish_product_time}
+		where t_id = #{t_id}
+</update>
+<update id="updateOperator_file" parameterType="map" >
+    update t_app_task
+		set
+			operator_file = #{operator_file}
+		where t_id = #{t_id}
+</update>
+<update id="updatetaskId" parameterType="map" >
+    update t_app_task
+		set
+			receive_company = #{receive_company}
+		where t_id = #{t_id}
+</update>
+<select id="getTaskQuliterCount" parameterType="map" resultType="usercenter.externalTask.model.Task">
+select   
+     t_app_task.t_id,
+     t_app_task.total_qty,
+     t_app_task.qualified_qty
+  from
+     t_app_task
+   where
+     t_id = #{t_id}
+</select>
+<update id="updateTaskStateCompleteEnd" parameterType="map">
+update t_app_task
+		set
+			state = #{state},
+			finish_task_time=#{finish_task_time}
+		where t_id = #{t_id}
+</update>
+<select id="getregTaskproduct" parameterType="map" resultType="usercenter.externalTask.model.Task">
+select   
+     t_app_task.t_id,
+     t_app_task.produced_qty,
+     t_app_task.sendout_qty,
+     t_app_task.return_send_qtyVo,
+     t_app_task.return_qtyVo,
+     t_app_task.total_qty,
+     t_app_task.confirmed_qtyVo
+  from
+     t_app_task
+   where
+     t_id = #{t_id}
+</select>
+<update id="updateTaskSendout" parameterType="map">
+update t_app_task
+    set 
+      t_id = #{t_id}
+      <if test="sendout_qty != null and sendout_qty != ''">
+      ,sendout_qty =#{sendout_qty}
+      </if>
+      <if test="return_send_qtyVo != null and return_send_qtyVo != ''">
+      ,return_send_qtyVo =#{return_send_qtyVo}
+      </if>
+     where t_id = #{t_id} 
+</update>
+<select id="getLastThreeDeliverTask" parameterType="map" resultType="usercenter.externalTask.model.Task">
+	select
+		t_app_task.*
+		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company!=t_app_task_logistics.send_company and t_app_task_logistics.confirm_state=0) as unReceivedlogisticsCount
+		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company!=t_app_task_logistics.send_company ) as logisticsCount
+		,rc.cpyname_cn as receive_company_name
+		,sc.cpyname_cn as send_company_name
+	from
+		t_app_task
+	left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	where 1=1
+		and t_app_task.state=25
+		and t_app_task.receive_company =#{sub_company_id}
+	and t_app_task.state&lt;30 and t_app_task.state&gt;5
+	and t_app_task.is_delete = 0
+	  order by t_app_task.send_time desc  limit 3
+</select>
+<select id="getLastThreeDeliverTaskForOut" parameterType="map" resultType="usercenter.externalTask.model.Task">
+	select
+		t_app_task.*
+		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company!=t_app_task_logistics.send_company and t_app_task_logistics.confirm_state=0) as unReceivedlogisticsCount
+		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company!=t_app_task_logistics.send_company ) as logisticsCount
+		,rc.cpyname_cn as receive_company_name
+		,sc.cpyname_cn as send_company_name
+	from
+		t_app_task
+	left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	where 1=1
+	<if test="state!=0">
+		and t_app_task.state=#{state}
+	</if>
+		and t_app_task.send_company = #{pur_company_id}
+		and t_app_task.is_delete = 0
+	 order by t_app_task.czsj desc limit 3
+</select>
+<select id="getSubLastThreeDeliverTaskForOut" parameterType="map" resultType="usercenter.externalTask.model.Task">
+	select
+		t_app_task.*
+		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company!=t_app_task_logistics.send_company and t_app_task_logistics.confirm_state=0) as unReceivedlogisticsCount
+		,(select count(0) from t_app_task_logistics where t_app_task.t_id=t_app_task_logistics.t_id and t_app_task.send_company!=t_app_task_logistics.send_company ) as logisticsCount
+		,rc.cpyname_cn as receive_company_name
+		,sc.cpyname_cn as send_company_name
+	from
+		t_app_task
+	left join t_app_company_info as rc on rc.company_id=t_app_task.receive_company
+	left join t_app_company_info as sc on sc.company_id=t_app_task.send_company
+	left join t_supplier_files as ts on ts.company_id = t_app_task.receive_company
+    left join t_subaccount_supplier_info as tu on tu.supplier_id = ts.supplier_id
+	where 1=1
+	<if test="state!=0">
+		and t_app_task.state=#{state}
+	</if>
+		and t_app_task.send_company = #{pur_company_id}
+		and tu.is_delete = 0
+        and tu.sa_id = #{sa_id}
+        and t_app_task.is_delete = 0
+	 order by t_app_task.czsj desc limit 3
+</select>
+<update id="updateTaskPicture" parameterType="map">
+     update t_app_task
+     set
+     product_pic =#{product_pic}
+     where t_id = #{t_id}
+</update>
+<select id="getReturnQtyVo" parameterType="map" resultType="usercenter.externalTask.model.Task">
+select return_qtyVo,
+       confirmed_qtyVo,
+       sendout_qty
+from   t_app_task
+where   t_id =#{t_id}
+</select>
+<update id="updateReturnQtyVo"  parameterType="map">
+ update t_app_task
+ set 
+     t_id =#{t_id}
+     <if test = "return_qtyVo != null and return_qtyVo != ''">
+     ,return_qtyVo = #{return_qtyVo}
+     </if>
+     <if test="confirmed_qtyVo != null and confirmed_qtyVo != ''">
+     ,confirmed_qtyVo = #{confirmed_qtyVo}
+     </if>
+ where  t_id =#{t_id}
+</update>
+<select id="getQtyCount" parameterType="map"  resultType="usercenter.externalTask.model.Task">
+select t_app_task.confirmed_qty,
+       t_app_task.confirmed_qtyVo,
+       t_app_task.return_qtyVo
+from   t_app_task 
+where  t_id =#{t_id}
+</select>
+<select id="getRegQtyCount" parameterType="map"  resultType="usercenter.externalTask.model.Task">
+select t_app_task.produced_qty,
+       t_app_task.sendout_qty,
+       t_app_task.return_send_qtyVo
+from   t_app_task 
+where  t_id =#{t_id}
+</select>
+</mapper>

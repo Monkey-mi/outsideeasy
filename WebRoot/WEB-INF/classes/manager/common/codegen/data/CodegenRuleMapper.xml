@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.common.codegen.data.CodegenRuleMapper">
+
+
+<select id="getCodegenRuleList" parameterType="map" resultType="manager.common.codegen.model.CodegenRule">
+	select
+		t_sys_codegen_rule.cgr_id,
+		t_sys_codegen_rule.code,
+		t_sys_codegen_rule.name,
+		t_sys_codegen_rule.len,
+		t_sys_codegen_rule.is_valid,
+		t_sys_codegen_rule.create_dt,
+		t_sys_codegen_rule.creator
+	from
+		t_sys_codegen_rule
+		<where>
+		  1=1
+			<if test="cgr_id!=null">
+			 	and	cgr_id=#{cgr_id}
+			</if>
+			<if test="code!=null">
+				and code=#{code}
+			</if>
+		</where>
+</select>
+<insert id="addCodegenRule" parameterType="manager.common.codegen.model.CodegenRule" keyProperty="cgr_id" useGeneratedKeys="true">
+	<selectKey keyProperty="cgr_id" resultType="int" order="BEFORE">
+		select ifnull(max(cgr_id)+1,1) from t_sys_codegen_rule
+	</selectKey>
+	insert into t_sys_codegen_rule
+	(
+		cgr_id,
+		code,
+		name,
+		len,
+		is_valid,
+		create_dt,
+		creator
+	)
+	values
+	(
+		#{cgr_id},
+		#{code},
+		#{name},
+		#{len},
+		#{is_valid},
+		#{create_dt},
+		#{creator}
+	)
+</insert>
+<update id="updateCodegenRule" parameterType="manager.common.codegen.model.CodegenRule">
+	update t_sys_codegen_rule
+		set
+			cgr_id = #{cgr_id},
+			code = #{code},
+			name = #{name},
+			len = #{len},
+			is_valid = #{is_valid},
+			create_dt = #{create_dt},
+			creator = #{creator}
+		where cgr_id = #{cgr_id}
+</update>
+<delete id="deleteCodegenRule" parameterType="manager.common.codegen.model.CodegenRule">
+	delete from t_sys_codegen_rule
+	where cgr_id = #{cgr_id}
+</delete>
+</mapper>

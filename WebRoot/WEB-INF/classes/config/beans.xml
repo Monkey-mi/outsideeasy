@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+        
+    <context:property-placeholder location="classpath:config/*.properties" />
+  
+    <!--自动扫描该包下所有的组件,根据标注处理-->
+    <!-- enable autowire -->
+    <context:annotation-config /> 
+    
+    <context:component-scan base-package="manager,platform,usercenter,util,common,com.outsideasy.activemq" >
+    	<!-- 主容器不扫描控制器，避免  路径无法匹配 -->
+   		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+    <mvc:annotation-driven />
+
+    <!-- 开启定时器 -->
+    <task:annotation-driven/>
+    
+    <!-- 用apache的datasource -->
+    <bean id="dataSource"   class="util.db.XBasicDataSource" destroy-method="close"
+        p:driverClassName="${jdbc.driverClassName}"
+        p:url="${jdbc.databaseurl}"
+        p:username="${jdbc.username}"
+        p:password="${jdbc.password}" >
+        <property name="maxActive"><value>${jdbc.maxActive}</value></property>  
+        <property name="initialSize"><value>${jdbc.initialSize}</value></property>  
+        <property name="maxWait"><value>${jdbc.maxWait}</value></property>
+        <property name="maxIdle"><value>${jdbc.maxIdle}</value></property>
+        <property name="minIdle"><value>${jdbc.minIdle}</value></property>
+      <!-- 只要下面两个参数设置成小于8小时(MySql默认)，就能避免MySql的8小时自动断开连接问题  参数百度：DBCP-->
+        <property name="timeBetweenEvictionRunsMillis"><value>14400000</value></property><!-- 4小时 -->
+        <property name="minEvictableIdleTimeMillis"><value>108000000</value></property><!-- 3小时 -->
+        <property name="validationQuery"> 
+			<value>SELECT 1</value> 
+		</property> 
+		<property name="testOnBorrow"> 
+			<value>true</value> 
+		</property>
+    </bean>
+    <!-- define the SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="typeAliasesPackage" value="manager,platform,usercenter" />
+        <!-- 可以单独指定mybatis的配置文件，或者写在本文件里面。 用下面的自动扫描装配(推荐)或者单独mapper -->
+        <property name="configLocation" value="classpath:config/mybatis-config.xml" />
+    </bean>
+ 
+    <!-- scan for mappers and let them be autowired -->
+    <!-- 自动扫描并组装MyBatis的映射文件和接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="manager.*.*.data,manager.*.data,platform.*.*.data,platform.*.data,usercenter.*.data,usercenter.*.*.*.data,usercenter.*.*.data,common.*.data" />
+    </bean>
+
+    <!-- enable transaction demarcation with annotations 
+    <tx:annotation-driven transaction-manager="transactionManager"  />
+    -->
+    <!-- transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    
+    <!-- 拦截器方式配置事物 -->
+	<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="append*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="save*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="create*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="update*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="modify*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="edit*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="delete*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="remove*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="init" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="delAndInit" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="execute*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+			<tx:method name="test*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>		
+			<tx:method name="get*" propagation="REQUIRED" />
+			<tx:method name="find*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="load*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="search*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="datagrid*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+    <aop:config>
+		<aop:pointcut id="transactionPointcut" expression="execution(* *..*.service.*.*(..))" />
+		<aop:advisor pointcut-ref="transactionPointcut" advice-ref="transactionAdvice" />
+	</aop:config>
+	
+    <!-- AOP 相关 -->
+    <bean id="mapperInterceptor" class="util.db.MapperInterceptor">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <aop:config>
+        <aop:aspect ref="mapperInterceptor">
+            <aop:pointcut id="mapperPointcut" expression="execution(public * *.*..data.*.*(..))" />
+            <aop:around method="methodRound" pointcut-ref="mapperPointcut" />
+        </aop:aspect>
+    </aop:config>
+	<!-- 服务层统一异常处理-->
+    <bean id="exceptionAdvisor" class="util.web.ExceptionAdvisor">
+    </bean>
+    <aop:config>
+    	<aop:aspect ref="exceptionAdvisor">
+    		<aop:pointcut id="exceptionAdvisorPointcut" expression="execution(* *..*.service.*.*(..))" />
+    		<aop:after-throwing method="doAfterThrowing" pointcut-ref="exceptionAdvisorPointcut" throwing="ex"/>
+    	</aop:aspect>
+    </aop:config> 
+	<!-- 文件 上传 -->
+   	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="utf-8"></property>
+	</bean>
+	<bean class="util.UTF8StringBeanPostProcessor"></bean>
+	<!-- 全局统一异常处理 -->
+	<bean id="exceptionResolver" class="util.web.CustomSimpleMappingExceptionResolver">
+        <property name="defaultErrorView">  
+            <value>/error/500.html</value>
+        </property>  
+    	<property name="exceptionMappings">  
+	        <props>  
+	            <prop key="java.lang.Exception">/error/500.html</prop>
+	        </props>   
+	    </property>  
+	    <!-- 设置日志输出级别，不定义则默认不输出警告等错误日志信息 -->       
+         <property name="warnLogCategory" value="WARN"></property> 
+    </bean>  
+    
+</beans>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.contract.data.PfOrderRequirementMapper">
+
+
+<select id="getPfOrderRequirementList" parameterType="map" resultType="platform.contract.model.PfOrderRequirement">
+	select
+		t_order_requirement.order_req_id,
+		t_order_requirement.pur_order_id,
+		t_order_requirement.order_bh,
+		t_order_requirement.req_text,
+		t_order_requirement.source_type,
+		t_order_requirement.create_dt,
+		t_order_requirement.creator_id,
+		t_order_requirement.creator_name
+	from
+		t_order_requirement
+</select>
+<insert id="addPfOrderRequirement" parameterType="platform.contract.model.PfOrderRequirement" keyProperty="order_req_id" useGeneratedKeys="true">
+	insert into t_order_requirement
+	(
+		pur_order_id,
+		order_bh,
+		req_text,
+		source_type,
+		create_dt,
+		creator_id,
+		creator_name
+	)
+	values
+	(
+		#{ddbh},
+		#{htbh},
+		#{cgyq},
+		0,
+		#{create_dt},
+		#{pid},
+		#{create_name}
+	)
+</insert>
+<update id="updatePfOrderRequirement" parameterType="platform.contract.model.PfOrderRequirement">
+	update t_order_requirement
+		set
+			order_req_id = #{order_req_id},
+			pur_order_id = #{pur_order_id},
+			order_bh = #{order_bh},
+			req_text = #{req_text},
+			source_type = #{source_type},
+			create_dt = #{create_dt},
+			creator_id = #{creator_id},
+			creator_name = #{creator_name}
+		where order_req_id = #{order_req_id}
+</update>
+<delete id="deletePfOrderRequirement" parameterType="platform.contract.model.PfOrderRequirement">
+	delete from t_order_requirement
+	where order_req_id = #{order_req_id}
+</delete>
+</mapper>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.contract.data.PfContractAttachmentMapper">
+
+
+<select id="getPfContractAttachmentList" parameterType="map" resultType="platform.contract.model.PfContractAttachment">
+	select
+		dbo.cghtfjb.htbh,
+		dbo.cghtfjb.wjbh,
+		dbo.cghtfjb.fjlx,
+		dbo.cghtfjb.wjmc,
+		dbo.cghtfjb.scrq,
+		dbo.cghtfjb.cjrm,
+		dbo.cghtfjb.ptsc
+	from
+		dbo.cghtfjb
+</select>
+<insert id="addPfContractAttachment" parameterType="platform.contract.model.PfContractAttachment" keyProperty="" useGeneratedKeys="true">
+	insert into dbo.cghtfjb
+	(
+		htbh,
+		wjbh,
+		fjlx,
+		wjmc,
+		scrq,
+		cjrm,
+		ptsc
+	)
+	values
+	(
+		#{htbh},
+		#{wjbh},
+		#{fjlx},
+		#{wjmc},
+		#{scrq},
+		#{cjrm},
+		#{ptsc}
+	)
+</insert>
+<update id="updatePfContractAttachment" parameterType="platform.contract.model.PfContractAttachment">
+	update dbo.cghtfjb
+		set
+			htbh = #{htbh},
+			wjbh = #{wjbh},
+			fjlx = #{fjlx},
+			wjmc = #{wjmc},
+			scrq = #{scrq},
+			cjrm = #{cjrm},
+			ptsc = #{ptsc}
+		where  = #{}
+</update>
+<delete id="deletePfContractAttachment" parameterType="platform.contract.model.PfContractAttachment">
+	delete from dbo.cghtfjb
+	where  = #{}
+</delete>
+</mapper>

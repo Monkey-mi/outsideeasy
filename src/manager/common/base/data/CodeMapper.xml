@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.common.base.data.CodeMapper">
+  <sql id="selColumns">
+        cid,
+        type_code,
+        code,
+        name,
+        value,
+        order_seq,
+        attrib,
+        def_1,
+        def_2,
+        def_3
+  </sql>
+
+   <sql id="valueColumns">
+        #{type_code},
+        #{code},
+        #{name},
+        #{value},
+        #{order_seq},
+        #{attrib},
+        #{def_1},
+        #{def_2},
+        #{def_3}
+  </sql>
+
+	<select id="getCodeList" parameterType="map" resultType="Code">
+        select 
+               b.type_code type_code,
+               b.cid cid,
+               b.code code,
+               b.name name,
+               b.value value,
+               b.order_seq order_seq,
+	           b.attrib attrib,
+	           b.def_1 def_1,
+	           b.def_2 def_2,
+	           b.def_3 def_3
+        from t_sys_code_type a,t_sys_code b
+	            <where>
+	                a.type_code=b.type_code
+		            <if test="type_code != null">
+		                and a.type_code like '%${type_code}%'
+		            </if>
+		            <if test="type_attrib != null">
+		                and a.attrib like #{type_attrib}
+		            </if>
+		            <if test="code != null">
+		                and b.code like #{code}
+		            </if>
+		            <if test="name != null">
+		                and b.name like #{name}
+		            </if>
+		            <if test="value != null">
+		                and b.value like #{value}
+		            </if>
+		            <if test="attrib != null">
+		                and b.attrib like #{attrib}
+		            </if>
+		            <if test="cid!=null">
+		                and b.cid=#{cid}
+		            </if>
+	            </where>
+  </select >
+  
+    <select id="getCodeListBySearch" parameterType="map" resultType="Code">
+	  select <include refid="selColumns"/> 
+	  from  t_sys_code
+		  <where>
+			  <if test="type_code!=null">
+			  type_code=#{type_code}
+			  </if>
+			  <if test="name!=null">
+			  and name like #{name}
+			  </if>
+			  <if test="value!=null">
+			  and value like #{value}
+			  </if>
+			  <if test="code!=null">
+			  and code like #{code}
+			  </if>
+		  </where>
+  </select>
+  
+  <select id="getCodeCount" parameterType="map" resultType="int">
+        select count(0)
+        from t_sys_code_type a,t_sys_code b
+        <where>
+            a.type_code=b.type_code
+            <if test="type_code != null">
+                and a.type_code like '%${type_code}%'
+            </if>
+            <if test="type_attrib != null">
+                and a.attrib like #{type_attrib}
+            </if>
+            <if test="code != null">
+                and b.code like #{code}
+            </if>
+            <if test="name != null">
+                and b.name like #{name}
+            </if>
+            <if test="value != null">
+                and b.value like #{value}
+            </if>
+            <if test="attrib != null">
+                and b.attrib like #{attrib}
+            </if>
+        </where>
+  </select> 
+  
+  <insert id="addCode" parameterType="Code" keyProperty="cid" useGeneratedKeys="true">
+        insert into t_sys_code(
+        type_code,
+        code,
+        name,
+        value,
+        order_seq,
+        attrib,
+        def_1,
+        def_2,
+        def_3)
+        values(<include refid="valueColumns" />)
+  </insert>
+  <update id="updateCode" parameterType="Code">
+        update t_sys_code 
+        set type_code=#{type_code},
+            code    =#{code},
+            name    =#{name},
+            value   =#{value},
+            order_seq=#{order_seq},
+            attrib  =#{attrib},
+            def_1   =#{def_1},
+            def_2   =#{def_2},
+            def_3   =#{def_3}
+        where cid=#{cid}
+  </update>
+  <delete id="deleteCode" parameterType="Code">
+        delete from t_sys_code where type_code=#{type_code} and code=#{code}
+  </delete>
+  
+      <sql id="selCodeTypeCols">
+	        tcid,
+	        type_code,   
+	        name,
+	        attrib,
+	        def_1,
+	        def_2,
+	        remark,
+	        con_type,
+	        suit_type
+  	   </sql> 
+   <select id="getCodeTypeList" parameterType="map" resultType="CodeType">
+		select <include refid="selCodeTypeCols"/>
+        from t_sys_code_type
+		<where>
+			<if test="tcid!=null">
+				tcid=#{tcid}
+			</if>
+			<if test="type_code != null">
+                and type_code like '%${type_code}%'
+			</if>
+			<if test="level != null">
+            	and level=#{level}
+			</if>
+			<if test="name != null">
+                and name like #{name}
+			</if>
+			<if test="attrib != null">
+                and attrib like #{attrib}
+			</if>
+			<if test="def_1 != null">
+                and def_1 like #{def_1}
+			</if>
+			<if test="def_2 != null">
+                and def_2 like #{def_2}
+			</if>
+			<if test="remark != null">
+                and remark like #{remark}
+			</if>
+			<if test="is_senior!= null">
+			is_senior=#{is_senior}
+			</if>
+			<if test="suit_type!=null">
+			and suit_type=#{suit_type}
+			</if>
+		</where>
+  </select>
+  
+  <insert id="addCodeType" parameterType="CodeType" keyProperty="tcid" useGeneratedKeys="true">
+        insert into t_sys_code_type(type_code,name,
+        attrib,
+        def_1,
+        def_2,
+        remark,
+        con_type,
+        suit_type)
+        values( 
+                #{type_code},
+		        #{name},
+		        #{attrib},
+		        #{def_1},
+		        #{def_2},
+		        #{remark},
+		        #{con_type},
+		        #{suit_type}
+		)
+  </insert>
+  <update id="updateCodeType" parameterType="CodeType">
+        update t_sys_code_type set
+            type_code=#{type_code},
+            name     =#{name},
+            attrib   =#{attrib},
+            def_1    =#{def_1},
+            def_2    =#{def_2},
+            remark   =#{remark},
+            con_type =#{con_type},
+            suit_type=#{suit_type}
+        where tcid=#{tcid}
+  </update>
+  
+  <delete id="deleteCodeType" parameterType="CodeType">
+        delete from t_sys_code_type where tcid=#{tcid}
+  </delete>
+  
+  <delete id="deleteCodeTypeByType" parameterType="CodeType">
+        delete from t_sys_code_type where freg_id=#{freg_id}
+  </delete>
+  
+  <!--  基础数据帮助配置 -->
+ <select id="getCodeConfigList" parameterType="map" resultType="CodeConfig">
+    select id,name,code_type,type,displayField,valueField,con_type from t_sys_code_config
+    <where>
+    <if test="id!=null">
+    id=#{id}
+    </if>
+    <if test="code_type!=null">
+    and code_type like '%${code_type}%'
+    </if>
+    <if test="name!=null">
+    and name like '%${name}%'
+    </if>
+    <if test="type!=null">
+    and type=#{type}
+    </if>
+    </where>
+ </select>
+ <insert id="addCodeConfig" parameterType="CodeConfig" keyProperty="id" useGeneratedKeys="true">
+ insert  into t_sys_code_config (name,code_type,type,displayField,valueField,con_type)
+                    values(#{name},#{code_type},#{type},#{displayField},#{valueField},#{con_type})
+ </insert>
+ <update id="updateCodeConfig" parameterType="CodeConfig">
+ update t_sys_code_config set name=#{name},displayField=#{displayField},valueField=#{valueField},con_type=#{con_type}
+ where id=#{id}
+ </update>
+ <delete id="deleteCodeConfig" parameterType="CodeConfig">
+	 delete from t_sys_code_config
+	 <where>
+		 <if test="id!=null">
+		 	id=#{id}
+		 </if>
+	 </where>
+ </delete>
+ <delete id="deleteCodeConfigByCode" parameterType="map">
+ 	delete from t_sys_code_config 
+ 		where code = #{typecode}
+ </delete>
+  
+  <select id="getCodeTypeSuitList" parameterType="map" resultType="CodeType">
+ 		 select distinct suit_type from t_sys_code_type
+  </select>
+    <select id="getCodeTypeCount" parameterType="map" resultType="int">
+        select COUNT(*) FROM t_sys_code_type
+        <where>
+        	<if test="type_code != null">
+        		type_code=#{type_code}
+        	</if>
+        </where>
+  </select>
+</mapper>

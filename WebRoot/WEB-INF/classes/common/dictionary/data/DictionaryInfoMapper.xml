@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.dictionary.data.DictionaryInfoMapper">
+
+
+<select id="getDictionaryInfoList" parameterType="map" resultType="common.dictionary.model.DictionaryInfo">
+	select
+		t_dictionary_info.id,
+		t_dictionary_info.dictionary_key,
+		t_dictionary_info.dictionary_value
+	from
+		t_dictionary_info
+</select>
+<select id="getDictionaryInfo" parameterType="String" resultType="common.dictionary.model.DictionaryInfo">
+select
+		t_dictionary_info.id,
+		t_dictionary_info.dictionary_value
+	from
+		t_dictionary_info
+	where
+	    dictionary_key = #{key}
+</select>
+<insert id="addDictionaryInfo" parameterType="common.dictionary.model.DictionaryInfo" keyProperty="id" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_dictionary_info
+	(	
+		dictionary_key,
+		dictionary_value
+	)
+	values
+	(
+		#{dictionary_key},
+		#{dictionary_value}
+	)
+</insert>
+<update id="updateDictionaryInfo" parameterType="common.dictionary.model.DictionaryInfo">
+	update t_dictionary_info
+		set
+			dictionary_key = #{dictionary_key},
+			dictionary_value = #{dictionary_value}
+		where id = #{id}
+</update>
+<delete id="deleteDictionaryInfo" parameterType="common.dictionary.model.DictionaryInfo">
+	delete from t_dictionary_info
+	where id = #{id}
+</delete>
+</mapper>

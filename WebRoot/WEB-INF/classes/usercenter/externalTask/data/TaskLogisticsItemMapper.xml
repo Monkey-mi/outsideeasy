@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.TaskLogisticsItemMapper">
+
+
+<select id="getLogisticsItemList" parameterType="Integer" resultType="usercenter.externalTask.TaskResponse.LogisticsItemVo">
+	select
+		t_app_logistics_item.item_id,
+		t_app_logistics_item.record_id,
+		t_app_logistics_item.t_id,
+		t_app_logistics_item.goods_name,
+		t_app_logistics_item.deliver_no,
+		t_app_logistics_item.arrived_no,
+		t_app_logistics_item.receive_no,
+		t_app_logistics_item.receive_time,	
+		t_app_logistics_item.qc_state,
+		t_app_task_logistics.send_id
+	from
+		t_app_logistics_item
+		left join t_app_task_logistics on t_app_logistics_item.record_id = t_app_task_logistics.record_id
+		where 
+		t_app_logistics_item.t_id = #{t_id}
+		
+</select>
+<select id="getLogisticsItemForRecordId" parameterType="Integer" resultType="usercenter.externalTask.TaskResponse.LogisticsItemVo">
+	select
+		t_app_logistics_item.item_id,
+		
+		t_app_task_logistics.send_id
+	from
+		t_app_logistics_item
+		left join t_app_task_logistics on t_app_logistics_item.record_id = t_app_task_logistics.record_id
+		where 
+		t_app_logistics_item.record_id = #{record_id}
+		
+</select>
+<update id="updateLogisticsItemforId" parameterType="map">
+update t_app_logistics_item
+      set	
+            receive_no = #{receive_no},		
+			qc_state = #{qc_state}		
+	where 
+		    item_id = #{item_id}
+</update>
+<update id="updateLogisticsItemforQc" parameterType="map">
+update t_app_logistics_item
+      set	
+            receive_no = #{receive_no}	
+	where 
+		    item_id = #{item_id}
+</update>
+<select id="getLogisticsItemforState" parameterType="Integer" resultType="usercenter.externalTask.TaskResponse.LogisticsItemVo">
+	select
+	    t_app_task_logistics.t_id,
+		t_app_task_logistics.send_id,
+		t_app_logistics_item.item_id
+	from
+		t_app_logistics_item
+		left join t_app_task_logistics on t_app_logistics_item.record_id = t_app_task_logistics.record_id
+		where 1=1
+		and t_app_logistics_item.qc_state = 0
+	
+		and t_app_logistics_item.t_id = #{t_id}
+		
+</select>
+<insert id="addLogisticsItem" parameterType="map" keyProperty="item_id" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="item_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_logistics_item
+	(
+	
+		record_id,
+		t_id,
+		goods_name,
+		deliver_no,
+		arrived_no,
+		receive_no,
+		qc_state,
+		receive_time
+	)
+	values
+	(
+		
+		#{record_id},
+		#{t_id},
+		#{goods_name},
+		#{deliver_no},
+		#{arrived_no},
+		#{receive_no},
+		#{qc_state},
+		#{receive_time}
+	)
+</insert>
+<update id="updateAppLogisticsItem" parameterType="usercenter.externalTask.model.TaskLogisticsItem">
+	update t_app_logistics_item
+		set
+			item_id = #{item_id},
+			t_id = #{t_id},
+			record_id = #{record_id},
+			goods_name = #{goods_name},
+			deliver_no = #{deliver_no},
+			arrived_no = #{arrived_no},
+			receive_no = #{receive_no},
+			qc_state = #{qc_state},
+			receive_time = #{receive_time}
+		where item_id = #{item_id}
+</update>
+<delete id="deleteAppLogisticsItem" parameterType="Integer">
+	delete from t_app_logistics_item
+	where item_id = #{item_id}
+</delete>
+<select id="getLogisticsItemforCount" parameterType="map" resultType="usercenter.externalTask.model.TaskLogisticsItem">
+select 
+      t_app_logistics_item.item_id,
+      t_app_logistics_item.arrived_no
+ from 
+    t_app_logistics_item
+ where
+    item_id = #{item_id} 
+
+</select>
+<select id="getTaskItemForRecordId" parameterType="Integer" resultType = "Integer">
+ select count(0)
+ from 
+    t_app_logistics_item
+ where
+     record_id = #{record_id}
+
+</select>
+<select id="getQcState" parameterType="map" resultType="String">
+  select 
+     t_app_logistics_item.qc_state
+ from 
+    t_app_logistics_item
+ where
+     item_id = #{item_id}
+
+</select>
+</mapper>

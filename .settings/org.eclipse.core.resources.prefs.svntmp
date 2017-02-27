@@ -1,0 +1,13 @@
+eclipse.preferences.version=1
+encoding//WebRoot/newresources/css/task.css=UTF-8
+encoding//WebRoot/platform/top.jsp=UTF-8
+encoding//WebRoot/usercenter/accountManage/registerInfo.jsp=UTF-8
+encoding//WebRoot/usercenter/companyManage/companyLeftMenu.jsp=UTF-8
+encoding//WebRoot/usercenter/outsourceTaskManage/connection.jsp=UTF-8
+encoding//WebRoot/usercenter/outsourceTaskManage/deliveredInfo.jsp=UTF-8
+encoding//WebRoot/usercenter/outsourceTaskManage/js/taskInfoJs.jsp=UTF-8
+encoding//WebRoot/usercenter/outsourceTaskManage/taskInfo.jsp=UTF-8
+encoding//WebRoot/usercenter/outsourceTaskManage/taskList.jsp=UTF-8
+encoding//src/config/ffmpeg.properties=UTF-8
+encoding//src/log4j.properties=UTF-8
+encoding/<project>=UTF-8

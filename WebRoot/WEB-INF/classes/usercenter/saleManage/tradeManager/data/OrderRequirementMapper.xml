@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.tradeManager.data.OrderRequirementMapper">
+
+
+<select id="getOrderRequirement" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderRequirement">
+	select
+		t_order_requirement.order_req_id,
+		t_order_requirement.pur_order_id,
+		t_order_requirement.order_bh,
+		t_order_requirement.req_text,
+		t_order_requirement.contract_terms,
+		t_order_requirement.source_type,
+		t_order_requirement.create_dt,
+		t_order_requirement.creator_id,
+		t_order_requirement.creator_name
+	from
+		t_order_requirement
+	where pur_order_id = #{pur_order_id}
+	    limit 0,1
+</select>
+<insert id="addOrderRequirement" parameterType="usercenter.saleManage.tradeManager.model.OrderRequirement" keyProperty="order_req_id" useGeneratedKeys="true">
+	insert into t_order_requirement
+	(
+		order_req_id,
+		pur_order_id,
+		order_bh,
+		req_text,
+		source_type,
+		create_dt,
+		creator_id,
+		creator_name
+	)
+	values
+	(
+		#{order_req_id},
+		#{pur_order_id},
+		#{order_bh},
+		#{req_text},
+		#{source_type},
+		#{create_dt},
+		#{creator_id},
+		#{creator_name}
+	)
+</insert>
+<update id="updateOrderRequirement" parameterType="usercenter.saleManage.tradeManager.model.OrderRequirement">
+	update t_order_requirement
+		set
+			order_req_id = #{order_req_id},
+			pur_order_id = #{pur_order_id},
+			order_bh = #{order_bh},
+			req_text = #{req_text},
+			source_type = #{source_type},
+			create_dt = #{create_dt},
+			creator_id = #{creator_id},
+			creator_name = #{creator_name}
+		where order_req_id = #{order_req_id}
+</update>
+<delete id="deleteOrderRequirement" parameterType="usercenter.saleManage.tradeManager.model.OrderRequirement">
+	delete from t_order_requirement
+	where order_req_id = #{order_req_id}
+</delete>
+</mapper>

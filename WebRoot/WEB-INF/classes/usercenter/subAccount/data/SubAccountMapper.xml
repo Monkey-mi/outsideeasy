@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.subAccount.data.SubAccountMapper">
+
+<select id="getSubAccountList" parameterType="map" resultType="usercenter.subAccount.model.SubAccount">
+	select
+		t_app_sub_account.sa_id,
+		t_app_sub_account.reg_id,
+		t_app_sub_account.org_id,
+		t_app_sub_account.role_id,
+		t_app_sub_account.sa_name,
+		t_app_sub_account.phone,
+		t_app_sub_account.sa_password,
+		t_app_sub_account.enabled,
+		t_app_sub_account.create_date,
+		t_app_sub_account.username,
+		t_app_sub_account.last_login_ip,
+		t_app_organization.name as org_name
+	from
+		t_app_sub_account
+	left join t_app_organization on t_app_organization.org_id=t_app_sub_account.org_id
+	where 1=1
+	and is_delete=0
+    <if test="reg_id!=null and reg_id!=''">
+       and t_app_sub_account.reg_id =#{reg_id}
+    </if>
+    <if test="org_id!=null and org_id!=''">
+       and t_app_sub_account.org_id =#{org_id}
+    </if>
+    <if test="sa_name!=null and sa_name!=''">
+       and t_app_sub_account.sa_name =#{sa_name}
+    </if>
+    <if test="sa_password!=null and sa_password!=''">
+       and t_app_sub_account.sa_password =#{sa_password}
+    </if>
+    order by org_name
+</select>
+<select id="getSubAccountListByReg_id_count" parameterType="map" resultType="java.lang.Integer">
+	select
+		count(0)
+	from
+		t_app_sub_account
+	left join t_sys_role on t_sys_role.role_id=t_app_sub_account.role_id
+	where 1=1
+	and is_delete=0
+    <if test="reg_id!=null and reg_id!=''">
+       and t_app_sub_account.reg_id =#{reg_id}
+    </if>
+    <if test="org_id!=null and org_id!=''">
+       and t_app_sub_account.org_id = #{org_id}
+    </if>
+    <if test="nodeForGrid!=null and nodeForGrid!=''">
+       and t_app_sub_account.org_id IN (select org_id from t_app_organization where parentId=#{nodeForGrid})
+    </if>
+    <if test="leafNodeForGrid!=null and leafNodeForGrid!=''">
+       and t_app_sub_account.org_id = #{leafNodeForGrid}
+    </if>
+     order by create_date desc
+</select>
+<select id="getSubAccountListByReg_id" parameterType="map" resultType="usercenter.subAccount.model.SubAccount">
+	select 
+		t_app_sub_account.sa_id,
+		t_app_sub_account.reg_id,
+		t_app_sub_account.org_id,
+		t_app_sub_account.role_id,
+		t_app_sub_account.sa_name,
+		t_app_sub_account.phone,
+		t_app_sub_account.sa_password,
+		t_app_sub_account.enabled,
+		t_app_sub_account.create_date,
+		t_app_sub_account.username,
+		t_app_sub_account.last_login_ip,
+		t_sys_role.role_name,
+		t_sys_role.role_desc
+	from
+		t_app_sub_account
+	left join t_sys_role on t_sys_role.role_id=t_app_sub_account.role_id
+	where 1=1
+	and is_delete=0
+    <if test="reg_id!=null and reg_id!=''">
+       and t_app_sub_account.reg_id =#{reg_id}
+    </if>
+    <if test="org_id!=null and org_id!=''">
+       and t_app_sub_account.org_id = #{org_id}
+    </if>
+    <if test="condition!=null and condition!=''">
+       and (t_app_sub_account.username like '%${condition}%'  or  t_app_sub_account.sa_name like '%${condition}%' )
+    </if>
+    order by create_date desc
+</select>
+<select id="getSubAccountBysa_id" parameterType="map" resultType="usercenter.subAccount.model.SubAccount">
+	select *
+	from
+		t_app_sub_account
+	where sa_id=#{sa_id}
+	and is_delete=0
+</select>
+<insert id="addSubAccount" parameterType="usercenter.subAccount.model.SubAccount">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="sa_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_sub_account
+	(
+		
+		reg_id,
+		org_id,
+		role_id,
+		sa_name,
+		phone,
+		sa_password,
+		enabled,
+		create_date,
+		username,
+		last_login_ip
+	)
+	values
+	(
+		
+		#{reg_id},
+		#{org_id},
+		#{role_id},
+		#{sa_name},
+		#{phone},
+		#{sa_password},
+		#{enabled},
+		#{create_date},
+		#{username},
+		#{last_login_ip}
+	)
+</insert>
+
+<!-- 更新子账号  -->
+<update id="updateSubAccount" parameterType="usercenter.subAccount.model.SubAccount">
+	update t_app_sub_account
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="org_id != '' and org_id != null">
+			org_id = #{org_id},
+			</if>
+			<if test="role_id != '' and role_id != null">
+			role_id = #{role_id},
+			</if>
+			<if test="sa_name != '' and sa_name != null">
+			sa_name = #{sa_name},
+			</if>
+			<if test="phone != '' and phone != null">
+			phone = #{phone},
+			</if>
+			<if test="enabled != '' and enabled != null">
+			enabled = #{enabled},
+			</if>
+			<if test="username != '' and username != null">
+			username = #{username},
+			</if>
+			<if test="last_login_ip != '' and last_login_ip != null">
+			last_login_ip = #{last_login_ip}
+			</if>
+		</trim>
+		where sa_id = #{sa_id}
+</update>
+
+<delete id="deleteSubAccount" parameterType="map">
+	update t_app_sub_account  set  is_delete=1
+	where sa_id = #{sa_id}
+</delete>
+
+<select id="findSubAccountByorg_id" parameterType="map" resultType="java.lang.Integer">
+	select count(*)
+	from t_app_sub_account
+	where org_id =#{org_id} 
+	and is_delete=0
+</select>
+
+<select id="findSubAccountByreg_id" parameterType="map" resultType="java.lang.Integer">
+	select count(*)
+	from t_app_sub_account
+	where reg_id =#{reg_id} 
+	and is_delete=0
+</select>
+
+<!-- 根据子账号名判断其是否存在 -->
+<select id="findSubAccountByName" parameterType="map" resultType="java.lang.Integer">
+	select count(*)
+	from t_app_sub_account
+	where sa_name =#{sa_name} 
+	and is_delete=0
+</select>
+
+<!-- 根据子账号名获取子账号信息 mishengliang 2016-05-16-->
+<select id="getSubAccountByName" parameterType="map" resultType="usercenter.subAccount.model.SubAccount">
+	select 
+		sa_id,
+		reg_id,
+		org_id,
+		role_id,
+		sa_name,
+		sa_password,
+		enabled,
+		create_date,
+		username,
+		phone,
+		last_login_ip
+	from 
+		t_app_sub_account
+	where 
+		sa_name =#{sa_name} 
+		and is_delete=0
+</select>
+
+<update id="updateResetPassword" parameterType="map">
+	update t_app_sub_account
+		set
+			sa_password=#{sa_password}
+		where sa_id = #{sa_id}
+</update>
+
+<update id="updateSubAccoutPsw" parameterType="usercenter.subAccount.model.SubAccount">
+	update 
+		t_app_sub_account
+	set
+		sa_password = #{sa_password}
+	where
+		sa_name = #{sa_name}
+</update>
+
+<!-- 更新账户上次登录IP -->
+<update id="updateLastIpAddress" parameterType="map">
+	update 
+		t_app_sub_account
+	set
+		last_login_ip = #{lastLoginIp}
+	where
+		sa_name = #{saName}
+</update>
+
+<select id="checkMobileExist" parameterType="map" resultType="java.lang.Integer">
+	select count(*)
+	from t_app_sub_account
+	where phone =#{mobile} 
+	and is_delete=0
+</select>
+</mapper>

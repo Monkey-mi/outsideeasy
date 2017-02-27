@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.basicdata.tradeClass.data.TradeClassMapper">
+
+
+<select id="getTradeClassList" parameterType="map" resultType="manager.basicdata.tradeClass.model.TradeClass">
+	select
+		t_trade_class.class_id,
+		t_trade_class.class_name,
+		t_trade_class.leaf,
+		t_trade_class.f_id
+	from
+		t_trade_class
+	where 1=1
+	<if test="node!=null">
+		and t_trade_class.f_id=#{node}
+	</if>
+	<if test="nodeIdForGrid!=null">
+		and (t_trade_class.f_id=#{nodeIdForGrid} or t_trade_class.class_id=#{nodeIdForGrid})
+	</if>
+	<if test="class_name!=null">
+		and t_trade_class.class_name=#{class_name}
+	</if>
+</select>
+<insert id="addTradeClass" parameterType="manager.basicdata.tradeClass.model.TradeClass" keyProperty="class_id" useGeneratedKeys="true">
+	<selectKey keyProperty="class_id" resultType="int" order="BEFORE">
+		select  ifnull(max(class_id)+1,1) from t_trade_class 		
+	</selectKey>
+	insert into t_trade_class
+	(
+		class_id,
+		class_name,
+		leaf,
+		f_id
+	)
+	values
+	(
+		#{class_id},
+		#{class_name},
+		#{leaf},
+		#{f_id}
+	)
+</insert>
+<update id="updateTradeClass" parameterType="manager.basicdata.tradeClass.model.TradeClass">
+	update t_trade_class
+		set
+			class_id = #{class_id},
+			class_name = #{class_name},
+			leaf=#{leaf},
+			f_id = #{f_id}
+		where class_id = #{class_id}
+</update>
+<delete id="deleteTradeClass" parameterType="manager.basicdata.tradeClass.model.TradeClass">
+	delete from t_trade_class
+	where class_id = #{class_id}
+</delete>
+
+<select id="getCountForAdd" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_trade_class where f_id =#{f_id} and class_name=#{class_name}
+</select>
+
+<select id="getCountForUpdate" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_trade_class where f_id =#{f_id} and class_name=#{class_name} and class_id != #{class_id}
+</select>
+
+<select id="getXiajiCount" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_trade_class where f_id =#{class_id}
+</select>
+</mapper>

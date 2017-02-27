@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AccessInvoiceTitleMapper">
+
+
+<select id="getAccessInvoiceTitleList" parameterType="map" resultType="usercenter.saleManage.model.AccessInvoiceTitle">
+	select
+		t_access_application_invoice_title.invoice_title_id,
+		t_access_application_invoice_title.invoice_title_name,
+		t_access_application_invoice_title.default_id,
+		t_access_application_invoice_title.invoice_title_sts,
+		t_access_application_invoice_title.app_invoice_title_id,
+		t_access_application_invoice_title.create_dt,
+		t_access_application_invoice_title.record_id
+	from
+		t_access_application_invoice_title
+		<where>
+		<if test="record_id!=null or supplier_id!=null">
+			and (record_id=#{record_id} or supplier_id=#{supplier_id})
+		</if>
+		<if test="app_invoice_title_id!=null">
+			and app_invoice_title_id=#{app_invoice_title_id}
+		</if>
+		</where>
+</select>
+<insert id="addAccessInvoiceTitle" parameterType="map" keyProperty="invoice_title_id" useGeneratedKeys="true">
+	insert into t_access_application_invoice_title
+	(
+		invoice_title_name,
+		default_id,
+		invoice_title_sts,
+		app_invoice_title_id,
+		record_id,
+		supplier_id
+	)
+	values
+	(
+		#{invoice_title_name},
+		#{default_id},
+		#{invoice_title_sts},
+		#{app_invoice_title_id},
+		#{record_id},
+		#{supplier_id}
+	)
+</insert>
+<update id="updateAccessInvoiceTitle" parameterType="map">
+	update t_access_application_invoice_title
+		set
+			invoice_title_id = #{invoice_title_id},
+			invoice_title_name = #{invoice_title_name},
+			default_id = #{default_id},
+			invoice_title_sts = #{invoice_title_sts},
+			app_invoice_title_id = #{app_invoice_title_id},
+			record_id = #{record_id}
+		where invoice_title_id = #{invoice_title_id}
+</update>
+<delete id="deleteAccessInvoiceTitle" parameterType="map">
+	delete from t_access_application_invoice_title
+	where invoice_title_id = #{invoice_title_id}
+</delete>
+<delete id="deleteAccessInvoiceTitleByRI" parameterType="map">
+	delete from t_access_application_invoice_title
+	where record_id = #{record_id}
+</delete>
+</mapper>

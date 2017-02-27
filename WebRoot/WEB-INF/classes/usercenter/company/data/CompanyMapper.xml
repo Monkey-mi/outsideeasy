@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.company.data.CompanyMapper">
+
+<select id="getSupplierFileList" parameterType="map" resultType="usercenter.company.model.Company">
+	select
+		t_app_company_info.company_id,
+		t_app_company_info.class_id,
+		t_app_company_info.nature_id,
+		t_app_company_info.apply_sts,
+		t_app_company_info.cpyname_en,
+		t_app_company_info.cpyname_cn,
+		t_app_company_info.reg_addr_code,
+		t_app_company_info.reg_addr,
+		t_app_company_info.contact_addr_code,
+		t_app_company_info.industry_id,
+		t_app_company_info.contact_addr,
+		t_app_company_info.f_phone,
+		t_app_company_info.corporation,
+		t_app_company_info.contacts,
+		t_app_company_info.m_phone,
+		t_app_company_info.fax,
+		t_app_company_info.email,
+		t_app_company_info.bus_license,
+		t_app_company_info.tax_no,
+		t_app_company_info.reg_fund,
+		t_app_company_info.taxman_id,
+		t_app_company_info.currency_id,
+		t_app_company_info.establish_dt,
+		t_app_company_info.emplyees,
+		t_app_company_info.college_num,
+		t_app_company_info.op_num,
+		t_app_company_info.tech_num,
+		t_app_company_info.qc_num,
+		t_app_company_info.staff_num,
+		t_app_company_info.qe_num,
+		t_app_company_info.company_area,
+		t_app_company_info.factory_area,
+		t_app_company_info.factory_owner,
+		t_app_company_info.use_begintime,
+		t_app_company_info.use_endtime,
+		t_app_company_info.turnover,
+		t_app_company_info.turnover_currency_id,
+		t_app_company_info.certification_system,
+		t_app_company_info.create_dt,
+		t_app_company_info.ip_addr,
+		t_app_company_info.checked_date,
+		t_app_company_info.version,
+		t_app_company_info.lng,
+		t_app_company_info.lat,
+		t_app_company_info.is_oem,
+		t_app_company_info.key_remark,
+		t_app_company_info.manage_score,
+		t_app_company_info.improve_score,
+		t_app_company_info.area_score,
+		t_app_company_info.exploit_score,
+		t_app_company_info.storage_score,
+		t_app_company_info.equ_score,
+		t_app_company_info.tec_score,
+		t_app_company_info.pro_file_score,
+		t_app_company_info.research_score,
+		t_app_company_info.reject_score,
+		t_app_company_info.quality_score,
+		t_app_company_info.qc_score,
+		t_app_company_info.filesave_score,
+		t_app_company_info.total_score,
+		t_app_company_info.is_archive,
+		t_app_company_info.is_delete,
+		t_app_company_info.operator,
+		t_app_company_info.operater_dt,
+		t_app_company_info.auditor,
+		t_app_company_info.audit_dt,
+		t_app_company_info.is_chinese,
+		t_app_company_info.mc_id_1,
+		t_app_company_info.mc_name_1,
+		t_app_company_info.mc_id_2,
+		t_app_company_info.mc_name_2,
+		t_app_company_info.mc_id_3,
+		t_app_company_info.mc_name_3
+	from
+		t_app_company_info
+	where 1=1
+	<if test="company_id!=null">
+		and t_app_company_info.company_id=#{company_id}
+	</if>
+</select>
+<insert id="addSupplierFile" parameterType="usercenter.company.model.Company" keyProperty="company_id" useGeneratedKeys="true">
+	insert into t_app_company_info
+	(
+		company_id,
+		class_id,
+		nature_id,
+		apply_sts,
+		cpyname_en,
+		cpyname_cn,
+		reg_addr_code,
+		reg_addr,
+		contact_addr_code,
+		industry_id,
+		contact_addr,
+		f_phone,
+		corporation,
+		contacts,
+		m_phone,
+		fax,
+		email,
+		bus_license,
+		tax_no,
+		reg_fund,
+		taxman_id,
+		currency_id,
+		establish_dt,
+		emplyees,
+		college_num,
+		op_num,
+		tech_num,
+		qc_num,
+		staff_num,
+		qe_num,
+		company_area,
+		factory_area,
+		factory_owner,
+		use_begintime,
+		use_endtime,
+		turnover,
+		turnover_currency_id,
+		certification_system,
+		create_dt,
+		ip_addr,
+		checked_date,
+		version,
+		lng,
+		lat,
+		is_oem,
+		key_remark,
+		manage_score,
+		improve_score,
+		area_score,
+		exploit_score,
+		storage_score,
+		equ_score,
+		tec_score,
+		pro_file_score,
+		research_score,
+		reject_score,
+		quality_score,
+		qc_score,
+		filesave_score,
+		total_score,
+		is_archive,
+		is_delete,
+		operator,
+		operater_dt,
+		auditor,
+		audit_dt,
+		is_chinese,
+		mc_id_1,
+		mc_name_1,
+		mc_id_2,
+		mc_name_2,
+		mc_id_3,
+		mc_name_3
+	)
+	values
+	(
+		#{company_id},
+		#{class_id},
+		#{nature_id},
+		#{apply_sts},
+		#{cpyname_en},
+		#{cpyname_cn},
+		#{reg_addr_code},
+		#{reg_addr},
+		#{contact_addr_code},
+		#{industry_id},
+		#{contact_addr},
+		#{f_phone},
+		#{corporation},
+		#{contacts},
+		#{m_phone},
+		#{fax},
+		#{email},
+		#{bus_license},
+		#{tax_no},
+		#{reg_fund},
+		#{taxman_id},
+		#{currency_id},
+		#{establish_dt},
+		#{emplyees},
+		#{college_num},
+		#{op_num},
+		#{tech_num},
+		#{qc_num},
+		#{staff_num},
+		#{qe_num},
+		#{company_area},
+		#{factory_area},
+		#{factory_owner},
+		#{use_begintime},
+		#{use_endtime},
+		#{turnover},
+		#{turnover_currency_id},
+		#{certification_system},
+		#{create_dt},
+		#{ip_addr},
+		#{checked_date},
+		#{version},
+		#{lng},
+		#{lat},
+		#{is_oem},
+		#{key_remark},
+		#{manage_score},
+		#{improve_score},
+		#{area_score},
+		#{exploit_score},
+		#{storage_score},
+		#{equ_score},
+		#{tec_score},
+		#{pro_file_score},
+		#{research_score},
+		#{reject_score},
+		#{quality_score},
+		#{qc_score},
+		#{filesave_score},
+		#{total_score},
+		#{is_archive},
+		#{is_delete},
+		#{operator},
+		#{operater_dt},
+		#{auditor},
+		#{audit_dt},
+		#{is_chinese},
+		#{mc_id_1},
+		#{mc_name_1},
+		#{mc_id_2},
+		#{mc_name_2},
+		#{mc_id_3},
+		#{mc_name_3}
+	)
+</insert>
+<update id="updateSupplierFile"  parameterType="usercenter.company.model.Company">
+	update t_app_company_info
+		set
+			company_id = #{company_id},
+			class_id = #{class_id},
+			nature_id = #{nature_id},
+			apply_sts = #{apply_sts},
+			cpyname_en = #{cpyname_en},
+			cpyname_cn = #{cpyname_cn},
+			reg_addr_code = #{reg_addr_code},
+			reg_addr = #{reg_addr},
+			contact_addr_code = #{contact_addr_code},
+			industry_id = #{industry_id},
+			contact_addr = #{contact_addr},
+			f_phone = #{f_phone},
+			corporation = #{corporation},
+			contacts = #{contacts},
+			m_phone = #{m_phone},
+			fax = #{fax},
+			email = #{email},
+			bus_license = #{bus_license},
+			tax_no = #{tax_no},
+			reg_fund = #{reg_fund},
+			taxman_id = #{taxman_id},
+			currency_id = #{currency_id},
+			establish_dt = #{establish_dt},
+			emplyees = #{emplyees},
+			college_num = #{college_num},
+			op_num = #{op_num},
+			tech_num = #{tech_num},
+			qc_num = #{qc_num},
+			staff_num = #{staff_num},
+			qe_num = #{qe_num},
+			company_area = #{company_area},
+			factory_area = #{factory_area},
+			factory_owner = #{factory_owner},
+			use_begintime = #{use_begintime},
+			use_endtime = #{use_endtime},
+			turnover = #{turnover},
+			turnover_currency_id = #{turnover_currency_id},
+			certification_system = #{certification_system},
+			create_dt = #{create_dt},
+			ip_addr = #{ip_addr},
+			checked_date = #{checked_date},
+			version = #{version},
+			lng = #{lng},
+			lat = #{lat},
+			is_oem = #{is_oem},
+			key_remark = #{key_remark},
+			manage_score = #{manage_score},
+			improve_score = #{improve_score},
+			area_score = #{area_score},
+			exploit_score = #{exploit_score},
+			storage_score = #{storage_score},
+			equ_score = #{equ_score},
+			tec_score = #{tec_score},
+			pro_file_score = #{pro_file_score},
+			research_score = #{research_score},
+			reject_score = #{reject_score},
+			quality_score = #{quality_score},
+			qc_score = #{qc_score},
+			filesave_score = #{filesave_score},
+			total_score = #{total_score},
+			is_archive = #{is_archive},
+			is_delete = #{is_delete},
+			operator = #{operator},
+			operater_dt = #{operater_dt},
+			auditor = #{auditor},
+			audit_dt = #{audit_dt},
+			is_chinese = #{is_chinese},
+			mc_id_1 = #{mc_id_1},
+			mc_name_1 = #{mc_name_1},
+			mc_id_2 = #{mc_id_2},
+			mc_name_2 = #{mc_name_2},
+			mc_id_3 = #{mc_id_3},
+			mc_name_3 = #{mc_name_3}
+		where company_id = #{company_id}
+</update>
+<delete id="deleteSupplierFile" parameterType="usercenter.company.model.Company">
+	delete from t_app_company_info
+	where company_id = #{company_id}
+</delete>
+
+<!-- 当前业务需求为：admin账号查询所有的供应商； 非admin查询自己所有的客户； -->
+<!-- 获取公司的简略信息  -->
+<select id="getCompanySimpleInfo" parameterType="map" resultType="usercenter.company.model.CompanySimpleInfo">
+	SELECT 
+		t_app_company_info.company_id, 
+		t_app_company_info.cpyname_cn, 
+		t_app_company_info.contact_addr,
+		t_app_company_info.f_phone,
+		t_app_company_info.email,
+		t_app_company_info.fax, 
+		t_app_company_info.key_remark,
+		t_app_company_info.apply_sts,
+		t_app_company_info.lng,
+		t_app_company_info.lat
+	FROM
+		t_app_company_info
+		 <if test="accountRole != 5"><!-- 不是超级账号，只能看到自己的供应商 -->
+			,t_supplier_owner_info
+			,t_reg_accout_company_info
+			,t_supplier_files
+		 </if>
+	WHERE 
+		1=1
+	<if test="applySts != null">
+	AND
+		apply_sts = #{applySts}
+ 	</if>	
+ 	<if test="addrNum != null">
+	AND
+		floor(contact_addr_code/#{addrNum}) = 1
+	AND
+		<![CDATA[ contact_addr_code % #{addrNum} < #{regionCode} ]]>
+ 	</if>
+    <if test="classString != null and classString != '' and tradeClassOrCompanyName != '' and tradeClassOrCompanyName != null">
+    AND(	
+    	cpyname_cn LIKE CONCAT('%',#{tradeClassOrCompanyName},'%')
+	OR
+		class_id in
+		<foreach collection="classString" item="classString" index="index" open="(" separator=", " close=")">
+       		#{classString}
+    	</foreach>
+    	)
+    </if>
+    <if test="accountRole != 5">
+    		AND
+			 t_reg_accout_company_info.reg_id = #{mainAccountId}
+			 AND 
+			 t_supplier_files.company_id = t_reg_accout_company_info.company_id 
+			 AND 
+			 t_supplier_files.supplier_id = t_supplier_owner_info.supplier_id 
+			 AND 
+			 t_supplier_owner_info.company_id = t_app_company_info.company_id
+    </if>
+	LIMIT #{start},#{limit}	
+</select>
+
+<!-- 根据条件查询公司总数 只有实名入驻的企业才会查询 -->
+<!-- <select id="getTotalNum" parameterType="map" resultType="java.lang.Integer">
+	SELECT 
+		count(*)
+	FROM
+		t_app_company_info
+		 <if test="accountRole != 5">
+			,t_supplier_owner_info
+			,t_reg_accout_company_info
+			,t_supplier_files
+		 </if>
+	WHERE
+		1=1
+	<if test="applySts != null">
+	AND
+		apply_sts = #{applySts}
+	</if>	
+	<if test="addrNum != null">
+	AND
+		floor(contact_addr_code/#{addrNum}) = 1
+	AND
+		<![CDATA[ contact_addr_code % #{addrNum} < #{regionCode} ]]>
+	</if>
+    <if test="classString != null and classString != '' and tradeClassOrCompanyName != '' and tradeClassOrCompanyName != null">
+    AND(	
+    	cpyname_cn LIKE CONCAT('%',#{tradeClassOrCompanyName},'%')
+	OR
+		class_id in
+		<foreach collection="classString" item="classString" index="index" open="(" separator=", " close=")">
+       		#{classString}
+    	</foreach>
+    	)
+    </if>
+    <if test="accountRole != 5">
+    		AND
+			 t_reg_accout_company_info.reg_id = #{mainAccountId}
+			 AND 
+			 t_supplier_files.company_id = t_reg_accout_company_info.company_id 
+			 AND 
+			 t_supplier_files.supplier_id = t_supplier_owner_info.supplier_id 
+			 AND 
+			 t_supplier_owner_info.company_id = t_app_company_info.company_id
+    </if>
+</select> -->
+<!-- 根据条件查询公司总数 只有实名入驻的企业才会查询 -->
+<select id="getTotalNum" parameterType="map" resultType="java.lang.Integer">
+	SELECT 
+		count(*)
+	FROM
+		t_app_company_info
+		 <if test="accountRole != 5"><!-- 不是超级账号，只能看到自己的供应商 -->
+			,t_supplier_owner_info
+			,t_reg_accout_company_info
+			,t_supplier_files
+		 </if>
+	WHERE 
+		1=1
+	<if test="applySts != null">
+	AND
+		apply_sts = #{applySts}
+ 	</if>	
+ 	<if test="addrNum != null">
+	AND
+		floor(contact_addr_code/#{addrNum}) = 1
+	AND
+		<![CDATA[ contact_addr_code % #{addrNum} < #{regionCode} ]]>
+ 	</if>
+    <if test="classString != null and classString != '' and tradeClassOrCompanyName != '' and tradeClassOrCompanyName != null">
+    AND(	
+    	cpyname_cn LIKE CONCAT('%',#{tradeClassOrCompanyName},'%')
+	OR
+		class_id in
+		<foreach collection="classString" item="classString" index="index" open="(" separator=", " close=")">
+       		#{classString}
+    	</foreach>
+    	)
+    </if>
+    <if test="accountRole != 5">
+    		AND
+			 t_reg_accout_company_info.reg_id = #{mainAccountId}
+			 AND 
+			 t_supplier_files.company_id = t_reg_accout_company_info.company_id 
+			 AND 
+			 t_supplier_files.supplier_id = t_supplier_owner_info.supplier_id 
+			 AND 
+			 t_supplier_owner_info.company_id = t_app_company_info.company_id
+    </if>
+</select>
+
+<!-- 查询行业信息  -->
+<select id="getTradeClassByCompanyId" parameterType="java.lang.Integer" resultType="java.lang.String">
+	select 
+		tc.class_name
+	from
+		t_trade_class tc,
+		t_app_company_info sf
+	where
+		sf.class_id = tc.class_id
+		and
+		sf.company_id = #{companyId}
+</select>
+
+<!-- 查询销售条目信息 -->
+<select id="getSaleItemByCompanyId" parameterType="java.lang.Integer" resultType="java.lang.String">
+	select 
+		goods_name
+	from 
+		t_app_goods
+	where 
+		company_id = #{companyId}
+</select>
+
+<!-- 查询购买业务信息  -->
+<select id="getBuyItemByCompanyId" parameterType="java.lang.Integer" resultType="java.lang.String">
+	select 
+		material_name
+	from
+		t_app_metarial
+	where
+		company_id = #{companyId}		
+</select>
+
+
+
+<!-- 通过公司ID查询公司基础信息 -->
+<select id="getCompanyBaseInfo" parameterType="java.lang.Integer" resultType="usercenter.company.model.CompanySimpleInfo">
+	SELECT 
+		tsf.cpyname_cn,
+		tc.class_name,
+		tsf.key_remark,
+		tsf.contact_addr,
+		tsf.f_phone,
+		tsf.contacts,
+		tsf.m_phone,
+		tsf.email,
+		tsf.apply_sts,
+	 	tsf.corporation,
+		tsf.establish_dt,
+		tsf.reg_fund,
+		tsf.reg_addr
+	FROM 
+		t_app_company_info tsf,
+		t_trade_class tc
+	WHERE
+		tsf.company_id = #{companyId}
+	AND
+		tsf.class_id = tc.class_id
+</select>
+
+<!-- 通过公司ID查询公司附加信息 -->
+<select id="getCompanyExtraInfo" parameterType="java.lang.Integer" resultType="usercenter.company.model.CompanyExtraInfo">
+SELECT 
+	tc.class_name,
+	cc.nature_name,
+	ic.industry_name
+FROM
+	t_trade_class tc,
+	t_company_class cc,
+	t_industry_class ic,
+	t_app_company_info sf
+WHERE
+	sf.nature_id = cc.nature_id
+	AND sf.class_id = tc.class_id
+	AND sf.industry_id = ic.industry_id
+	AND	sf.company_id = #{companyId}
+</select>
+
+<!-- 通过公司ID查询银行账户 -->
+<select id="getBankAccount" parameterType="java.lang.Integer" resultType="usercenter.company.model.UcBankAccount">
+	select
+		account_name,
+		account_code
+	from
+		t_app_bank_account
+	where
+		company_id = #{companyId}		
+</select>
+
+<!-- 通过公司ID查询发票抬头  -->
+<select id="getInvoiceTitleNames" parameterType="java.lang.Integer" resultType="java.lang.String">
+	select 
+		invoice_title_name
+	from
+		t_app_invoice_title
+	where
+		company_id = #{companyId} 
+</select>
+<!-- 通过公司名称查询id  -->
+<select id="getCpynameId" parameterType="map" resultType="java.lang.Integer">
+	select 
+		t_app_company_info.company_id
+	from
+		t_app_company_info
+		left join t_reg_accout_company_info on t_reg_accout_company_info.company_id = t_app_company_info.company_id
+	where
+		t_app_company_info.cpyname_cn = #{cpyname_cn}	
+		and t_reg_accout_company_info.reg_id is not null	
+		and t_app_company_info.apply_sts=15
+</select>
+
+</mapper>

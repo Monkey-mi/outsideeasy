@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.TaskOutputMapper">
+<select id="getTaskOutputList" parameterType="map" resultType="usercenter.externalTask.TaskResponse.TaskOutputVo">
+	select
+		t_app_task_output.record_id,
+		t_app_task_output.t_id,
+		t_app_task_output.sec_id,
+		t_app_task_output.scrq,
+		t_app_task_output.worker_no,
+		t_app_task_output.work_time,
+		t_app_task_output.yield_qty,
+		t_app_task_output.locked,
+		t_app_process_section.section_name,
+		t_app_process_section.mjbz
+	from
+		t_app_task_output 
+		left join t_app_process_section  on  t_app_task_output.sec_id = t_app_process_section.sec_id
+		where  1 = 1
+		<if test="t_id != null and t_id != ''">
+		and t_app_task_output.t_id = #{t_id}
+		</if>
+		<if test="scrq != null and scrq != ''">
+		<![CDATA[
+			  and DATE_FORMAT(t_app_task_output.scrq, '%Y-%m-%d') =  #{scrq}
+		]]>	
+		
+		</if>
+		order by t_app_task_output.scrq desc
+</select>
+<select id="getTaskOutputListCount" parameterType="map" resultType="Integer">
+	select
+		count(0)
+	from
+		t_app_task_output 
+		left join t_app_process_section  on  t_app_task_output.sec_id = t_app_process_section.sec_id
+		where  1 = 1
+		<if test="t_id != null and t_id != ''">
+		and t_app_task_output.t_id = #{t_id}
+		</if>
+		<if test="scrq != null and scrq != ''">
+		<![CDATA[
+			  and DATE_FORMAT(t_app_task_output.scrq, '%Y-%m-%d') =  #{scrq}
+		]]>	
+		
+		</if>
+		order by t_app_task_output.scrq desc
+</select>
+<insert id="addTaskOutput" parameterType="map">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="record_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task_output
+	(		
+		t_id,
+		sec_id,
+		scrq,
+		worker_no,
+		work_time,
+		yield_qty
+				
+	)
+	values
+	(
+	
+		#{t_id},
+		#{sec_id},
+		#{scrq},
+		#{worker_no},
+		#{work_time},
+		#{yield_qty}
+		
+	)
+</insert>
+<select id="selectCountForOneday" parameterType="map" resultType="Integer">
+  select
+		count(*)
+	from
+		t_app_task_output
+		where  1 = 1
+		<if test="t_id != null and t_id != ''">
+		and t_app_task_output.t_id = #{t_id}
+		</if>
+		<if test="sec_id != null and sec_id != ''">
+		and t_app_task_output.sec_id = #{sec_id}
+		</if>
+		<if test="scrq != null and scrq != ''">
+		<![CDATA[
+			  and DATE_FORMAT(t_app_task_output.scrq, '%Y-%m-%d') =  #{scrq}
+		]]>	 
+		</if>
+
+
+</select>
+<update id="updateTaskOutput" parameterType="usercenter.externalTask.model.TaskOutput">
+	update t_app_task_output
+		set		  		      		    
+		    worker_no =  #{worker_no},
+		    yield_qty =  #{yield_qty}
+		where 1=1
+		 <if test="t_id != null and t_id != ''">
+		    and t_app_task_output.t_id = #{t_id}
+		 </if>
+		 <if test="sec_id != null and sec_id != ''">
+		     and t_app_task_output.sec_id = #{sec_id}
+		</if>
+		 <if test="scrq != null and scrq != ''">
+		<![CDATA[
+			  and DATE_FORMAT(t_app_task_output.scrq, '%Y-%m-%d') =  #{scrq}
+		]]>	
+		</if>
+</update>
+<delete id="deleteTaskOutput" parameterType="map">
+	delete  from t_app_task_output
+		where 1=1
+		 <if test="t_id != null and t_id != ''">
+		    and t_app_task_output.t_id = #{t_id}
+		 </if>
+		 <if test="scrq != null and scrq != ''">
+		<![CDATA[
+			  and DATE_FORMAT(t_app_task_output.scrq, '%Y-%m-%d') =  #{scrq}
+		]]>	
+		</if>
+</delete>
+<select id="getTaskOutputListForMouth" parameterType="map" resultType="usercenter.externalTask.model.TaskOutput">
+select
+		 distinct t_app_task_output.scrq
+	from
+		t_app_task_output 
+		where  1 = 1
+		<if test="t_id != null and t_id != ''">
+		and t_app_task_output.t_id = #{t_id}
+		</if>
+		<if test="scrq != null and scrq != ''">
+		<![CDATA[
+			  and DATE_FORMAT(t_app_task_output.scrq, '%Y-%m') =  #{scrq}
+		]]>	
+		</if>
+		order by  scrq desc
+</select>
+<select id="getTaskOutputListForMouthVo" parameterType="map" resultType="usercenter.externalTask.model.TaskOutput">
+select
+		 distinct t_app_task_output.scrq
+	from
+		t_app_task_output 
+		where  1 = 1
+		<if test="t_id != null and t_id != ''">
+		and t_app_task_output.t_id = #{t_id}
+		</if>
+		<if test="scrq != null and scrq != '' and buType==0">
+		<![CDATA[
+			  and DATE_FORMAT(t_app_task_output.scrq, '%Y-%m') <  #{scrq}
+		]]>	
+		</if>
+		<if test="scrq != null and scrq != '' and buType==1">
+		<![CDATA[
+			  and DATE_FORMAT(t_app_task_output.scrq, '%Y-%m') >  #{scrq}
+		]]>	
+		</if>
+		order by scrq ${order}
+		limit 1
+</select>
+<select id="getCountForTask" parameterType="map" resultType="Integer">
+  select
+		sum(yield_qty)
+	from
+		t_app_task_output
+	where  t_app_task_output.t_id = #{t_id} and t_app_task_output.sec_id = #{sec_id}
+</select>
+<select id="getFirstDay" parameterType="map" resultType="usercenter.externalTask.model.TaskOutput">
+	select
+		 distinct t_app_task_output.scrq
+	from
+		t_app_task_output 
+	where t_app_task_output.t_id = #{t_id}
+	order by  scrq asc
+	limit 0,1
+</select>
+<select id="getTaskOutputSec" parameterType="map" resultType="usercenter.externalTask.model.TaskOutput">
+    select
+		 t_app_task_output.record_id,		
+		 t_app_task_output.sec_id,
+		 t_app_process_section.mjbz
+	from
+		 t_app_task_output 
+		 left join t_app_process_section  on  t_app_task_output.sec_id = t_app_process_section.sec_id
+	where t_app_task_output.t_id = #{t_id}
+	    <if test="scrq != null and scrq != ''">
+		  <![CDATA[
+			  and DATE_FORMAT(t_app_task_output.scrq, '%Y-%m-%d') =  #{scrq}
+		  ]]>			
+		</if>
+</select>
+</mapper>

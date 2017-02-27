@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.BankAccountMapper">
+
+
+<select id="getBankAccountList" parameterType="map" resultType="manager.supplier.model.BankAccount">
+	select
+		t_app_bank_account.account_id,
+		t_app_bank_account.account_name,
+		t_app_bank_account.company_id,
+		case  when t_app_bank_account.default_id=1 then 'true' else 'false' END as default_id,
+		t_app_bank_account.account_code
+	from
+		t_app_bank_account
+		where 1=1
+	<if test="company_id!=null">
+		and t_app_bank_account.company_id=#{company_id}
+	</if>
+</select>
+<insert id="addBankAccount" parameterType="manager.supplier.model.BankAccount" keyProperty="account_id" useGeneratedKeys="true">
+	<selectKey keyProperty="account_id" resultType="int" order="BEFORE">
+		select  ifnull(max(account_id)+1,1) from t_app_bank_account 		
+	</selectKey>
+	insert into t_app_bank_account
+	(
+		account_id,
+		account_name,
+		company_id,
+		default_id,
+		account_code
+	)
+	values
+	(
+		#{account_id},
+		#{account_name},
+		#{company_id},
+		<if test="default_id==true">
+			1
+		</if>
+		<if test="default_id==false">
+			0
+		</if>,
+		#{account_code}
+	)
+</insert>
+<update id="updateBankAccount" parameterType="manager.supplier.model.BankAccount">
+	update t_app_bank_account
+		set
+			account_id = #{account_id},
+			account_name = #{account_name},
+			company_id = #{company_id},
+			default_id = #{default_id},
+			<if test="default_id==true">
+				default_id=1
+			</if>
+			<if test="default_id==false">
+				default_id=0
+			</if>,
+			account_code = #{account_code}
+		where account_id = #{account_id}
+</update>
+<delete id="deleteBankAccount" parameterType="manager.supplier.model.BankAccount">
+	delete from t_app_bank_account
+		where account_id = #{account_id}
+		
+</delete>
+</mapper>

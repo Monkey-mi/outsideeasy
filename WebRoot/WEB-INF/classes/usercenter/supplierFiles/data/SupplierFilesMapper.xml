@@ -1,0 +1,1036 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.supplierFiles.data.SupplierFilesMapper">
+
+<!-- 通过拥有者ID查询 主账号 供应商总数-->
+<select id="getSupplierFilseForMainTotal" parameterType="map" resultType="Integer">
+	SELECT
+		count(*)
+	FROM(
+		SELECT
+			tsf.supplier_id
+		FROM
+			t_supplier_files tsf
+			<if test="(minScore != null and minScore != '' ) or ( maxScore != null and maxScore != '')">
+			inner join (	
+				select * from(
+					select
+						tscr.supplier_id,
+						tscr.check_score
+					from
+						t_supplier_checkfactory_report tscr
+						order by tscr.create_dt DESC
+				) as newtable
+				GROUP BY supplier_id								
+			) as cs on cs.supplier_id=tsf.supplier_id 
+				<if test="minScore != null and minScore != ''">
+					<![CDATA[and cs.check_score >= #{minScore}]]>
+				</if>
+				<if test="maxScore != null and maxScore != ''">
+					<![CDATA[and cs.check_score <= #{maxScore}]]>
+				</if>
+				<if test="minScore != null or maxScore != null">
+					and tsf.no_check = 0<!-- 按分数搜索时，结果中不出现免检供应商 -->
+				</if>	
+			</if>
+			<if test="tagId != null and tagId != ''"><!-- 标签过滤 -->
+			inner join t_supplier_tag_info tsti on tsti.supplier_id = tsf.supplier_id
+						and tsti.tag_id = #{tagId}
+			</if>
+			inner join t_app_company_info as taci on taci.company_id = tsf.company_id
+						and taci.apply_sts = 15<!-- 入驻认证的才可在供应商中显示  -->
+						<if test="complexKey != '' and complexKey != null">
+						and(
+							taci.corporation LIKE CONCAT('%','${complexKey}','%')
+							OR
+							taci.m_phone LIKE CONCAT('%','${complexKey}','%')
+							OR
+							taci.contact_addr LIKE CONCAT('%','${complexKey}','%')
+							OR
+							tsf.supplier_cpyname LIKE CONCAT('%','${complexKey}','%')
+						)
+						</if>
+			<if test="fileStatus == 1 and inviteStatus != null and inviteStatus != 0"><!-- 备选供应商 -->
+			<!-- inner join t_admittance_invite tai on tai.supplier_id = newTable.supplier_id and tai.accepter_id = newTable.company_id -->
+			inner join 
+			(SELECT * FROM
+				(SELECT * FROM
+					t_admittance_invite
+					ORDER BY create_dt DESC
+				) as newtable
+				GROUP BY accepter_id,supplier_id
+			)as tai on tai.supplier_id = tsf.supplier_id and tai.accepter_id = tsf.company_id 
+			</if>
+			<if test="categoryLists != null">
+			inner join t_access_application_category taac on taac.record_id = tsf.record_id
+			</if>	
+			<if test="categoryLists == null and purchaseNature != 0"><!-- 全部时不用搜索 -->
+			inner join t_access_application_category taac on taac.record_id = tsf.record_id
+			inner join t_purchase_category tpc on tpc.category_id = taac.category_id and tpc.purchase_nature_id = #{purchaseNature}
+			</if>				
+			left join t_supplier_owner_info as soi on soi.supplier_id = tsf.supplier_id
+			left join t_supplier_regaccount_info tsri on tsri.supplier_id = tsf.supplier_id
+		WHERE
+			tsri.reg_id = #{accountId}
+			and
+			tsf.file_status = #{fileStatus}
+			and 
+			tsf.is_delete = 0
+			<if test="fileStatus == 1 and inviteStatus != null and inviteStatus != 0">
+				<choose>
+					<when test="inviteStatus == 1">and tai.invite_status = 0 and <![CDATA[DATE_ADD( tai.create_dt,INTERVAL 7 DAY) >= now()]]></when><!-- 邀请未过期 -->
+					<when test="inviteStatus == 2">and tai.invite_status = 1</when><!-- 已接受 -->
+					<when test="inviteStatus == 3">and tai.invite_status = 0 and <![CDATA[DATE_ADD( tai.create_dt,INTERVAL 7 DAY) < now()]]></when><!-- 邀请已过期 -->
+				</choose>
+			</if>			
+			<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+			and(
+				<if test="provinceCodes != null and cityCodes == null">
+				FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+				(FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				)or(
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+				)	
+				</if>
+			)
+			</if>
+			<if test="categoryLists != null"><!-- 采购分类搜索 -->
+				 and taac.category_id in
+				<foreach collection="categoryLists" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+			</if>
+		GROUP BY tsf.supplier_id
+	) as newTable
+</select>
+
+<!-- 备选供应商7天邀请过期  -->
+<!-- 通过拥有者ID查询 主账号 供应商列表信息 -->
+<select id="getSupplierFilseForMain" parameterType="map" resultType="map" >
+	select 
+	newtable2.*,
+	taai1.content as m_phone,
+	taai2.content as contact_addr_code,
+	taai3.content as contact_addr
+	from
+	(
+	SELECT
+	*
+	from(
+	SELECT
+			tsf.supplier_id,
+			tsf.company_id,
+			tsf.record_id,
+			tsf.supplier_cpyname,
+			tsf.file_status,
+			tsf.create_dt,
+			tsf.no_check,
+			tsf.is_auth_updated,
+			tsf.auth_dt,
+			tsf.source_type,
+			soi.company_id owner_id,
+			<if test="fileStatus == 2">tsoo.create_dt exampt_dt,</if>
+			taci.corporation,
+			tcah.created_dt authchange_dt
+		FROM
+			t_supplier_files tsf
+			left join 
+			(SELECT * FROM
+				(SELECT * FROM
+					t_company_authcation_history
+					ORDER BY created_dt DESC
+				) as newtable
+				GROUP BY company_id
+			)as tcah on tcah.company_id = tsf.company_id and DATE_ADD(tcah.created_dt,INTERVAL 30 DAY) > now()
+			<if test="(minScore != null and minScore != '' ) or ( maxScore != null and maxScore != '')">
+			inner join (	
+				select * from(
+					select
+						tscr.supplier_id,
+						tscr.check_score
+					from
+						t_supplier_checkfactory_report tscr
+						order by tscr.create_dt DESC
+				) as newtable
+				GROUP BY supplier_id								
+			) as cs on cs.supplier_id=tsf.supplier_id 
+				<if test="minScore != null and minScore != ''">
+					<![CDATA[and cs.check_score >= #{minScore}]]>
+				</if>
+				<if test="maxScore != null and maxScore != ''">
+					<![CDATA[and cs.check_score <= #{maxScore}]]>
+				</if> 
+				<if test="minScore != null or maxScore != null">
+					and tsf.no_check = 0<!-- 按分数搜索时，结果中不出现免检供应商 -->
+				</if>			
+			</if>
+			<if test="tagId != null and tagId != ''">
+			inner join t_supplier_tag_info tsti on tsti.supplier_id = tsf.supplier_id
+						and tsti.tag_id = #{tagId}
+			</if>
+			inner join t_app_company_info as taci on taci.company_id = tsf.company_id
+						and taci.apply_sts = 15<!-- 入驻认证的才可在供应商中显示  -->
+						<if test="complexKey != '' and complexKey != null">
+						and(
+							taci.corporation LIKE CONCAT('%','${complexKey}','%')
+							OR
+							taci.m_phone LIKE CONCAT('%','${complexKey}','%')
+							OR
+							taci.contact_addr LIKE CONCAT('%','${complexKey}','%')
+							OR
+							tsf.supplier_cpyname LIKE CONCAT('%','${complexKey}','%')
+						)
+						</if>
+			<if test="fileStatus == 1 and inviteStatus != null and inviteStatus != 0"><!-- 备选供应商 -->
+			<!-- inner join t_admittance_invite tai on tai.supplier_id = newtable2.supplier_id and tai.accepter_id = newtable2.company_id -->
+			inner join 
+			(SELECT * FROM
+				(SELECT * FROM
+					t_admittance_invite
+					ORDER BY create_dt DESC
+				) as newtable
+				GROUP BY accepter_id,supplier_id
+			)as tai on tai.supplier_id = tsf.supplier_id and tai.accepter_id = tsf.company_id 
+			</if>
+			<if test="fileStatus == 2">
+			inner join t_supplier_out_oprate tsoo on tsoo.supplier_id = tsf.supplier_id
+			</if>	
+			<if test="categoryLists != null">
+			inner join t_access_application_category taac on taac.record_id = tsf.record_id
+			</if>	
+			<if test="categoryLists == null and purchaseNature != 0"><!-- 全部时不用搜索 -->
+			inner join t_access_application_category taac on taac.record_id = tsf.record_id
+			inner join t_purchase_category tpc on tpc.category_id = taac.category_id and tpc.purchase_nature_id = #{purchaseNature}
+			</if>	
+			left join t_supplier_owner_info as soi on soi.supplier_id = tsf.supplier_id
+			left join t_supplier_regaccount_info tsri on tsri.supplier_id = tsf.supplier_id
+		WHERE
+			tsri.reg_id = #{accountId}
+			and
+			tsf.file_status = #{fileStatus}
+			and 
+			tsf.is_delete = 0
+			<if test="fileStatus == 1 and inviteStatus != null and inviteStatus != 0">
+				<choose>
+					<when test="inviteStatus == 1">and tai.invite_status = 0 and <![CDATA[DATE_ADD( tai.create_dt,INTERVAL 7 DAY) >= now()]]></when><!-- 邀请未过期 -->
+					<when test="inviteStatus == 2">and tai.invite_status = 1</when><!-- 已接受 -->
+					<when test="inviteStatus == 3">and tai.invite_status = 0 and <![CDATA[DATE_ADD( tai.create_dt,INTERVAL 7 DAY) < now()]]></when><!-- 邀请已过期 -->
+				</choose>
+			</if>
+			<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+			and(
+				<if test="provinceCodes != null and cityCodes == null">
+				FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+				(FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				)or(
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+				)	
+				</if>
+			)
+			</if>
+			<if test="categoryLists != null"><!-- 采购分类搜索 -->
+				 and taac.category_id in
+				<foreach collection="categoryLists" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+			</if>
+		ORDER BY FIELD(owner_id,#{companyId}) DESC
+	)	as newtable
+		GROUP BY supplier_id
+		<choose>
+			<when test="fileStatus == 0">
+				ORDER BY FIELD(owner_id,#{companyId}) DESC,auth_dt DESC
+			</when>
+			<when test="fileStatus == 1">
+				ORDER BY FIELD(owner_id,#{companyId}) DESC,create_dt DESC
+			</when>
+			<when test="fileStatus == 2">
+				ORDER BY FIELD(owner_id,#{companyId}) DESC,exampt_dt DESC
+			</when>
+		</choose>
+	limit #{start},#{limit}
+	) as newtable2
+	LEFT JOIN t_access_application_info taai1 on taai1.e_id = 14 and newtable2.supplier_id = taai1.supplier_id
+	LEFT JOIN t_access_application_info taai2 on taai2.e_id = 52 and newtable2.supplier_id = taai2.supplier_id
+	LEFT JOIN t_access_application_info taai3 on taai3.e_id = 13 and newtable2.supplier_id = taai3.supplier_id
+	<choose>
+		<when test="fileStatus == 0">
+			ORDER BY FIELD(owner_id,#{companyId}) DESC,auth_dt DESC
+		</when>
+		<when test="fileStatus == 1">
+			ORDER BY FIELD(owner_id,#{companyId}) DESC,create_dt DESC
+		</when>
+		<when test="fileStatus == 2">
+			ORDER BY FIELD(owner_id,#{companyId}) DESC,exampt_dt DESC
+		</when>
+	</choose>
+</select>
+
+<!-- 通过拥有者ID查询 子行号 供应商总数-->
+<select id="getSupplierFilseForSubTotal" parameterType="map" resultType="Integer">
+	SELECT
+		count(*)
+	FROM(
+		SELECT
+			tsf.supplier_id
+		FROM
+			t_supplier_files tsf
+			<if test="(minScore != null and minScore != '' ) or ( maxScore != null and maxScore != '')">
+			inner join (	
+				select * from(
+					select
+						tscr.supplier_id,
+						tscr.check_score
+					from
+						t_supplier_checkfactory_report tscr
+						order by tscr.create_dt DESC
+				) as newtable
+				GROUP BY supplier_id								
+			) as cs on cs.supplier_id=tsf.supplier_id 
+				<if test="minScore != null and minScore != ''">
+					<![CDATA[and cs.check_score >= #{minScore}]]>
+				</if>
+				<if test="maxScore != null and maxScore != ''">
+					<![CDATA[and cs.check_score <= #{maxScore}]]>
+				</if>
+				<if test="minScore != null or maxScore != null">
+					and tsf.no_check = 0<!-- 按分数搜索时，结果中不出现免检供应商 -->
+				</if>	 			
+			</if>
+			<if test="tagId != null and tagId != ''"><!-- 标签过滤 -->
+			inner join t_supplier_tag_info tsti on tsti.supplier_id = tsf.supplier_id
+						and tsti.tag_id = #{tagId}
+			</if>
+			inner join t_app_company_info as taci on taci.company_id = tsf.company_id
+						and taci.apply_sts = 15<!-- 入驻认证的才可在供应商中显示  -->
+						<if test="complexKey != '' and complexKey != null">
+						and(
+							taci.corporation LIKE CONCAT('%','${complexKey}','%')
+							OR
+							taci.m_phone LIKE CONCAT('%','${complexKey}','%')
+							OR
+							taci.contact_addr LIKE CONCAT('%','${complexKey}','%')
+							OR
+							tsf.supplier_cpyname LIKE CONCAT('%','${complexKey}','%')
+						)
+						</if>
+			<if test="fileStatus == 1 and inviteStatus != null and inviteStatus != 0"><!-- 备选供应商 -->
+			<!-- inner join t_admittance_invite tai on tai.supplier_id =tsf.supplier_id and tai.accepter_id = tsf.company_id -->
+			inner join 
+			(SELECT * FROM
+				(SELECT * FROM
+					t_admittance_invite
+					ORDER BY create_dt DESC
+				) as newtable
+				GROUP BY accepter_id,supplier_id
+			)as tai on tai.supplier_id = tsf.supplier_id and tai.accepter_id = tsf.company_id 
+			</if>
+			<if test="categoryLists != null">
+			inner join t_access_application_category taac on taac.record_id = tsf.record_id
+			</if>	
+			<if test="categoryLists == null and purchaseNature != 0"><!-- 全部时不用搜索 -->
+			inner join t_access_application_category taac on taac.record_id = tsf.record_id
+			inner join t_purchase_category tpc on tpc.category_id = taac.category_id and tpc.purchase_nature_id = #{purchaseNature}
+			</if>		
+			left join t_supplier_owner_info soi on soi.supplier_id = tsf.supplier_id
+			<choose>
+			<when test='fileStatus == 1'><!-- 备选不做子账号限制 -->
+			inner join t_supplier_regaccount_info tsri on tsri.supplier_id = tsf.supplier_id
+			inner join t_app_sub_account tasa on tasa.sa_id = #{accountId} and tasa.reg_id = tsri.reg_id
+			</when>
+			<otherwise>
+			left join t_subaccount_supplier_info tssi on tssi.supplier_id = tsf.supplier_id  and tssi.is_delete = 0
+			</otherwise>
+			</choose>
+		WHERE
+			tsf.file_status = #{fileStatus}
+			<if test="fileStatus != 1">
+			and
+			tssi.sa_id = #{accountId}
+			</if>
+			and 
+			tsf.is_delete = 0
+			<if test="fileStatus == 1 and inviteStatus != null and inviteStatus != 0">
+				<choose>
+					<when test="inviteStatus == 1">and tai.invite_status = 0 and <![CDATA[DATE_ADD( tai.create_dt,INTERVAL 7 DAY) >= now()]]></when><!-- 邀请未过期 -->
+					<when test="inviteStatus == 2">and tai.invite_status = 1</when><!-- 已接受 -->
+					<when test="inviteStatus == 3">and tai.invite_status = 0 and <![CDATA[DATE_ADD( tai.create_dt,INTERVAL 7 DAY) < now()]]></when><!-- 邀请已过期 -->
+				</choose>
+			</if>
+			<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+			and(
+				<if test="provinceCodes != null and cityCodes == null">
+				FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+				(FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				)or(
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+				)	
+				</if>
+			)
+			</if>
+			<if test="categoryLists != null"><!-- 采购分类搜索 -->
+				 and taac.category_id in
+				<foreach collection="categoryLists" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+			</if>
+		GROUP BY tsf.supplier_id
+	) as newTable
+</select>
+
+<!-- 通过拥有者ID查询 子行号 供应商列表信息 -->
+<select id="getSupplierFilseForSub" parameterType="map" resultType="map">
+	select 
+	newtable2.*,
+	taai1.content as m_phone,
+	taai2.content as contact_addr_code,
+	taai3.content as contact_addr
+	from
+	(
+	SELECT
+	*
+	from(
+	SELECT
+			tsf.supplier_id,
+			tsf.company_id,
+			tsf.record_id,
+			tsf.supplier_cpyname,
+			tsf.file_status,
+			tsf.create_dt,
+			tsf.no_check,
+			tsf.is_auth_updated,
+			tsf.auth_dt,
+			tsf.source_type,
+			soi.company_id owner_id,
+			<if test="fileStatus == 2">tsoo.create_dt exampt_dt,</if>
+			taci.corporation,
+			tcah.created_dt authchange_dt
+		FROM
+			t_supplier_files tsf
+			left join 
+			(SELECT * FROM
+				(SELECT * FROM
+					t_company_authcation_history
+					ORDER BY created_dt DESC
+				) as newtable
+				GROUP BY company_id
+			)as tcah on tcah.company_id = tsf.company_id and DATE_ADD(tcah.created_dt,INTERVAL 30 DAY) > now()
+			<if test="(minScore != null and minScore != '' ) or ( maxScore != null and maxScore != '')">
+			inner join (	
+				select * from(
+					select
+						tscr.supplier_id,
+						tscr.check_score
+					from
+						t_supplier_checkfactory_report tscr
+						order by tscr.create_dt DESC
+				) as newtable
+				GROUP BY supplier_id								
+			) as cs on cs.supplier_id=tsf.supplier_id 
+				<if test="minScore != null and minScore != ''">
+					<![CDATA[and cs.check_score >= #{minScore}]]>
+				</if>
+				<if test="maxScore != null and maxScore != ''">
+					<![CDATA[and cs.check_score <= #{maxScore}]]>
+				</if>
+				<if test="minScore != null or maxScore != null">
+					and tsf.no_check = 0<!-- 按分数搜索时，结果中不出现免检供应商 -->
+				</if>	 			
+			</if>
+			<if test="tagId != null and tagId != ''"><!-- 标签过滤 -->
+			inner join t_supplier_tag_info tsti on tsti.supplier_id = tsf.supplier_id
+						and tsti.tag_id = #{tagId}
+			</if>
+			inner join t_app_company_info taci on taci.company_id = tsf.company_id
+						and taci.apply_sts = 15<!-- 入驻认证的才可在供应商中显示  -->
+						<if test="complexKey != '' and complexKey != null">
+						and(
+							taci.corporation LIKE CONCAT('%','${complexKey}','%')
+							OR
+							taci.m_phone LIKE CONCAT('%','${complexKey}','%')
+							OR
+							taci.contact_addr LIKE CONCAT('%','${complexKey}','%')
+							OR
+							tsf.supplier_cpyname LIKE CONCAT('%','${complexKey}','%')
+						)
+						</if>
+			<if test="fileStatus == 2">
+			inner join t_supplier_out_oprate tsoo on tsoo.supplier_id = tsf.supplier_id
+			</if>
+			<if test="fileStatus == 1 and inviteStatus != null and inviteStatus != 0"><!-- 备选供应商 -->
+			inner join 
+			(SELECT * FROM
+				(SELECT * FROM
+					t_admittance_invite
+					ORDER BY create_dt DESC
+				) as newtable
+				GROUP BY accepter_id,supplier_id
+			)as tai on tai.supplier_id = tsf.supplier_id and tai.accepter_id = tsf.company_id
+			</if>
+			<if test="categoryLists != null">
+			inner join t_access_application_category taac on taac.record_id = tsf.record_id
+			</if>	
+			<if test="categoryLists == null and purchaseNature != 0"><!-- 全部时不用搜索 -->
+			inner join t_access_application_category taac on taac.record_id = tsf.record_id
+			inner join t_purchase_category tpc on tpc.category_id = taac.category_id and tpc.purchase_nature_id = #{purchaseNature}
+			</if>			
+			left join t_supplier_owner_info soi on soi.supplier_id = tsf.supplier_id
+			<choose>
+				<when test='fileStatus == 1'><!-- 备选不做子账号限制 -->
+				inner join t_supplier_regaccount_info tsri on tsri.supplier_id = tsf.supplier_id
+				inner join t_app_sub_account tasa on tasa.sa_id = #{accountId} and tasa.reg_id = tsri.reg_id
+				</when>
+				<otherwise>
+				left join t_subaccount_supplier_info tssi on tssi.supplier_id = tsf.supplier_id  and tssi.is_delete = 0
+				</otherwise>
+			</choose>
+		WHERE
+			tsf.file_status = #{fileStatus}
+			<if test="fileStatus != 1">
+			and
+			tssi.sa_id = #{accountId}
+			</if>
+			and 
+			tsf.is_delete = 0
+			<if test="fileStatus == 1 and inviteStatus != null and inviteStatus != 0">
+				<choose>
+					<when test="inviteStatus == 1">and tai.invite_status = 0 and <![CDATA[DATE_ADD( tai.create_dt,INTERVAL 7 DAY) >= now()]]></when><!-- 邀请未过期 -->
+					<when test="inviteStatus == 2">and tai.invite_status = 1</when><!-- 已接受 -->
+					<when test="inviteStatus == 3">and tai.invite_status = 0 and <![CDATA[DATE_ADD( tai.create_dt,INTERVAL 7 DAY) < now()]]></when><!-- 邀请已过期 -->
+				</choose>
+			</if>
+			<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+			and(
+				<if test="provinceCodes != null and cityCodes == null">
+				FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				</if>
+				<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+				(FLOOR(taci.contact_addr_code / 10000)*10000
+				in
+				<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+				)or(
+				FLOOR(taci.contact_addr_code / 100)*100
+				in
+				<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+				)	
+				</if>
+			)
+			</if>
+			<if test="categoryLists != null"><!-- 采购分类搜索 -->
+				 and taac.category_id in
+				<foreach collection="categoryLists" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>	
+			</if>
+		ORDER BY FIELD(owner_id,#{companyId}) DESC
+	)	as newtable
+		GROUP BY supplier_id
+		<choose>
+			<when test="fileStatus == 0">
+				ORDER BY FIELD(owner_id,#{companyId}) DESC,auth_dt DESC
+			</when>
+			<when test="fileStatus == 1">
+				ORDER BY FIELD(owner_id,#{companyId}) DESC,create_dt DESC
+			</when>
+			<when test="fileStatus == 2">
+				ORDER BY FIELD(owner_id,#{companyId}) DESC,exampt_dt DESC
+			</when>
+		</choose>
+		limit #{start},#{limit}
+	) as newtable2
+	LEFT JOIN t_access_application_info taai1 on taai1.e_id = 14 and newtable2.supplier_id = taai1.supplier_id
+	LEFT JOIN t_access_application_info taai2 on taai2.e_id = 52 and newtable2.supplier_id = taai2.supplier_id
+	LEFT JOIN t_access_application_info taai3 on taai3.e_id = 13 and newtable2.supplier_id = taai3.supplier_id
+	<choose>
+		<when test="fileStatus == 0">
+			ORDER BY FIELD(owner_id,#{companyId}) DESC,auth_dt DESC
+		</when>
+		<when test="fileStatus == 1">
+			ORDER BY FIELD(owner_id,#{companyId}) DESC,create_dt DESC
+		</when>
+		<when test="fileStatus == 2">
+			ORDER BY FIELD(owner_id,#{companyId}) DESC,exampt_dt DESC
+		</when>
+	</choose>
+</select>
+
+<!-- 查询验厂周期基础信息表  -->
+<select id="getCheckCycle" resultType="usercenter.saleManage.model.CheckFactoryCycle">
+	select 
+		t_check_factory_cycle.factory_cycle_id,
+		t_check_factory_cycle.factory_cycle_name,
+		t_check_factory_cycle.create_dt
+	from
+		t_check_factory_cycle
+</select>
+
+<!-- 通过ID改变供应商状态 -->
+<update id="updateSupplierStatusById" parameterType="map">
+	update
+		t_supplier_files
+	set
+		file_status = #{fileStatus}
+	where
+		supplier_id = #{supplierId}
+</update>
+
+<update id="updateSupplierStatusByRecordId" parameterType="map">
+	update
+		t_supplier_files
+	set
+		file_status = #{file_status},
+		auth_dt = #{auth_dt}
+	where
+		record_id = #{record_id}
+</update>
+<!-- 逻辑删除供应商 -->
+<update id="deleteSupplierById">
+	update
+		t_supplier_files
+	set
+		is_delete = #{isDelete}
+	where
+		supplier_id in
+	<foreach collection="supplierIds" item="item" index="index" open="(" separator="," close=")">
+		#{item}
+	</foreach>	
+</update>
+
+<insert id="addSupplierFiles" parameterType="map" keyProperty="supplier_id" useGeneratedKeys="true">
+	insert into t_supplier_files
+	(
+		company_id,
+		record_id,
+		supplier_cpyname,
+		source_type,
+		file_status
+	)
+	values
+	(
+		#{company_id},
+		#{record_id},
+		#{supplier_cpyname},
+		#{source_type},
+		#{file_status}
+	)
+</insert>
+
+<select id="checkSupplierExist" resultType="usercenter.supplierFiles.model.SupplierFiles" parameterType="map">
+	select * from t_supplier_files where supplier_id IN (select supplier_id from t_supplier_owner_info where company_id=#{owner_id})
+	and company_id=#{company_id} and file_status=0 limit 1
+</select>
+
+<select id="checkSupplierOfBrother" resultType="usercenter.supplierFiles.model.SupplierFiles" parameterType="map">
+		select * 
+		from t_supplier_files 
+		where 1=1 
+		and supplier_id IN 
+		(select supplier_id from t_supplier_regaccount_info 
+		where 1=1
+		<if test="reg_id!=null and reg_id!=''">
+			and reg_id=#{reg_id}
+		</if>
+		<if test="sa_id!=null and sa_id!=''">
+			and reg_id=(select reg_id from t_app_sub_account where sa_id=#{sa_id} limit 1)
+		</if>
+		)
+		and company_id=#{company_id} limit 1
+</select>
+
+<!-- 获取供应商采购分类 -->
+<select id="getSupplierCategory" parameterType="map" resultType="map">
+	SELECT
+		taac.id,
+		taac.category_id,
+		taac.record_id,
+		taac.create_dt,
+		tpc.category_name,
+		tpc.f_id,
+		tpc.purchase_nature_id
+	FROM
+		t_access_application_category taac
+	LEFT JOIN t_purchase_category  tpc on taac.category_id = tpc.category_id
+	WHERE
+		taac.record_id = #{recordId}
+</select>
+
+<!-- 获取免检供应商 -->
+<select id="getExemptCheckSupplier" parameterType="map" resultType="usercenter.supplierFiles.model.SupplierFiles">
+	select 
+		tsf.supplier_id,
+		tsf.company_id,
+		tsf.record_id,
+		tsf.supplier_cpyname,
+		tsf.file_status,
+		tsf.create_dt,
+		tsf.no_check,
+		tsf.no_checkor_id,
+		tsf.no_checkor,
+		tsf.no_check_dt,
+		tsf.is_auth_updated,
+		tsf.auth_dt,
+		tsf.source_type,
+		tsf.is_delete
+	from 
+		t_supplier_files tsf,
+		t_supplier_owner_info tsoi,
+		<if test="regId != null and regId != 0">
+		t_supplier_regaccount_info tsri,
+		</if>
+		<if test="saId != null and saId != 0">
+		t_subaccount_supplier_info tssi,
+		</if>
+		t_access_application_record taar,
+		t_app_company_info taci
+	where
+		tsf.no_check = 1
+		and
+		taci.company_id = tsf.company_id
+		<if test="regId != null and regId != 0">
+		and
+		tsf.supplier_id = tsri.supplier_id
+		and
+		tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+		and
+		tsf.supplier_id = tssi.supplier_id
+		and
+		tssi.is_delete = 0
+		and
+		tssi.sa_id = #{saId}
+		</if>
+		and
+		tsoi.supplier_id = tsf.supplier_id 
+		and 
+		tsoi.company_id = #{companyId}
+		and 
+		taar.record_id = tsf.record_id
+		and 
+		taar.access_status = 3<!-- 审核状态为已通过  -->
+	<if test="mulParams != null and mulParams != ''">
+	AND(
+		tsf.supplier_cpyname like CONCAT("%",#{mulParams},"%")
+		or
+		tsf.no_checkor like CONCAT("%",#{mulParams},"%")
+	)
+	</if>	
+	<if test="startDate != null and startDate != ''"><![CDATA[and tsf.no_check_dt >= #{startDate}]]></if>
+	<if test="endDate != null and endDate != ''"><![CDATA[and tsf.no_check_dt <= #{endDate}]]></if>
+	<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+	and(
+		<if test="provinceCodes != null and cityCodes == null">
+		FLOOR(taci.contact_addr_code / 10000)*10000
+		in
+		<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>	
+		</if>
+		<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+		FLOOR(taci.contact_addr_code / 100)*100
+		in
+		<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>	
+		</if>
+		<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+		(FLOOR(taci.contact_addr_code / 10000)*10000
+		in
+		<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>	
+		)or(
+		FLOOR(taci.contact_addr_code / 100)*100
+		in
+		<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		)	
+		</if>
+	)
+	</if>
+	order by tsf.no_check_dt desc
+	limit #{start},#{limit}
+</select>
+
+<!-- 获取免检供应商总数 -->
+<select id="getExemptCheckSupplierTotal" parameterType="map" resultType="Integer">
+	select 
+		count(*)
+	from 
+		t_supplier_files tsf,
+		t_supplier_owner_info tsoi,
+		<if test="regId != null and regId != 0">
+		t_supplier_regaccount_info tsri,
+		</if>
+		<if test="saId != null and saId != 0">
+		t_subaccount_supplier_info tssi,
+		</if>
+		t_access_application_record taar,
+		t_app_company_info taci
+	where
+		tsf.no_check = 1
+		and
+		taci.company_id = tsf.company_id
+		<if test="regId != null and regId != 0">
+		and
+		tsf.supplier_id = tsri.supplier_id
+		and
+		tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+		and
+		tsf.supplier_id = tssi.supplier_id
+		and
+		tssi.is_delete = 0
+		and
+		tssi.sa_id = #{saId}
+		</if>
+		and
+		tsoi.supplier_id = tsf.supplier_id 
+		and 
+		tsoi.company_id = #{companyId}
+		and 
+		taar.record_id = tsf.record_id
+		and 
+		taar.access_status = 3<!-- 审核状态为已通过  -->
+	<if test="mulParams != null and mulParams != ''">
+	AND(
+		tsf.supplier_cpyname like CONCAT("%",#{mulParams},"%")
+		or
+		tsf.no_checkor like CONCAT("%",#{mulParams},"%")
+	)
+	</if>	
+	<if test="startDate != null and startDate != ''"><![CDATA[and tsf.no_check_dt >= #{startDate}]]></if>
+	<if test="endDate != null and endDate != ''"><![CDATA[and tsf.no_check_dt <= #{endDate}]]></if>
+	<if test="provinceCodes != null or cityCodes != null"><!-- 搜索省级范围 -->
+	and(
+		<if test="provinceCodes != null and cityCodes == null">
+		FLOOR(taci.contact_addr_code / 10000)*10000
+		in
+		<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>	
+		</if>
+		<if test="cityCodes != null and provinceCodes == null "><!-- 搜索市级范围 -->
+		FLOOR(taci.contact_addr_code / 100)*100
+		in
+		<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>	
+		</if>
+		<if test="cityCodes != null and provinceCodes != null "><!-- 搜索省市市级范围 -->
+		(FLOOR(taci.contact_addr_code / 10000)*10000
+		in
+		<foreach collection="provinceCodes" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>	
+		)or(
+		FLOOR(taci.contact_addr_code / 100)*100
+		in
+		<foreach collection="cityCodes" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		)	
+		</if>
+	)
+	</if>
+</select>
+
+<!-- 设置免检供应商 -->
+<update id="siteNoCheckSupplierFile" parameterType="map">
+	UPDATE
+		t_supplier_files
+	SET
+		no_check = 1,
+		no_checkor_id = #{noCheckorId},
+		no_checkor = #{noCheckor},
+		no_check_dt = NOW()
+	WHERE
+		supplier_id in
+		<foreach collection="supplierIds" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+</update>
+
+<!-- 批量恢复验厂 -->
+<update id="regainCheckFac" parameterType="map">
+	UPDATE
+		t_supplier_files
+	SET
+		no_check = 0
+	WHERE
+		supplier_id in
+		<foreach collection="supplierIds" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+</update>
+<select id="getLastThreeAccessSupplier" resultType="usercenter.supplierFiles.model.SupplierFiles" parameterType="map">
+	select * from t_supplier_files where supplier_id IN (select supplier_id from t_supplier_owner_info where company_id=#{pur_company_id})
+	 and file_status=0 
+	 order by auth_dt desc
+	 limit 3
+</select>
+<update id="updateAuthStsByCompanyId" parameterType="map">
+	update
+		t_supplier_files
+	set
+		is_auth_updated = 1
+	where
+		company_id = #{company_id}
+</update>
+<select id="getSupplierIdByRecordId" resultType="Integer" parameterType="Integer">
+	select supplier_id from t_supplier_files where record_id=#{record_id}
+</select>
+
+<select id="checkSupplierExistInReg" resultType="java.lang.Integer" parameterType="map">
+	select count(*) from t_supplier_files where supplier_id IN (select supplier_id from t_supplier_regaccount_info where reg_id=(select reg_id from t_reg_accout_company_info where company_id=#{company_id} limit 1))
+	and supplier_cpyname=#{supplierName}  
+</select>
+
+<select id="getSupplierUseInfo" parameterType="map" resultType="map">
+	select 
+		tsf.supplier_id,
+		tsf.record_id
+	from 
+		t_supplier_files tsf,
+		t_supplier_owner_info tsoi
+	where
+		tsf.supplier_id = tsoi.supplier_id
+		and
+		tsf.company_id = #{companyId}
+		and
+		tsoi.company_id = #{receiveCompanyId}
+</select>
+
+<update id="updateCpNameBySupplieId" parameterType="map">
+	update
+		t_supplier_files
+	set
+		supplier_cpyname = #{cpName}
+	where
+		supplier_id = #{supplierId}	
+</update>
+<select id="getSuppliersByOwnerId" parameterType="map" resultType="usercenter.supplierFiles.model.SupplierFiles">
+	SELECT
+			tsf.supplier_id,
+			tsf.company_id,
+			tsf.record_id,
+			tsf.supplier_cpyname,
+			tsf.file_status,
+			tsf.create_dt,
+			tsf.no_check,
+			tsf.is_auth_updated,
+			tsf.auth_dt,
+			tsf.source_type
+		FROM
+		<if test="regId != null and regId != 0">
+			t_supplier_regaccount_info tsri,
+		</if>
+		<if test="saId != null and saId != 0">
+			t_subaccount_supplier_info tssi,
+		</if>
+			t_supplier_files tsf,
+			t_supplier_owner_info tsoi
+		WHERE
+			tsoi.supplier_id = tsf.supplier_id 
+			and 
+			tsoi.company_id = #{companyId}
+		<if test="regId != null and regId != 0">
+			AND
+			tsri.supplier_id = tsf.supplier_id
+			AND
+			tsri.reg_id = #{regId}
+		</if>
+		<if test="saId != null and saId != 0">
+			AND
+			tssi.supplier_id = tsf.supplier_id
+			AND
+			tssi.is_delete = 0
+			AND
+			tssi.sa_id = #{saId}
+		</if>
+		and tsf.is_delete = 0
+		and tsf.file_status = 0
+</select>
+</mapper>

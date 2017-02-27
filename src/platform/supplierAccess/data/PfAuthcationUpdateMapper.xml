@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.supplierAccess.data.PfAuthcationUpdateMapper">
+<!-- 变更正式附件信息 -->
+<update id="updateRegisterAttched" parameterType="platform.supplierAccess.model.UpdateRegisterAttched">
+	update t_app_register_attched
+		set
+			file_name = #{file_name},
+			file_path = #{file_path},
+			create_dt = #{create_dt},
+			file_format = #{file_format},
+			ismust = #{ismust},
+			remark = #{remark},
+			iscustom = #{iscustom},
+			mogodb_id = #{object_id},
+			company_id = #{company_id}
+		where 
+			id = #{o_id}
+</update>
+
+<!-- 获取附件信息 -->
+<select id="getUpdateRegisterAttchedList" parameterType="map" resultType="platform.supplierAccess.model.UpdateRegisterAttched">
+	select
+		t_update_register_attched.id,
+		t_update_register_attched.o_id,
+		t_update_register_attched.file_name,
+		t_update_register_attched.file_path,
+		t_update_register_attched.create_dt,
+		t_update_register_attched.file_format,
+		t_update_register_attched.ismust,
+		t_update_register_attched.remark,
+		t_update_register_attched.iscustom,
+		t_update_register_attched.object_id,
+		t_update_register_attched.company_id
+	from
+		t_update_register_attched
+	where  
+		t_update_register_attched.auth_update_id  in (${ids})
+</select>
+
+<select id="getPfAuthcationUpdateList" parameterType="map" resultType="platform.supplierAccess.model.PfAuthcationUpdate">
+	SELECT t_authcation_update.*,
+			 t_company_class.nature_name,
+			 t_industry_class.industry_name,
+			 t_trade_class.class_name,
+			 t_currency.currency_name,
+			 a.object_id as bus_license,
+			 b.object_id as tax_certificate,
+			 c.object_id as org_code,
+			 d.object_id as rat_certificate
+ from  t_authcation_update
+left join t_company_class on t_company_class.nature_id=t_authcation_update.nature_id
+left join t_industry_class  on t_industry_class.industry_id=t_authcation_update.industry_id
+left join t_trade_class on t_trade_class.class_id=t_authcation_update.class_id
+left join t_currency on t_currency.currency_id=t_authcation_update.currency_id
+left join t_update_register_attched a on a.auth_update_id=t_authcation_update.auth_update_id and a.file_type_id=18
+left join t_update_register_attched b on b.auth_update_id=t_authcation_update.auth_update_id and b.file_type_id=19
+left join t_update_register_attched c on c.auth_update_id=t_authcation_update.auth_update_id and c.file_type_id=20
+left join t_update_register_attched d on d.auth_update_id=t_authcation_update.auth_update_id and d.file_type_id=21
+	<where>
+		1=1
+		<if test="ids!=null">
+			and t_authcation_update.auth_update_id  in (${ids})
+		</if>
+		<if test="condition!=null and condition!=''">
+		  	and (t_authcation_update.cpyname_cn like '%${condition}%' or t_authcation_update.company_id like '${condition}%' )
+		</if>
+		<if test="company_id!=null">
+			and t_authcation_update.company_id=#{company_id}
+		</if>
+	</where>
+</select>
+
+<!-- 变更正式表信息 -->
+<update id="updateSupplierFromUpdate" parameterType="platform.supplierAccess.model.PfAuthcationUpdate">
+	update 
+		t_app_company_info
+	set
+		class_id = #{class_id},
+		nature_id = #{nature_id},
+		cpyname_cn = #{cpyname_cn},
+		contact_addr_code = #{contact_addr_code},
+		contact_addr = #{contact_addr},
+		industry_id = #{industry_id},
+		f_phone = #{f_phone},
+		corporation = #{corporation},
+		reg_fund = #{reg_fund},
+		currency_id = #{currency_id},
+		establish_dt = #{establish_dt}
+	where 
+		company_id = #{company_id}
+</update>
+
+<update id="updatePfAuthcationState" parameterType="map">
+	update t_authcation_update
+		set
+			state = #{state}
+		where 
+			auth_update_id in (${ids})
+</update>
+
+<select id="getLastAuthcationUpdateItem" parameterType="map" resultType="platform.supplierAccess.model.PfAuthcationUpdate">
+	select 
+		auth_update_id,
+		company_id,
+		class_id,
+		nature_id,
+		key_remark,
+		cpyname_cn,
+		contact_addr_code,
+		contact_addr,
+		lng,
+		lat,
+		industry_id ,
+		f_phone,
+		corporation,
+		reg_fund,
+		currency_id,
+		establish_dt,
+		created_dt,
+		state,
+		auth_opinion,
+		company_introduction
+	from
+		t_authcation_update
+	where
+		company_id = #{company_id}
+	order by auth_update_id desc
+	limit 1	
+</select>
+
+<!-- 插入一条新数据  -->
+<insert id="addPfAuthcationUpdate" parameterType="platform.supplierAccess.model.PfAuthcationUpdate" keyProperty="auth_update_id" useGeneratedKeys="true">
+	insert into
+		t_authcation_update
+		(
+			auth_update_id,
+			company_id,
+			class_id,
+			nature_id,
+			key_remark,
+			cpyname_cn,
+			contact_addr_code,
+			contact_addr,
+			lng,
+			lat,
+			industry_id ,
+			f_phone,
+			corporation,
+			reg_fund,
+			currency_id,
+			establish_dt,
+			state,
+			auth_opinion,
+			company_introduction
+		)
+	values
+		(
+			#{auth_update_id},
+			#{company_id},
+			#{class_id},
+			#{nature_id},
+			#{key_remark},
+			#{cpyname_cn},
+			#{contact_addr_code},
+			#{contact_addr},
+			#{lng},
+			#{lat},
+			#{industry_id} ,
+			#{f_phone},
+			#{corporation},
+			#{reg_fund},
+			#{currency_id},
+			#{establish_dt},
+			#{state},
+			#{auth_opinion},
+			#{company_introduction}
+		)	
+</insert>
+
+<!-- 更新变更企业信息表中的数据 -->
+<update id="updatePfAuthcationUpdate" parameterType="platform.supplierAccess.model.PfAuthcationUpdate">
+	update
+		t_authcation_update
+	set
+		company_id = #{company_id},
+		class_id = #{class_id},
+		nature_id = #{nature_id},
+		key_remark = #{key_remark},
+		cpyname_cn = #{cpyname_cn},
+		contact_addr_code = #{contact_addr_code},
+		contact_addr = #{contact_addr},
+		lng = #{lng},
+		lat = #{lat},
+		industry_id = #{industry_id} ,
+		f_phone = #{f_phone},
+		corporation = #{corporation},
+		reg_fund = #{reg_fund},
+		currency_id = #{currency_id},
+		establish_dt = #{establish_dt},
+		created_dt = #{created_dt},
+		state = #{state},
+		auth_opinion = #{auth_opinion},
+		company_introduction = #{company_introduction}
+	where
+		auth_update_id = #{auth_update_id}	
+</update>
+
+</mapper>

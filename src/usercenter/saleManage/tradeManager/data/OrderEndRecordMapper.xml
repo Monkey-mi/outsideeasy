@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.tradeManager.data.OrderEndRecordMapper">
+
+
+<select id="getOrderEndRecordById" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderEndRecord">
+	select
+		t_order_end_record.order_end_id,
+		t_order_end_record.pur_order_id,
+		t_order_end_record.end_description,
+		t_order_end_record.mogodb_id,
+		t_order_end_record.end_status,
+		t_order_end_record.create_dt,
+		t_order_end_record.confirm_dt
+	from
+		t_order_end_record
+	where
+	    t_order_end_record.pur_order_id = #{pur_order_id}
+	    ORDER BY create_dt DESC LIMIT 1 
+</select>
+<select id="getOrderEndRecordByIdForOut" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderEndRecord">
+	select
+		t_order_end_record.order_end_id,
+		t_order_end_record.pur_order_id,
+		t_order_end_record.end_description,
+		t_order_end_record.mogodb_id,
+		t_order_end_record.end_status,
+		t_order_end_record.create_dt,
+		t_order_end_record.confirm_dt
+	from
+		t_order_end_record
+	where
+	    t_order_end_record.pur_order_id = #{pur_order_id}
+	    and t_order_end_record.end_status = 0
+	    ORDER BY create_dt DESC LIMIT 1 
+</select>
+<insert id="addOrderEndRecord" parameterType="map" keyProperty="order_end_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="order_end_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_order_end_record
+	(
+		pur_order_id,
+		end_description
+	)
+	values
+	(
+		#{pur_order_id},
+		#{end_description}
+	)
+</insert>
+<update id="updateOrderEndRecord" parameterType="map">
+	update t_order_end_record
+		set		
+			end_status = #{end_status},
+			confirm_dt = #{confirm_dt}
+		where order_end_id = #{order_end_id}
+</update>
+<update id="updateOrderEndRecordStop" parameterType="map">
+	update t_order_end_record
+		set		
+			t_order_end_record.end_status = #{end_status}
+		where   
+		t_order_end_record.pur_order_id = #{pur_order_id}
+	    and t_order_end_record.end_status = 0
+</update>
+<delete id="deleteOrderEndRecord" parameterType="usercenter.saleManage.tradeManager.model.OrderEndRecord">
+	delete from t_order_end_record
+	where order_end_id = #{order_end_id}
+</delete>
+</mapper>

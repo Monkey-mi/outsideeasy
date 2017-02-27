@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.orderManager.data.MngOrderQualitycheckMapper">
+
+<select id="getMngOrderQualitycheckList" parameterType="map" resultType="manager.orderManager.model.MngOrderQualitycheck">
+	select
+		     t_order_qualitycheck.check_id,
+		     t_order_qualitycheck.checkor_id,
+		     t_order_qualitycheck.checkor_name,
+		     t_order_qualitycheck.check_dt,
+		     t_order_qualitycheck.source_type,
+		     t_order_qualitycheck.delivery_dt,
+		     t_order_qualitycheck.delivery_number,
+		     t_order_qualitycheck.pur_company_id,
+		     t_order_qualitycheck.sup_company_id,
+		     t_order_qualitycheck.supplier_id,
+		     d.cpyname_cn as  send_cpyname_cn,		
+		     t.cpyname_cn as receive_cpyname_cn
+	from
+		t_order_qualitycheck	
+		left join t_app_company_info as t on t_order_qualitycheck.pur_company_id = t.company_id
+		left join t_app_company_info as d on t_order_qualitycheck.sup_company_id = d.company_id
+	where 1=1
+	<if test="condition!=null and condition!=''">
+		and (
+		t_order_qualitycheck.delivery_number like '%${condition}%'
+		or t.cpyname_cn like '%${condition}%')
+	</if>
+	<if test="status!=null and status!='' and status==0">
+	   <if test="start_time!=null and start_time!=''">
+	    and t_order_qualitycheck.delivery_dt &gt;= #{start_time}
+	    </if>
+	    <if test="end_time!=null and end_time!=''">
+	    and t_order_qualitycheck.delivery_dt &lt;= #{end_time}
+	    </if>
+	</if>
+	<if test="status!=null and status!='' and status==1">
+	   <if test="start_time!=null and start_time!=''">
+	    and t_order_qualitycheck.check_dt &gt;= #{start_time}
+	    </if>
+	    <if test="end_time!=null and end_time!=''">
+	    and t_order_qualitycheck.check_dt &lt;= #{end_time}
+	    </if>
+	</if>
+	<if test="orderBySQL!=null and orderBySQL!=''">
+		order by  ${orderBySQL}
+	</if>
+</select>
+
+<insert id="addMngOrderQualitycheck" parameterType="manager.orderManager.model.MngOrderQualitycheck" keyProperty="check_id" useGeneratedKeys="true">
+	<selectKey keyProperty="check_id" resultType="Integer" order="BEFORE">
+		select  isnull(max(check_id)+1,1) from t_order_qualitycheck 		
+	</selectKey>
+	insert into t_order_qualitycheck
+	(
+		     check_id,
+		     checkor_id,
+		     checkor_name,
+		     check_dt,
+		     source_type,
+		     delivery_dt,
+		     delivery_number,
+		     pur_company_id,
+		     sup_company_id,
+		     supplier_id
+	)
+	values
+	(
+		     #{check_id},
+		     #{checkor_id},
+		     #{checkor_name},
+		     #{check_dt},
+		     #{source_type},
+		     #{delivery_dt},
+		     #{delivery_number},
+		     #{pur_company_id},
+		     #{sup_company_id},
+		     #{supplier_id}
+	)
+</insert>
+<update id="updateMngOrderQualitycheck" parameterType="manager.orderManager.model.MngOrderQualitycheck">
+	update t_order_qualitycheck
+		set
+		     check_id=#{check_id},
+		     checkor_id=#{checkor_id},
+		     checkor_name=#{checkor_name},
+		     check_dt=#{check_dt},
+		     source_type=#{source_type},
+		     delivery_dt=#{delivery_dt},
+		     delivery_number=#{delivery_number},
+		     pur_company_id=#{pur_company_id},
+		     sup_company_id=#{sup_company_id},
+		     supplier_id=#{supplier_id}
+		where check_id= #{check_id}
+</update>
+<delete id="deleteMngOrderQualitycheck" parameterType="manager.orderManager.model.MngOrderQualitycheck">
+	delete from t_order_qualitycheck
+	where check_id= #{check_id}
+</delete>
+</mapper>

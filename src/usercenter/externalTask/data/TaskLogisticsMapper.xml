@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.TaskLogisticsMapper">
+<select id="getTaskLogisticsList" parameterType="map" resultType="usercenter.externalTask.TaskResponse.TasklogisticsVo">
+	select
+		t_app_task_logistics.record_id,
+		t_app_task_logistics.t_id,
+		t_app_task_logistics.tpye,
+		t_app_task_logistics.start_date,
+		t_app_task_logistics.licence_plate,
+		t_app_task_logistics.driver,
+		t_app_task_logistics.phone_number,
+		t_app_task_logistics.confirm_state,
+		t_app_task_logistics.remark,
+		t_app_task_logistics.send_id,
+		t_app_task_logistics.send_company,
+		t_app_task_logistics.send_count,
+		t_app_task_logistics.create_dt,
+		t_app_task_logistics.confirm_dt
+	from
+		t_app_task_logistics
+	where 		 
+	    t_app_task_logistics.t_id = #{t_id}		 
+		 
+		
+</select>
+<select id="getTaskLogisticsState" parameterType="Integer" resultType="String">
+	select
+		t_app_task_logistics.confirm_state		
+	from
+		t_app_task_logistics
+	where 		 
+	    t_app_task_logistics.record_id = #{record_id}
+
+</select>
+<select id="getTaskLogistics" parameterType="Integer" resultType="usercenter.externalTask.model.TaskLogistics">
+	select
+		t_app_task_logistics.record_id,
+		t_app_task_logistics.t_id,
+		t_app_task_logistics.tpye,
+		t_app_task_logistics.start_date,
+		t_app_task_logistics.licence_plate,
+		t_app_task_logistics.driver,
+		t_app_task_logistics.phone_number,
+		t_app_task_logistics.confirm_state,
+		t_app_task_logistics.remark,
+		t_app_task_logistics.send_id,
+		t_app_task_logistics.send_company,
+		t_app_task_logistics.send_count,
+		t_app_task_logistics.create_dt,
+		t_app_task_logistics.confirm_dt
+	from
+		t_app_task_logistics
+	where 		 
+	    t_app_task_logistics.record_id = #{record_id}
+
+</select>
+<insert id="addTaskLogistics" parameterType="usercenter.externalTask.model.TaskLogistics" keyProperty="record_id" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="record_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task_logistics
+	(
+		
+		t_id,
+		tpye,
+		start_date,
+		licence_plate,
+		driver,
+		phone_number,
+		confirm_state,
+		remark,
+		send_id,
+		send_company,
+		send_count
+	)
+	values
+	(
+	
+		#{t_id},
+		#{tpye},
+		#{start_date},
+		#{licence_plate},
+		#{driver},
+		#{phone_number},
+		#{confirm_state},
+		#{remark},
+		#{send_id},
+		#{send_company},
+		#{send_count}
+		
+	)
+</insert>
+<update id="updateTaskLogistics" parameterType="map">
+	update t_app_task_logistics
+		set
+			confirm_state = #{confirm_state},
+			confirm_dt = #{confirm_dt}
+			
+		where record_id = #{record_id}
+</update>
+<update id="updateTaskLogisticsvo" parameterType="map">
+	update t_app_task_logistics
+		set							
+		driver=#{driver},
+		licence_plate=#{licence_plate},
+		remark=#{remark},
+		phone_number=#{phone_number}		
+		where record_id = #{record_id}
+</update>
+<update id="updateTaskLogisticspro" parameterType="map">
+	update t_app_task_logistics
+		set							
+		driver=#{driver},
+		licence_plate=#{licence_plate},
+		remark=#{remark},
+		send_count=#{send_count},
+		phone_number=#{phone_number}		
+		where record_id = #{record_id}
+</update>
+<delete id="deleteTaskLogistics" parameterType="Integer">
+	delete from t_app_task_logistics
+	where record_id = #{record_id}
+</delete>
+
+<select id="getTaskLogisticsBySearch" parameterType="map" resultType="usercenter.externalTask.TaskResponse.TasklogisticsVo">
+	select * 
+	from
+		view_getTaskLogisticsBySearch
+	where 1=1
+	<if test = "t_id != null and t_id !=''">
+	  and t_id = #{t_id}
+	</if>
+	<if test = "tpye == 2  and tpye !=''">
+	  and send_company = #{send_company}
+	</if>
+	<if test = "tpye == 1  and tpye !=''">
+	  and send_company != #{send_company}
+	</if>
+	<if test = "state == 1  and state !=''">
+	  and confirm_state = 1
+	</if>
+	<if test = "state == 2  and state !=''">
+	  and confirm_state = 0
+	</if>
+	<if test = "startTime != null and startTime !=''">
+	   and start_date &gt;= #{startTime}
+	</if>
+	<if test = "endTime != null and endTime !=''">
+	   and start_date &lt;= #{endTime}
+	</if>
+	<if test = "search != null and search !=''">
+	   and (driver like CONCAT('%',#{search},'%')  or licence_plate  like CONCAT('%',#{search},'%')  or send_id  like CONCAT('%',#{search},'%'))
+	</if>		 
+	   order by start_date	desc 
+		 
+		
+</select>
+
+<select id="getCountLogisticsForState" parameterType="Integer" resultType="Integer">
+       select
+           count(*)
+       from
+           t_app_task_logistics
+       where
+      	    t_id = #{t_id} and confirm_state = 0	                  
+</select>
+<select id="getCountLogisticsForsendId" parameterType="map" resultType="Integer">
+       select
+           count(*)
+       from
+           t_app_task_logistics
+       where
+      	    t_id = #{t_id} and send_id = #{send_id}	and send_company = #{send_company}                  
+</select>
+<select id="getLogisticsForState" parameterType="Integer" resultType="usercenter.externalTask.model.TaskLogistics">
+       select
+           t_app_task_logistics.record_id,
+		   t_app_task_logistics.t_id,
+		   t_app_task_logistics.tpye,
+		   t_app_task_logistics.start_date,
+		   t_app_task_logistics.licence_plate,
+		   t_app_task_logistics.driver,
+		   t_app_task_logistics.phone_number,
+		   t_app_task_logistics.confirm_state,
+		   t_app_task_logistics.remark,
+		   t_app_task_logistics.send_id,
+		   t_app_task_logistics.send_company,
+		   t_app_task_logistics.send_count,
+		   t_app_task_logistics.create_dt,
+		   t_app_task_logistics.confirm_dt
+       from
+           t_app_task_logistics
+       where
+      	    t_id = #{t_id} and confirm_state = 0	                  
+</select>
+<select id="getTaskLogisticsByparams" parameterType="map" resultType="usercenter.externalTask.TaskResponse.TasklogisticsVo">
+  select
+           t_app_task_logistics.record_id,
+		   t_app_task_logistics.t_id,
+		   t_app_task_logistics.tpye,
+		   t_app_task_logistics.start_date,
+		   t_app_task_logistics.licence_plate,
+		   t_app_task_logistics.driver,
+		   t_app_task_logistics.phone_number,
+		   t_app_task_logistics.confirm_state,
+		   t_app_task_logistics.remark,
+		   t_app_task_logistics.send_id,
+		   t_app_task_logistics.send_company,
+		   t_app_task_logistics.send_count,
+		   t_app_task_logistics.create_dt,
+		   t_app_task_logistics.confirm_dt
+       from
+           t_app_task_logistics
+       where 1=1
+	<if test = "t_id != null and t_id !=''">
+	  and t_app_task_logistics.t_id = #{t_id}
+	</if>	
+	<if test = "start_date != null and startTime !=''">
+	   and t_app_task_logistics.start_date = #{start_date}
+	</if>
+	<if test = "licence_plate != null and licence_plate !=''">
+	   and t_app_task_logistics.licence_plate = #{licence_plate}
+	</if>
+	<if test = "send_id != null and send_id !=''">
+	   and t_app_task_logistics.send_id = #{send_id}
+	</if>
+	<if test = "driver != null and driver !=''">
+	   and t_app_task_logistics.driver = #{driver} 
+	</if>	
+
+</select>
+<select id="regSendId" parameterType="map" resultType="usercenter.externalTask.model.TaskLogistics">
+select
+           t_app_task_logistics.record_id		  
+       from
+           t_app_task_logistics
+       where
+       t_app_task_logistics.t_id=#{t_id} and t_app_task_logistics.send_id=#{send_id} and t_app_task_logistics.send_company=#{send_company}
+</select>
+<select id="getTaskLogisticsCount" parameterType="map" resultType="usercenter.externalTask.TaskResponse.TasklogisticsVo">
+select    
+           t_id,
+           sum(send_count) as sendout_qty  
+       from
+           t_app_task_logistics
+       where
+       t_id=#{t_id} and send_company=#{send_company}
+
+</select>
+<select id="getLogisticsForStateSend" parameterType="map" resultType="Integer">
+       select
+           count(0)		
+       from
+           t_app_task_logistics
+       where
+      	    t_id = #{t_id} and confirm_state = 0
+      	    and send_company=#{companyId}	                  
+</select>
+</mapper>

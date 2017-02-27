@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.common.main.data.ModuleMapper">
+ 
+   <sql id="LogValues">
+        #{logdtm  },
+        #{clientip},
+        #{login_id},
+        #{mod_id  },
+        #{mod_name},
+        #{s_name  },
+        #{s_path  },
+        #{s_method},
+        #{s_data},
+        #{request_html},
+        #{error_message}
+        <if test="log_type != null and log_type != ''">
+       ,#{log_type}
+       </if>
+ </sql>
+ 
+  <sql id="LogCols">
+       logdtm   ,
+       clientip ,
+       login_id ,
+       mod_id   ,
+       mod_name ,
+       s_name   ,
+       s_path   ,
+       s_method ,
+       s_data   ,
+       request_html,
+       error_message
+       <if test="log_type != null and log_type != ''">
+       ,log_type
+       </if>
+ </sql>
+  <select id="getLogList" parameterType="map" resultType="SRMLog">
+    select 
+       t_log_syslog.logid    ,
+       t_log_syslog.logdtm   ,
+       t_log_syslog.clientip ,
+       t_log_syslog.login_id ,
+       t_log_syslog.mod_id   ,
+       t_log_syslog.mod_name ,
+       t_log_syslog.s_name   ,
+       t_log_syslog.s_path   ,
+       t_log_syslog.s_method ,
+       t_log_syslog.s_data  ,
+       t_log_syslog.request_html,
+       t_log_syslog.error_message
+    from t_log_syslog
+    where 1=1  
+      <if test="condition!=null and condition!='' ">
+      and t_log_syslog.login_id like '%${condition}%'
+      </if>     
+      <if test = "apply_sts != '' and apply_sts != null "> 
+      and  t_log_syslog.mod_name = #{apply_sts}
+      </if>   
+      <if test = "apply_stsSearch != '' and apply_stsSearch != null"> 
+       <if test = "apply_stsSearch==2">
+       and t_log_syslog.login_id like '%:%'
+       </if>
+       <if test = "apply_stsSearch==1">
+       and t_log_syslog.login_id not like '%:%'
+       </if>     
+      </if>
+      <if test="nodeIdForGrid != null and nodeIdForGrid != ''">
+      and  t_log_syslog.error_message is not null 
+      </if>
+      <if test="start_time != null and start_time != ''">
+      and  t_log_syslog.logdtm   &gt;= #{start_time}
+      </if>
+      <if test="end_time != null and end_time != ''">
+      and  t_log_syslog.logdtm   &lt;= #{end_time}
+      </if>
+      <if test="node != null and node != '' and  node != 0">
+      and  t_log_syslog.request_html in (
+       select t_sys_page_authority.page_path
+       from t_sys_page_authority
+       LEFT JOIN t_sys_function_class on  t_sys_page_authority.class_id = t_sys_function_class.class_id  
+        where 
+            t_sys_function_class.class_id = #{node}
+            or  t_sys_function_class.parentId = #{node}
+            )
+      </if>
+     order by logid desc 
+ </select>
+
+
+ <insert id="addLog" parameterType="SRMLog" keyProperty="logid" useGeneratedKeys="true">
+    insert into t_log_syslog(<include refid="LogCols"></include>)
+    values(<include refid="LogValues"></include>)
+ </insert>
+<!-- 系统模块 -->
+<sql id="selColumns">
+        id,
+        parentid parentId,
+        mod_type,
+        mod_code,
+        text,
+        textCls,
+        expanded,
+        leaf,
+        isvalid,
+        urltype,
+        url,
+        urltarget,
+        IFNULL(icon,'')  as icon,
+        IFNULL(iconCls,'') as iconCls,
+        jsview,
+        IFNULL(qtip,'') as qtip,
+        IFNULL(qtitle,'') as qtitle ,
+        order_seq,
+        remark,
+        create_date,
+        modify_date,
+        ctrller,
+        extracfg,
+        softSet,
+        module
+  </sql>
+  
+  <sql id="insertCol">
+  	    parentid,
+        mod_type,
+        mod_code,
+        text,
+        textCls,
+        expanded,
+        leaf,
+        isvalid,
+        urltype,
+        url,
+        urltarget,
+        icon,
+        iconCls,
+        qtip,
+        qtitle ,
+        order_seq,
+        remark,
+        create_date,
+        modify_date,
+        ctrller,
+        jsview,
+        extracfg,
+        softSet,
+        module
+  </sql>
+  <sql id="valueColumns">
+        #{parentId},
+        #{mod_type},
+        #{mod_code},
+        #{text},#{textCls},#{expanded},#{leaf},#{isvalid},#{urltype},#{url},#{urltarget},#{icon},#{iconCls},
+        #{qtip},#{qtitle},#{order_seq},#{remark},#{create_date},#{modify_date},
+        #{ctrller},
+        #{jsview},
+        #{extraCfg},
+        #{softSet},
+        #{module}
+  </sql>
+  
+  <select id="getModuleList" parameterType="map" resultType="Module">
+        select <include refid="selColumns" />
+        from t_sys_module 
+        <where >
+            <if test="id !=null"> 
+                (id = #{id}
+                <if test="mod_code != null">
+            		or  mod_code = #{mod_code}
+            	</if>
+                )
+            </if>
+            <if test="id == null">
+            	<if test="mod_code != null">
+            	and mod_code = #{mod_code}
+            	</if>
+            </if>
+            <if test="parentId != null"> 
+                and parentId =#{parentId}
+            </if>
+            <if test="leaf != null">
+            	and leaf =#{leaf}
+            </if>
+            <if test="u_id != null">
+             and id in(
+                select a.model_id
+                from t_user_role_model a,t_user_role_ref b 
+                <where>
+                    a.role_id=b.role_id
+                    and b.u_id=#{u_id}
+                    <if test="ou_id != null">
+                        and b.ou_id = #{ou_id}
+                    </if>
+                </where> 
+                )
+            </if>
+            and isvalid='true'
+        </where>
+  </select>
+  
+<select id="getSysMenuByLoginId" parameterType="map" resultType="Module">
+        select <include refid="selColumns" />
+        from t_sys_module
+        <where >
+	        <if test="node!=null">
+	          parentid = #{node} 
+	        </if>
+            <if test="leaf =='true'"> 
+            or id = #{node}
+            </if>
+             <if test="u_id != null">
+             and id in(
+                select a.mod_id 
+                from t_user_module a 
+                <where>
+                    a.u_id = #{u_id}
+                    <if test="ou_id != null">
+                        and a.ou_id = #{ou_id}
+                    </if>
+                </where>
+                union 
+                select a.model_id as mod_id
+                from t_user_role_model a,t_user_role_ref b 
+                <where>
+                    a.role_id=b.role_id
+                    and b.u_id=#{u_id}
+                    <if test="ou_id != null">
+                        and b.ou_id = #{ou_id}
+                    </if>
+                </where> 
+                )
+            </if> 
+            <if test="mod_type!=null">
+            and mod_type=#{mod_type}
+            </if>
+            and isvalid='true'
+        </where>
+        order by order_seq
+  </select>
+  
+ <select id="getModuleListFilterRole" parameterType="map" resultType="Module">
+  		select <include refid="selColumns" />
+   		from t_sys_module 
+   <where >
+            mod_type != 'SYS'         
+            <if test="id !=null"> 
+                and id = #{id} 
+            </if>
+            <if test="parentId !=null"> 
+                and parentId =#{parentId}
+            </if>
+            <if test="u_id != null">
+             and id in(
+                select a.mod_id 
+				from t_user_module a 
+				where a.u_id = #{u_id} 
+				<!-- 没有ou_id字段  <if test="ou_id!=null">
+				and a.ou_id=#{ou_id}
+				</if>-->
+				union 
+				select a.model_id as mod_id 
+				from t_user_role_model a,t_user_role_ref b
+				where a.role_id=b.role_id
+				and b.u_id=#{u_id} 
+				<!-- 没有ou_id字段<if test="ou_id!=null">
+				and b.ou_id=#{ou_id}
+				</if>-->
+				union
+				select a.model_id as mod_id 
+				from t_user_role_model a,t_user_role_ref b,t_user_role_config c
+				where 
+				a.role_id=c.con_id 
+				and c.role_id=b.role_id
+				and b.u_id=#{u_id}
+				<!-- 没有ou_id字段 and b.ou_id=#{ou_id}-->
+            )
+            </if>
+        </where>
+  </select> 
+  
+ <select id="getFuncListFilterUid" parameterType="map" resultType="Function">
+			  select f_id,mod_id,code,name,type,order_seq
+			  		from t_sys_func
+			  		<where>
+			  		    <if test="mod_id != null">mod_id =#{mod_id}</if>
+			  		    <if test="u_id!=null">
+			  		         f_id in(
+			  		         select a.f_id
+			  		         from t_user_func a
+			  		         where a.u_id=#{u_id}
+			  		         union 
+			  		         select a.f_id
+			  		         from t_user_role_func a,t_user_role_ref b
+			  		         where a.role_id=b.role_id and b.u_id=#{u_id}
+			  		         union 
+			  		         select a.f_id
+			  		         from t_user_role_func a,t_user_role_config b,t_user_role_ref c
+			  		         where a.role_id=b.con_id and b.role_id=c.role_id and c.u_id=#{u_id}
+			  		         )
+			  		    </if>
+			  		</where>
+  </select>	
+  
+ <insert id="addModule" parameterType="Module" keyProperty="id" useGeneratedKeys="true">
+        insert into t_sys_module(<include refid="insertCol"/>)
+        values(<include refid="valueColumns" />)
+  </insert>
+  <update id="updateModule" parameterType="Module">
+        update t_sys_module set 
+	        <if test="mod_type!=null">
+	        	mod_type=#{mod_type},
+	        </if>    
+	        <if test="mod_code!=null">
+	        	mod_code=#{mod_code},
+	        </if>    
+	        <if test="text!=null">
+	        	text=#{text},
+	        </if> 
+            <if test="textCls!=null">
+	        	textCls=#{textCls},
+	        </if>
+            <if test="expanded!=null">
+	        	expanded=#{expanded},
+	        </if>
+	         <if test="leaf!=null">
+	        	leaf=#{leaf},
+	        </if>
+            <if test="isvalid!=null">
+	        	isvalid=#{isvalid},
+	        </if>
+            <if test="urltype!=null">
+	        	urltype=#{urltype},
+	        </if>
+            <if test="url!=null">
+	        	url=#{url},
+	        </if>
+            <if test="urltarget!=null">
+	        	 urltarget=#{urltarget},
+	        </if>
+	        <if test="icon!=null">
+	        	 icon=#{icon},
+	        </if>
+            <if test="iconCls!=null">
+	        	 iconCls=#{iconCls},
+	        </if>
+            <if test="qtip!=null">
+	        	 qtip=#{qtip},
+	        </if>
+            <if test="qtitle!=null">
+	        	 qtitle=#{qtitle},
+	        </if>
+            <if test="order_seq!=null">
+	        	 order_seq=#{order_seq},
+	        </if>
+            <if test="remark!=null">
+	        	 remark=#{remark},
+	        </if>
+            <if test="create_date!=null">
+	        	 create_date=#{create_date},
+	        </if>
+            <if test="ctrller!=null">
+	        	  ctrller=#{ctrller},
+	        </if>
+           <if test="jsview!=null">
+	        	  jsview=#{jsview},
+	        </if>
+	        <if test="extraCfg!=null">
+	        	 extracfg=#{extraCfg},
+	        </if>
+	        	 modify_date=#{modify_date}
+        where id =#{id}
+  </update>
+  
+  <delete id="deleteModule" parameterType="Module">
+        delete from t_sys_module where id =#{id}
+  </delete>
+  
+  
+  
+    <select id="getCountByPId" parameterType="map" resultType="int">
+        select count(*)
+        from t_sys_module
+        where parentid = #{node}
+  </select>
+  
+  <select id="getFuncList" parameterType="map" resultType="Function">
+  		select f_id,mod_id,code,name,type,order_seq
+  		from t_sys_func
+  		<where>
+  		    <if test="mod_id != null">mod_id =#{mod_id}</if>
+  		    <if test="u_id!=null">
+  		        and  f_id in(
+  		         select a.f_id
+  		         from t_user_func a
+  		         <where>
+  		            a.u_id=#{u_id}
+  		            <if test="ou_id != null">
+  		                and a.ou_id = #{ou_id}
+  		            </if>
+  		         </where> 
+  		         union 
+  		         select a.f_id
+  		         from t_user_role_func a,t_user_role_ref b
+  		         <where>
+  		            a.role_id=b.role_id 
+  		            and b.u_id=#{u_id}
+  		            <if test="ou_id != null">
+                        and b.ou_id = #{ou_id}
+                    </if>
+  		         </where> 
+  		         )
+  		    
+  		    </if>
+  		</where>
+  </select>
+  
+  <insert id="addFunction" parameterType="Function" keyProperty="f_id" useGeneratedKeys="true">
+        insert into t_sys_func(mod_id,code,name,type,order_seq)
+        values(#{mod_id},#{code},#{name},#{type},#{order_seq})
+  </insert>
+  
+  <update id="updateFunction" parameterType="Function">
+  		update t_sys_func
+  		set code=#{code},name=#{name},type=#{type},order_seq=#{order_seq}
+  		where f_id=#{f_id}
+  </update>
+  
+  <delete id="deleteFunction" parameterType="Function">
+  		delete from t_sys_func
+  		where f_id=#{f_id}
+  </delete>
+  
+      <delete id="deleteFuncByMid" parameterType="int">
+  		delete from t_sys_func
+  		where mod_id =#{value}
+ 	 </delete>
+  
+    <select id="getCountByModCode" parameterType="map" resultType="int">
+        select count(*)
+        from t_sys_module
+        where mod_code = #{mod_code}
+  </select>
+  
+<insert id="addTest" parameterType="manager.common.main.model.Test" keyProperty="id" useGeneratedKeys="true">
+	<selectKey keyProperty="id" resultType="int" order="BEFORE">
+		select  ifnull(max(id)+1,1) from test 		
+	</selectKey>
+	insert into test
+	(
+		id,
+		name
+	)
+	values
+	(
+		#{id},
+		#{name}
+	)
+</insert>
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.purchaseManage.purchaseCategory.data.PurchaseNatureMapper">
+
+
+<select id="getPurchaseNatureList" parameterType="map" resultType="usercenter.purchaseManage.purchaseCategory.model.PurchaseNature">
+	select
+		t_purchase_nature.purchase_nature_id,
+		t_purchase_nature.purchase_nature_name,
+		t_purchase_nature.create_dt
+	from
+		t_purchase_nature
+</select>
+<insert id="addPurchaseNature" parameterType="usercenter.purchaseManage.purchaseCategory.model.PurchaseNature" keyProperty="purchase_nature_id" useGeneratedKeys="true">
+	insert into t_purchase_nature
+	(
+		purchase_nature_id,
+		purchase_nature_name,
+		create_dt
+	)
+	values
+	(
+		#{purchase_nature_id},
+		#{purchase_nature_name},
+		#{create_dt}
+	)
+</insert>
+<update id="updatePurchaseNature" parameterType="usercenter.purchaseManage.purchaseCategory.model.PurchaseNature">
+	update t_purchase_nature
+		set
+			purchase_nature_id = #{purchase_nature_id},
+			purchase_nature_name = #{purchase_nature_name},
+			create_dt = #{create_dt}
+		where purchase_nature_id = #{purchase_nature_id}
+</update>
+<delete id="deletePurchaseNature" parameterType="usercenter.purchaseManage.purchaseCategory.model.PurchaseNature">
+	delete from t_purchase_nature
+	where purchase_nature_id = #{purchase_nature_id}
+</delete>
+</mapper>

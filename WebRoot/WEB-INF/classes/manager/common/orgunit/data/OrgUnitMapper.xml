@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.common.orgunit.data.OrgUnitMapper">
+
+
+<select id="getOrgUnitList" parameterType="map" resultType="manager.common.orgunit.model.OrgUnit">
+	select
+		t_mst_orgunit.ou_id,
+		t_mst_orgunit.ou_code,
+		t_mst_orgunit.ou_name,
+		t_mst_orgunit.ou_alias,
+		t_mst_orgunit.ou_address,
+		t_mst_orgunit.ou_leader,
+		t_mst_orgunit.ou_type,
+		t_mst_orgunit.ou_parentid,
+		t_mst_orgunit.creator,
+		t_mst_orgunit.create_dt,
+		t_mst_orgunit.create_ou,
+		t_mst_orgunit.del_flg
+	from
+		t_mst_orgunit
+</select>
+
+<select id="getOrgUnitListByCode"  parameterType="string" resultType="manager.common.orgunit.model.OrgUnit">
+	select *
+	  from t_mst_orgunit
+	 where ou_code=#{value}
+</select>
+
+<insert id="addOrgUnit" parameterType="manager.common.orgunit.model.OrgUnit" keyProperty="ou_id" useGeneratedKeys="true">
+	insert into t_mst_orgunit
+	(
+		ou_id,
+		ou_code,
+		ou_name,
+		ou_alias,
+		ou_address,
+		ou_leader,
+		ou_type,
+		ou_parentid,
+		creator,
+		create_dt,
+		create_ou,
+		del_flg
+	)
+	values
+	(
+		#{ou_id},
+		#{ou_code},
+		#{ou_name},
+		#{ou_alias},
+		#{ou_address},
+		#{ou_leader},
+		#{ou_type},
+		#{ou_parentid},
+		#{creator},
+		#{create_dt},
+		#{create_ou},
+		#{del_flg}
+	)
+</insert>
+<update id="updateOrgUnit" parameterType="manager.common.orgunit.model.OrgUnit">
+	update t_mst_orgunit
+		set
+			ou_id = #{ou_id},
+			ou_code = #{ou_code},
+			ou_name = #{ou_name},
+			ou_alias = #{ou_alias},
+			ou_address = #{ou_address},
+			ou_leader = #{ou_leader},
+			ou_type = #{ou_type},
+			ou_parentid = #{ou_parentid},
+			creator = #{creator},
+			create_dt = #{create_dt},
+			create_ou = #{create_ou},
+			del_flg = #{del_flg}
+		where ou_id = #{ou_id}
+</update>
+<delete id="deleteOrgUnit" parameterType="manager.common.orgunit.model.OrgUnit">
+	delete from t_mst_orgunit
+	where ou_id = #{ou_id}
+</delete>
+</mapper>

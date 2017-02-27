@@ -1,0 +1,40 @@
+@charset "utf-8";
+/* CSS Document 顶部公用样式*/
+
+.top_1_wrap{ width:100%; height:25px; line-height:25px; background-color:#fff; overflow:hidden; min-width:1024px;}
+.top_1_float{ width:auto; height:25px; line-height:25px;}
+.top_1_float a{ margin:0px 5px;}
+.top_1_float a:hover{ text-decoration:underline;}
+.top_1_float .beta{background-color:#f1af27; color:#fff;width:30px;height:16px; border-radius:3px;}
+.dologin{ float:left; width:auto; height:auto;}
+.haslogin{float:left; width:auto; height:auto;display:none;}
+.select_wrap{width:500px;position:relative;}
+.select_wrap select{opacity:0;filter:alpha(opacity=0);position:absolute;left:0px;top:0px;}
+.doregister{float:left; width:auto; height:auto;}
+.top_logon_wrap{ width:100%; height:95px; background:url(../images/new/dht.png) repeat-x;}
+.logo_img_wrap{ float:left; width:260px;}
+.logo_right_wrap{ float:left; width:760px; height:100%;}
+/*============导航菜单=============*/
+.main_nav_wrap{ position:relative; top:0px; left:0px; z-index:1; width:100%; height:80px;}
+.main_nav_wrap ul{}
+.main_nav_wrap ul>li{ float:left; width:90px; height:80px; line-height:80px; text-align:center; color:#fff;}
+.main_nav_wrap ul>li>a{ color:#fff; font-size:14px;letter-spacing:3px; width:100%; height:100%; float:left;}
+.main_nav_wrap ul>li a:hover{ text-decoration:none;}
+.main_nav_wrap ul>li ul{ display:none;}
+
+.main_nav_wrap ul>li:hover{ background:#506686;}
+.main_nav_wrap .curr{ background:#506686;}
+.main_nav_wrap ul>li:hover ul{ display:block; width:90px; height:auto; }
+.main_nav_wrap ul>li:hover ul li{background:#58749c; width:90px; height:50px; line-height:50px; text-align:center; color:#fff;}
+.main_nav_wrap ul>li:hover ul li a{ color:#fff; font-size:14px;letter-spacing:3px;}
+.main_nav_wrap ul>li:hover ul li a:hover{ text-decoration:none;}
+.main_nav_wrap ul>li:hover ul li:hover{ background:#506686;}
+.main_nav_wrap .hover_down{background:url(../images/nav_sub.png) no-repeat 90% 52%;}
+.logo_right_wrap .search_wrap{ float:right; width:230px; height:30px; margin-top:25px; overflow:hidden; background-color:#fff; }
+.logo_right_wrap .search_wrap input{ width:190px; height:30px; line-height:30px; border:none; float:left;}
+.logo_right_wrap .search_wrap button{ float:left; border-left:1px solid #58749c; width:30px; height:30px; cursor:pointer; background: url(../images/icon/search.png) no-repeat 0 0;}
+
+.logo_text{ float:left; width:125px; height:auto; line-height:20px; margin:6px 0px 0px 10px;}
+.logo_text .font1{letter-spacing:10px; font-size:18px;font-weight:bold;}
+.logo_text .font2{font-size:13px; font-weight:bold; margin-top:6px;}
+

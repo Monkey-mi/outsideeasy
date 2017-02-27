@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AccessAccountMapper">
+
+
+<select id="getAccessAccountList" parameterType="map" resultType="usercenter.saleManage.model.AccessAccount">
+	select
+		t_access_application_account.account_id,
+		t_access_application_account.account_name,
+		t_access_application_account.default_id,
+		t_access_application_account.account_code,
+		t_access_application_account.account_sts,
+		t_access_application_account.app_account_id,
+		t_access_application_account.create_dt,
+		t_access_application_account.record_id
+	from
+		t_access_application_account
+		<where>
+		<if test="record_id!=null or supplier_id!=null">
+			and (record_id=#{record_id} or supplier_id=#{supplier_id})
+		</if>
+		<if test="app_account_id!=null">
+			and app_account_id=#{app_account_id}
+		</if>
+		</where>
+</select>
+<insert id="addAccessAccount" parameterType="map" keyProperty="account_id" useGeneratedKeys="true">
+	insert into t_access_application_account
+	(
+		account_name,
+		default_id,
+		account_code,
+		account_sts,
+		app_account_id,
+		record_id,
+		supplier_id
+	)
+	values
+	(
+		#{account_name},
+		#{default_id},
+		#{account_code},
+		#{account_sts},
+		#{app_account_id},
+		#{record_id},
+		#{supplier_id}
+	)
+</insert>
+<update id="updateAccessAccount" parameterType="map">
+	update t_access_application_account
+		set
+			account_id = #{account_id},
+			default_id = #{default_id}
+			<if test="account_name != null and account_name != ''">
+			,account_name = #{account_name}
+			</if>
+			<if test="account_code != null and account_code != ''">
+			,account_code = #{account_code}
+			</if>
+		where account_id = #{account_id}
+</update>
+<delete id="deleteAccessAccount" parameterType="map">
+	delete from t_access_application_account
+	where account_id = #{account_id}
+</delete>
+<delete id="deleteAccessAccountByRI" parameterType="map">
+	delete from t_access_application_account
+	where record_id=#{record_id}
+</delete>
+</mapper>

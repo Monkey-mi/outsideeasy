@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.mongodb.data.MogoFileMapper">
+<select id="checkFileIsUse" parameterType="map" resultType="common.mongodb.model.MogoFileVo">
+SELECT a.mogodb_id,a.supplier_id as bus_id,table_name from(
+select mogodb_id,supplier_id,'t_access_application_attched' as table_name from t_access_application_attched where mogodb_id is not null
+union all 
+select mogodb_id,company_id,'t_app_register_attched' as table_name from t_app_register_attched where mogodb_id is not null
+union all 
+select object_id,t_id,'t_app_task_file' as table_name from t_app_task_file where object_id is not null and file_type not in (49,31,32,43,44)  
+union all 
+select object_id,shipping_id,'t_app_task_file' as table_name from t_app_task_file where object_id is not null and file_type =49
+union all 
+select object_id,record_id,'t_app_task_file' as table_name from t_app_task_file where object_id is not null and file_type in (31,32,43,44)
+union all 
+select view_no,t_id,'t_app_task_file' as table_name from t_app_task_file where view_no is not null
+union all 
+select mogodb_id,pur_order_id,'t_order_agreement_file' as table_name from t_order_agreement_file where mogodb_id is not null
+union all 
+select mogodb_id,pur_order_id,'t_order_attched_file' as table_name from t_order_attched_file where mogodb_id is not null
+union all 
+select view_no,pur_order_id,'t_order_attched_file' as table_name from t_order_attched_file where view_no is not null
+union all 
+select mogodb_id,register_id,'t_order_delivery_attached' as table_name from t_order_delivery_attached where mogodb_id is not null
+union all 
+select object_id,auth_update_id,'t_update_register_attched' as table_name from t_update_register_attched where object_id is not null
+union all 
+select mogodb_id,web_id,'t_web_content_file' as table_name from t_web_content_file where mogodb_id is not null
+union all 
+select object_id,auth_history_id,'t_company_auth_attached_history' as table_name from t_company_auth_attached_history where object_id is not null
+union all 
+select mogodb_id,supplier_id,'t_supplier_checkfactory_inform' as table_name from t_supplier_checkfactory_inform where mogodb_id is not null
+union all 
+select mogodb_id,supplier_id,'t_supplier_checkfactory_report' as table_name from t_supplier_checkfactory_report where mogodb_id is not null
+union all 
+select mogodb_id,supplier_id,'t_supplier_materialcheck' as table_name from t_supplier_materialcheck where mogodb_id is not null
+union all 
+select qc_file,t_id,'t_app_qc' as table_name from t_app_qc where qc_file is not null
+union all 
+select mongodb_id,t_id,'t_task_random_check' as table_name from t_task_random_check where mongodb_id is not null)a
+where a.mogodb_id=#{mogodb_id}
+</select>
+<delete id="deleteFileContact" parameterType="map">
+	delete from 
+	<if test=" table_name=='t_app_task_file' ">
+	t_app_task_file where object_id = #{mogodb_id} or view_no = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_order_attched_file' ">
+	t_order_attched_file where mogodb_id = #{mogodb_id} or view_no = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_access_application_attched' ">
+	t_access_application_attched where mogodb_id = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_app_register_attched' ">
+	t_app_register_attched where mogodb_id = #{mogodb_id}
+	</if> 
+	<if test=" table_name=='t_order_agreement_file' ">
+	t_order_agreement_file where mogodb_id = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_order_delivery_attached' ">
+	t_order_delivery_attached where mogodb_id = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_update_register_attched' ">
+	t_update_register_attched where object_id = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_company_auth_attached_history' ">
+	t_company_auth_attached_history where object_id = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_web_content_file' ">
+	t_web_content_file where mogodb_id = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_supplier_checkfactory_inform' ">
+	t_supplier_checkfactory_inform where mogodb_id = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_supplier_checkfactory_report' ">
+	t_supplier_checkfactory_report where mogodb_id = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_supplier_materialcheck' ">
+	t_supplier_materialcheck where mogodb_id = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_app_qc' ">
+	t_app_qc where qc_file = #{mogodb_id}
+	</if>
+	<if test=" table_name=='t_task_random_check' ">
+	t_task_random_check where mongodb_id = #{mogodb_id}
+	</if>
+</delete>
+</mapper>

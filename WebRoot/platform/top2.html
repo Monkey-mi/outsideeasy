@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>顶部</title>
+<script  type="text/javascript">
+$(function(){
+	var result = isLoginForPlateForm();	
+		if(result.isLogin == true){
+			$(".dologin").css("display","none");
+			$(".haslogin").css("display","block");
+		}
+});
+</script>
+</head>
+<body class="bg_grey">
+<div id="topPage">
+<div class="top_logon_wrap">
+	<div class="div_1024_c_wrap">
+		<div class="f_l">
+			<img src="/newresources/images/logo/logo_main.png" style="cursor:pointer" onclick="go_redirect('index.jsp')"/>
+		</div>
+		<div class="top_right_nav">
+			<div class="dologin">
+				<a href="/login.html" class="mr10">登录</a>
+			</div>
+			<div class="haslogin">
+				<a href="/supplierForPlateForm/registerInfo.htm" class="mr10">企业中心</a>
+			</div>
+			<a href="/index.jsp">首页</a>
+		</div>
+	</div>
+</div>
+</div>
+</body>
+</html>

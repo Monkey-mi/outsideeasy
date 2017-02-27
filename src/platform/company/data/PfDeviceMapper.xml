@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfDeviceMapper">
+
+
+<select id="getDeviceOutList" parameterType="map" resultType="com.outsideasy.ws.erp.supplier.vo.DeviceOut">
+	select
+		t_app_devicelist.device_id,
+		t_app_devicelist.device_name,
+		t_app_devicelist.company_id,
+		t_app_devicelist.specifications as format,
+		t_app_devicelist.place,
+		t_app_devicelist.price,
+		t_app_devicelist.buy_day,
+		t_app_devicelist.advanced,
+		t_app_devicelist.device_num
+	from
+		t_app_devicelist
+		where 1=1
+	<if test="company_id!=null">
+		and t_app_devicelist.company_id=#{company_id}
+	</if>
+</select>
+
+<!-- 根据公司ID获取设备名  -->
+<select id="getDeviceByCompanyId" parameterType="java.lang.Integer" resultType="platform.company.model.PfDevice">
+	select 
+	   device_id,       
+	   device_name,     
+	   specifications,  
+	   place,           
+	   price,          
+	   buy_day,         
+	   advanced,        
+	   device_num
+	from
+		t_app_devicelist
+	where
+		company_id = #{companyId}
+</select>
+
+<!-- 根据公司ID获取设备  -->
+<select id="getDeviceMapByCompanyId" parameterType="map" resultType="map">
+	select 
+	   device_id,       
+	   device_name,     
+	   specifications,  
+	   place,           
+	   price,          
+	   buy_day,         
+	   advanced,        
+	   device_num
+	from
+		t_app_devicelist
+	where
+		company_id = #{companyId}
+</select>
+
+<!-- 删除设备 -->
+<delete id="deleteDevice" parameterType="map">
+	delete from
+		t_app_devicelist
+	where
+		device_id = #{deviceId}
+</delete>
+
+<!-- 批量删除设备 -->
+<delete id="deleteDevices" parameterType="map">
+	delete from
+		t_app_devicelist
+	where
+		device_id in
+		<foreach item="item" index="index" collection="deviceIds" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+</delete>
+
+<delete id="deleteDeviceByCompanyId" parameterType="map">
+	delete from
+		t_app_devicelist
+	where
+		company_id = #{companyId}
+</delete>
+
+<!-- 更新设备信息 -->
+<update id="updateDeviceByDeviceId" parameterType="map">
+	update
+		t_app_devicelist
+	<set>
+		device_id = #{deviceId}	
+		<if test="deviceName != null">
+			,device_name = #{deviceName}
+		</if>
+		<if test="specifications != null">
+			,specifications = #{specifications}
+		</if>
+		<if test="place != null">
+			,place = #{place}
+		</if>
+		<if test="price != null">
+			,price = #{price}
+		</if>
+		<if test="buyDay != null and buyDay != ''">
+			,buy_day = #{buyDay}
+		</if>
+		<if test="advanced != null">
+			,advanced = #{advanced}
+		</if>
+		<if test="deviceNum != null">
+			,device_num= #{deviceNum}
+		</if>
+	</set>
+	where
+		device_id = #{deviceId}	
+</update>
+
+<!-- 增加新的设备  -->
+<insert id="addDevice" parameterType="map" keyProperty="device_id" useGeneratedKeys="true">
+	insert into 
+		t_app_devicelist(device_name,
+		specifications,
+		place
+		<if test="price != null and price != ''">
+		,price
+		</if>
+		<if test="buyDay != null and buyDay != ''">
+		,buy_day
+		</if>
+		,advanced
+		<if test="deviceNum != null and deviceNum != ''">
+		,device_num
+		</if>
+		,company_id)
+	values
+		(#{deviceName},#{specifications},#{place}
+		<if test="price != null and price != ''">
+		,#{price}
+		</if>
+		<if test="buyDay != null and buyDay != ''">
+		,#{buyDay}
+		</if>
+		,#{advanced}
+		<if test="deviceNum != null and deviceNum != ''">
+		,#{deviceNum}
+		</if>
+		,#{companyId})
+</insert>
+
+</mapper>

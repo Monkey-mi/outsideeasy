@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfInvoiceTitleMapper">
+
+
+<select id="getInvoiceTitleOutList" parameterType="map" resultType="com.outsideasy.ws.erp.supplier.vo.InvoiceTitleOut">
+	select
+		t_app_invoice_title.invoice_title_id,
+		t_app_invoice_title.invoice_title_name,
+		t_app_invoice_title.company_id,
+		
+		case when t_app_invoice_title.default_id=1 then 'true' else 'false' END as default_id
+	from
+		t_app_invoice_title
+		where 1=1
+	<if test="company_id!=null">
+		and t_app_invoice_title.company_id=#{company_id}
+	</if>
+</select>
+
+	<!-- 通过公司ID查询发票抬头 -->
+<select id="getInvoiceTitleNames" parameterType="java.lang.Integer" resultType="platform.company.model.PfInvoiceTitle">
+	select
+		invoice_title_id,
+		invoice_title_name
+	from
+		t_app_invoice_title
+	where
+		company_id = #{companyId}
+</select> 
+
+<select id="getInvoiceTitleNamesMap" parameterType="map" resultType="map">
+	select
+		invoice_title_id,
+		invoice_title_name,
+		default_id,
+		invoice_title_sts
+	from
+		t_app_invoice_title
+	where
+		company_id = #{companyId}
+</select> 
+
+<!-- 删除指定发票抬头 -->
+<delete id="deleteInvoiceTitle" parameterType="map">
+	delete from
+		t_app_invoice_title
+	where
+		invoice_title_id = #{invoiceTitleId}
+</delete>
+
+<!-- 通过抬头ID更新发票抬头 -->
+<update id="updateInvoiceTitleByTitleId" parameterType="map">
+	update
+		t_app_invoice_title
+	<set>
+		invoice_title_id = #{invoiceTitleId}
+		<if test="invoiceTitleName != null">
+			,invoice_title_name = #{invoiceTitleName}
+		</if>
+		<if test="defaultId != null">
+			,default_id = #{defaultId}
+		</if>
+		<if test="invoice_title_sts != null and invoice_title_sts != ''">
+			,invoice_title_sts = #{invoice_title_sts}
+		</if>
+	</set>
+	where
+		invoice_title_id = #{invoiceTitleId}
+</update>
+
+<!-- 重置默认标记-->
+<update id="resetDefaultId" parameterType="map">
+	update
+		t_app_invoice_title
+	<set>
+			default_id = 0
+	</set>
+	where
+		company_id = #{companyId}
+</update>
+
+<!-- 增加发票抬头 -->
+<update id="addInvoiceTitle" parameterType="map">
+	insert into 
+		t_app_invoice_title(invoice_title_name,default_id,invoice_title_sts,company_id)
+	values
+		(#{invoiceTitleName},#{defaultId},#{invoice_title_sts},#{companyId})
+</update>
+
+</mapper>

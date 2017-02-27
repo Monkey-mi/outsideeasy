@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:task="http://www.springframework.org/schema/task"
+     xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+          http://cxf.apache.org/jaxws
+    http://cxf.apache.org/schemas/jaxws.xsd">
+	
+	<!-- 材料 -->
+	<bean id="supplierImpl" class="com.outsideasy.ws.erp.supplier.SupplierImpl">
+	</bean>
+	<jaxws:server id="supplierInter" serviceClass="com.outsideasy.ws.erp.supplier.SupplierInter" address="/erp/supplier/supplierInter">
+		<jaxws:serviceBean>
+			<ref bean="supplierImpl"/>
+		</jaxws:serviceBean>
+		<jaxws:inInterceptors>  
+            <ref bean="authentication_server"></ref>
+        </jaxws:inInterceptors> 
+	</jaxws:server>
+	
+	<!-- 材料 -->
+	<bean id="supplierAccessImpl" class="com.outsideasy.ws.erp.supplier.SupplierAccessImpl">
+	</bean>
+	<jaxws:server id="supplierAccessInter" serviceClass="com.outsideasy.ws.erp.supplier.SupplierAccessInter" address="/erp/supplier/supplierAccessInter">
+		<jaxws:serviceBean>
+			<ref bean="supplierAccessImpl"/>
+		</jaxws:serviceBean>
+		<jaxws:inInterceptors>  
+            <ref bean="authentication_server"></ref>
+        </jaxws:inInterceptors> 
+	</jaxws:server>
+	<!-- 合同协同 -->
+	<bean id="contractSyncImpl" class="com.outsideasy.ws.erp.contract.ContractSyncImpl">
+	</bean>
+	<jaxws:server id="contractSyncInter" serviceClass="com.outsideasy.ws.erp.contract.ContractSyncInter" address="/erp/contract/contractSyncInter">
+		<jaxws:serviceBean>
+			<ref bean="contractSyncImpl"/>
+		</jaxws:serviceBean>
+		<jaxws:inInterceptors>  
+            <ref bean="authentication_server"></ref>
+        </jaxws:inInterceptors> 
+	</jaxws:server>
+	<!-- 追催协同 -->
+	<bean id="synergyUrgeSyncImpl" class="com.outsideasy.ws.erp.contract.SynergyUrgeSyncImpl">
+	</bean>
+	<jaxws:server id="synergyUrgeSyncInter" serviceClass="com.outsideasy.ws.erp.contract.SynergyUrgeSyncInter" address="/erp/contract/synergyUrgeSyncInter">
+		<jaxws:serviceBean>
+			<ref bean="synergyUrgeSyncImpl"/>
+		</jaxws:serviceBean>
+		<jaxws:inInterceptors>  
+            <ref bean="authentication_server"></ref>
+        </jaxws:inInterceptors> 
+	</jaxws:server>
+</beans>

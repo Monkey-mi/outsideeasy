@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.user.data.RegAccoutCompanyInfoMapper">
+
+
+<select id="getRegAccoutCompanyInfoList" parameterType="map" resultType="common.user.model.RegAccoutCompanyInfo">
+	select
+		t_reg_accout_company_info.r_c_id,
+		t_reg_accout_company_info.reg_id,
+		t_reg_accout_company_info.company_id
+	from
+		t_reg_accout_company_info
+		where 1=1
+		<if test="company_id!=null">
+			and company_id=#{company_id}
+		</if>
+</select>
+<select id="getRegAccoutCompanyInfoOne" parameterType="map" resultType="common.user.response.RegAccountCompanyVo">
+	select
+		t_reg_accout_company_info.company_id,
+		t_app_company_info.cpyname_cn
+	from
+		t_reg_accout_company_info
+		left join t_app_company_info on t_reg_accout_company_info.company_id = t_app_company_info.company_id
+	where
+	     1=1
+	    <if test="supplier_cpyname != null and supplier_cpyname != '' ">
+		and t_app_company_info.cpyname_cn like '%${supplier_cpyname}%'
+		</if>
+	    and t_reg_accout_company_info.reg_id = #{reg_id} and t_app_company_info.apply_sts = 15 and t_app_company_info.is_delete = 0
+</select>
+<select id="getRegAccoutCompanyInfoCount" parameterType="map" resultType="Integer">
+	select
+		count(*)
+	from
+		t_reg_accout_company_info
+		left join t_app_company_info on t_reg_accout_company_info.company_id = t_app_company_info.company_id
+	where
+	     1=1
+	    <if test="supplier_cpyname!=null and supplier_cpyname!=''">
+		and t_app_company_info.cpyname_cn like '%${supplier_cpyname}%'
+		</if>
+	    and t_reg_accout_company_info.reg_id = #{reg_id} and t_app_company_info.apply_sts = 15 and t_app_company_info.is_delete = 0
+</select>
+<select id="getRegAccoutCompanyListID" parameterType="map" resultType="common.user.response.RegAccountCompanyVo">
+	select
+		t_reg_accout_company_info.company_id		
+	from
+		t_reg_accout_company_info
+		left join t_app_company_info on t_reg_accout_company_info.company_id = t_app_company_info.company_id
+	where
+	     1=1
+	    <if test="supplier_cpyname!=null and supplier_cpyname!=''">
+		and t_app_company_info.cpyname_cn like '%${supplier_cpyname}%'
+		</if>
+	    and t_reg_accout_company_info.reg_id = #{reg_id} and t_app_company_info.apply_sts = 15 and t_app_company_info.is_delete = 0
+</select>
+<insert id="addRegAccoutCompanyInfo" parameterType="common.user.model.RegAccoutCompanyInfo" keyProperty="r_c_id" useGeneratedKeys="true">
+	insert into t_reg_accout_company_info
+	(
+		r_c_id,
+		reg_id,
+		company_id
+	)
+	values
+	(
+		#{r_c_id},
+		#{reg_id},
+		#{company_id}
+	)
+</insert>
+<update id="updateRegAccoutCompanyInfo" parameterType="common.user.model.RegAccoutCompanyInfo">
+	update t_reg_accout_company_info
+		set
+			r_c_id = #{r_c_id},
+			reg_id = #{reg_id},
+			company_id = #{company_id}
+		where r_c_id = #{r_c_id}
+</update>
+<delete id="deleteRegAccoutCompanyInfo" parameterType="common.user.model.RegAccoutCompanyInfo">
+	delete from t_reg_accout_company_info
+	where r_c_id = #{r_c_id}
+</delete>
+
+<!-- 通过公司账号获取主账号ID -->
+<select id="getRegIdByCpId" parameterType="Integer" resultType="Integer">
+select 
+	reg_id
+from
+	t_reg_accout_company_info
+where
+	company_id = #{companyId}
+</select>
+</mapper>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.tradeManager.data.OrderDeliveryNoticedetailsMapper">
+
+<select id="getOrderDeliveryNoticedetailsList" parameterType="map" resultType="usercenter.saleManage.tradeManager.response.OrderDeliveryVo">
+	select
+		t_order_delivery_noticedetails.notice_delivery_time,
+		t_order_delivery_noticedetails.confirm_delivery_time,
+		t_order_delivery_noticedetails.number,
+		t_order_delivery_noticedetails.delivery_address,
+		t_purchase_order_detail.product_name,
+		t_purchase_order_detail.product_size,
+		t_purchase_order_detail.unit,
+		t_purchase_order_detail.remark,
+		t_purchase_order_detail.product_artno
+	from
+		t_order_delivery_noticedetails
+		left join t_purchase_order_detail on t_order_delivery_noticedetails.order_detail_id = t_purchase_order_detail.order_detail_id
+	where 
+	    t_order_delivery_noticedetails.delivery_notice_id = #{delivery_notice_id}
+	    and t_order_delivery_noticedetails.pur_order_id=#{pur_order_id}
+	    limit 0,10
+</select>
+<select id="getOrderDeliveryNoticedetailsListAll" parameterType="map" resultType="usercenter.saleManage.tradeManager.response.OrderDeliveryVo">
+	select
+		t_order_delivery_noticedetails.notice_delivery_time,
+		t_order_delivery_noticedetails.confirm_delivery_time,
+		t_order_delivery_noticedetails.number,
+		t_order_delivery_noticedetails.delivery_address,
+		t_purchase_order_detail.product_name,
+		t_purchase_order_detail.product_size,
+		t_purchase_order_detail.unit,
+		t_purchase_order_detail.remark,
+		t_purchase_order_detail.product_artno
+	from
+		t_order_delivery_noticedetails
+		left join t_purchase_order_detail on t_order_delivery_noticedetails.order_detail_id = t_purchase_order_detail.order_detail_id
+	where 
+	    t_order_delivery_noticedetails.delivery_notice_id = #{delivery_notice_id}
+	     and t_order_delivery_noticedetails.pur_order_id=#{pur_order_id}
+</select>
+<select id="getOrderDeliveryNoticedetailsListCount" parameterType="map" resultType="Integer">
+	select
+		count(0)
+	from
+		t_order_delivery_noticedetails
+		left join t_purchase_order_detail on t_order_delivery_noticedetails.order_detail_id = t_purchase_order_detail.order_detail_id
+	where 
+	    t_order_delivery_noticedetails.delivery_notice_id = #{delivery_notice_id}	  
+	    and t_order_delivery_noticedetails.pur_order_id=#{pur_order_id} 
+</select>
+
+<!-- 获取指定的信息 -->
+<select id="getOrderDeliveryNoticedetailsListInfo" parameterType="map" resultType="usercenter.saleManage.tradeManager.response.OrderDeliveryVoInfo">
+	select
+		t_order_delivery_noticedetails.details_id,
+		t_order_delivery_noticedetails.notice_delivery_time,
+		t_order_delivery_noticedetails.confirm_delivery_time,
+		t_order_delivery_noticedetails.number,
+		t_order_delivery_noticedetails.delivery_address,
+		t_order_delivery_noticedetails.is_edit,
+		t_order_delivery_noticedetails.clhh,<!-- 产品id -->
+		t_order_delivery_noticedetails.htbh,<!-- 合同编号 -->
+		t_order_delivery_noticedetails.is_modified,<!-- 是否修改过交期时间 -->
+		t_order_delivery_noticedetails.pur_order_id,
+		tpo.order_bh,<!-- 订单编号 -->
+		t_purchase_order_detail.product_name,
+		t_purchase_order_detail.product_size,
+		t_purchase_order_detail.unit,
+		t_purchase_order_detail.remark,
+		t_purchase_order_detail.product_artno
+	from
+		t_order_delivery_noticedetails
+		inner join t_purchase_order tpo on tpo.pur_order_id = t_order_delivery_noticedetails.pur_order_id
+		left join t_purchase_order_detail on t_order_delivery_noticedetails.order_detail_id = t_purchase_order_detail.order_detail_id
+	where 
+	    t_order_delivery_noticedetails.delivery_notice_id = #{deliveryNoticeId}
+	<!-- <choose>
+		<when test="showType != null and showType == 0">//oreder 0:订单排序  product 1:产品排序
+			ORDER BY pur_order_id DESC
+		</when>
+		<when test="showType != null and showType == 1">
+			ORDER BY clhh DESC
+		</when>
+	</choose> -->
+	ORDER BY t_purchase_order_detail.product_name ASC,t_order_delivery_noticedetails.notice_delivery_time ASC
+	<if test="detailLimit != null and detailLimit != 0">
+		limit #{detailLimit}
+	</if>    
+</select>
+
+<insert id="addOrderDeliveryNoticedetails" parameterType="usercenter.saleManage.tradeManager.model.OrderDeliveryNoticedetails" keyProperty="details_id" useGeneratedKeys="true">
+	insert into t_order_delivery_noticedetails
+	(
+		details_id,
+		delivery_notice_id,
+		order_detail_id,
+		notice_delivery_time,
+		confirm_delivery_time,
+		number
+	)
+	values
+	(
+		#{details_id},
+		#{delivery_notice_id},
+		#{order_detail_id},
+		#{notice_delivery_time},
+		#{confirm_delivery_time},
+		#{number}
+	)
+</insert>
+<update id="updateOrderDeliveryNoticedetails" parameterType="usercenter.saleManage.tradeManager.model.OrderDeliveryNoticedetails">
+	update t_order_delivery_noticedetails
+		set
+			details_id = #{details_id},
+			delivery_notice_id = #{delivery_notice_id},
+			order_detail_id = #{order_detail_id},
+			notice_delivery_time = #{notice_delivery_time},
+			confirm_delivery_time = #{confirm_delivery_time},
+			number = #{number}
+		where details_id = #{details_id}
+</update>
+<delete id="deleteOrderDeliveryNoticedetails" parameterType="usercenter.saleManage.tradeManager.model.OrderDeliveryNoticedetails">
+	delete from t_order_delivery_noticedetails
+	where details_id = #{details_id}
+</delete>
+
+<!-- 更新送货通知表确认时间 -->
+<update id="updateNoticeDetailsConfirmTime" parameterType="map">
+	UPDATE
+	t_order_delivery_noticedetails
+	SET
+	confirm_delivery_time = notice_delivery_time
+	WHERE
+	delivery_notice_id = #{noticeId}
+</update>
+
+<!-- 更新送货通知表确认时间 -->
+<update id="updateConfirmDate" parameterType="map">
+	UPDATE
+	t_order_delivery_noticedetails
+	SET
+	confirm_delivery_time = #{confirmDeliveryTime}
+	WHERE
+	details_id = #{detailsId}
+</update>
+
+
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.MngSupplierMaterialcheckMapper">
+
+
+<select id="getMngSupplierMaterialcheckList" parameterType="map" resultType="manager.supplier.model.MngSupplierMaterialcheck">
+	select
+		t_supplier_materialcheck.materialcheck_id,
+		t_supplier_materialcheck.file_name,
+		t_supplier_materialcheck.create_dt,
+		t_supplier_materialcheck.remark,
+		t_supplier_materialcheck.mogodb_id,
+		t_supplier_materialcheck.supplier_id,
+		t_supplier_materialcheck.source_type,
+		t_supplier_materialcheck.operator_id,
+		t_supplier_materialcheck.operator_name,
+		t_supplier_materialcheck.send_company_id
+	from
+		t_supplier_materialcheck
+		where 1=1
+		<if test="supplier_id!=null">
+			and t_supplier_materialcheck.supplier_id=#{supplier_id}
+		</if>
+</select>
+<insert id="addMngSupplierMaterialcheck" parameterType="manager.supplier.model.MngSupplierMaterialcheck" keyProperty="materialcheck_id" useGeneratedKeys="true">
+	insert into t_supplier_materialcheck
+	(
+		materialcheck_id,
+		file_name,
+		create_dt,
+		remark,
+		mogodb_id,
+		supplier_id,
+		source_type,
+		operator_id,
+		operator_name,
+		send_company_id
+	)
+	values
+	(
+		#{materialcheck_id},
+		#{file_name},
+		#{create_dt},
+		#{remark},
+		#{mogodb_id},
+		#{supplier_id},
+		#{source_type},
+		#{operator_id},
+		#{operator_name},
+		#{send_company_id}
+	)
+</insert>
+<update id="updateMngSupplierMaterialcheck" parameterType="manager.supplier.model.MngSupplierMaterialcheck">
+	update t_supplier_materialcheck
+		set
+			materialcheck_id = #{materialcheck_id},
+			file_name = #{file_name},
+			create_dt = #{create_dt},
+			remark = #{remark},
+			mogodb_id = #{mogodb_id},
+			supplier_id = #{supplier_id},
+			source_type = #{source_type},
+			operator_id = #{operator_id},
+			operator_name = #{operator_name},
+			send_company_id = #{send_company_id}
+		where materialcheck_id = #{materialcheck_id}
+</update>
+<delete id="deleteMngSupplierMaterialcheck" parameterType="manager.supplier.model.MngSupplierMaterialcheck">
+	delete from t_supplier_materialcheck
+	where materialcheck_id = #{materialcheck_id}
+</delete>
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.contract.data.PfOutHtmxbMapper">
+
+
+<select id="getPfOutHtmxbList" parameterType="map" resultType="platform.contract.model.PfOutHtmxb">
+	select
+		dbo.po_out_htmxb.id,
+		dbo.po_out_htmxb.htbh,
+		dbo.po_out_htmxb.htxh,
+		dbo.po_out_htmxb.pur_order_id,
+		dbo.po_out_htmxb.order_detail_id
+	from
+		dbo.po_out_htmxb
+</select>
+<insert id="addPfOutHtmxb" parameterType="platform.contract.model.PfOutHtmxb" keyProperty="" useGeneratedKeys="true">
+	insert into dbo.po_out_htmxb
+	(
+		id,
+		htbh,
+		htxh,
+		pur_order_id,
+		order_detail_id
+	)
+	values
+	(
+		#{id},
+		#{htbh},
+		#{htxh},
+		#{pur_order_id},
+		#{order_detail_id}
+	)
+</insert>
+<update id="updatePfOutHtmxb" parameterType="platform.contract.model.PfOutHtmxb">
+	update dbo.po_out_htmxb
+		set
+			id = #{id},
+			htbh = #{htbh},
+			htxh = #{htxh},
+			pur_order_id = #{pur_order_id},
+			order_detail_id = #{order_detail_id}
+		where  = #{}
+</update>
+<delete id="deletePfOutHtmxb" parameterType="platform.contract.model.PfOutHtmxb">
+	delete from dbo.po_out_htmxb
+	where  = #{}
+</delete>
+</mapper>

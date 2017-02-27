@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.taskManager.data.MngProcessSectionMapper">
+
+
+<select id="getMngProcessSectionList" parameterType="map" resultType="manager.taskManager.model.MngProcessSection">
+	select
+		t_app_process_section.sec_id,
+		t_app_process_section.t_id,
+		t_app_process_section.section_name,
+		t_app_process_section.sx,
+		t_app_process_section.mjbz
+	from
+		t_app_process_section
+	where
+		t_app_process_section.t_id = #{t_id}
+</select>
+<insert id="addMngProcessSection" parameterType="manager.taskManager.model.MngProcessSection" keyProperty="sec_id" useGeneratedKeys="true">
+	insert into t_app_process_section
+	(
+		sec_id,
+		t_id,
+		section_name,
+		sx,
+		mjbz
+	)
+	values
+	(
+		#{sec_id},
+		#{t_id},
+		#{section_name},
+		#{sx},
+		#{mjbz}
+	)
+</insert>
+<update id="updateMngProcessSection" parameterType="manager.taskManager.model.MngProcessSection">
+	update t_app_process_section
+		set
+			sec_id = #{sec_id},
+			t_id = #{t_id},
+			section_name = #{section_name},
+			sx = #{sx},
+			mjbz = #{mjbz}
+		where sec_id = #{sec_id}
+</update>
+<delete id="deleteMngProcessSection" parameterType="manager.taskManager.model.MngProcessSection">
+	delete from t_app_process_section
+	where sec_id = #{sec_id}
+</delete>
+</mapper>

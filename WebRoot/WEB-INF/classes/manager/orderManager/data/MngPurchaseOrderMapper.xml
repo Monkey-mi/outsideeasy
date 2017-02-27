@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.orderManager.data.MngPurchaseOrderMapper">
+
+
+<select id="getMngPurchaseOrderList" parameterType="map" resultType="manager.orderManager.model.MngPurchaseOrder">
+	select
+		t_purchase_order.pur_order_id,
+		t_purchase_order.order_bh,
+		t_purchase_order.agreement_bh,
+		t_purchase_order.order_status,
+		t_purchase_order.create_dt,
+		t_purchase_order.category_id,
+		t_purchase_order.supplier_id,
+		t_purchase_order.sum_money,
+		t_purchase_order.pur_company_id,
+		t_purchase_order.pur_cpyname_cn,
+		t_purchase_order.pur_creator_id,
+		t_purchase_order.pur_creator_name,
+		t_purchase_order.invoice_title_id,
+		t_purchase_order.pur_invoice_type,
+		t_purchase_order.pur_invoice_title,
+		t_purchase_order.delivery_address_id,
+		t_purchase_order.pur_delivery_address,
+		t_purchase_order.pur_delivery_contact,
+		t_purchase_order.pur_delivery_contact_phone,
+		t_purchase_order.pur_memo,
+		t_purchase_order.sup_company_id,
+		t_purchase_order.sup_cpyname_cn,
+		t_purchase_order.sup_contact,
+		t_purchase_order.sup_contact_phone,
+		t_purchase_order.sup_contact_address,
+		t_purchase_order.sup_memo,
+		t_purchase_order.order_remark,
+		t_purchase_order.pur_delete_flag,
+		t_purchase_order.sup_delete_flag,
+		t_purchase_order.source_type,
+		t_purchase_order.lock_agreement,
+		t_purchase_order.delivery_date
+	from
+		t_purchase_order
+		where 1=1
+		<if test="condition != null and condition != ''">
+		 and (t_purchase_order.order_bh like '%${condition}%' 
+		 or t_purchase_order.pur_cpyname_cn like '%${condition}%'
+		 or t_purchase_order.sup_cpyname_cn like '%${condition}%'
+		 or t_purchase_order.pur_company_id  like '%${condition}%'
+		 or t_purchase_order.sup_company_id like '%${condition}%')
+		</if>
+		<if test="status != null and status != ''">
+		 and t_purchase_order.order_status = #{status} 	 
+		</if>
+		order by t_purchase_order.create_dt desc
+</select>
+<insert id="addMngPurchaseOrder" parameterType="manager.orderManager.model.MngPurchaseOrder" keyProperty="pur_order_id" useGeneratedKeys="true">
+	insert into t_purchase_order
+	(
+		pur_order_id,
+		order_bh,
+		agreement_bh,
+		order_status,
+		create_dt,
+		category_id,
+		category_name,
+		supplier_id,
+		sum_money,
+		pur_company_id,
+		pur_cpyname_cn,
+		pur_creator_id,
+		pur_creator_name,
+		invoice_title_id,
+		pur_invoice_type,
+		pur_invoice_title,
+		delivery_address_id,
+		pur_delivery_address,
+		pur_delivery_contact,
+		pur_delivery_contact_phone,
+		pur_memo,
+		sup_company_id,
+		sup_cpyname_cn,
+		sup_contact,
+		sup_contact_phone,
+		sup_contact_address,
+		sup_memo,
+		order_remark,
+		pur_delete_flag,
+		sup_delete_flag,
+		source_type,
+		lock_agreement,
+		delivery_date
+	)
+	values
+	(
+		#{pur_order_id},
+		#{order_bh},
+		#{agreement_bh},
+		#{order_status},
+		#{create_dt},
+		#{category_id},
+		#{category_name},
+		#{supplier_id},
+		#{sum_money},
+		#{pur_company_id},
+		#{pur_cpyname_cn},
+		#{pur_creator_id},
+		#{pur_creator_name},
+		#{invoice_title_id},
+		#{pur_invoice_type},
+		#{pur_invoice_title},
+		#{delivery_address_id},
+		#{pur_delivery_address},
+		#{pur_delivery_contact},
+		#{pur_delivery_contact_phone},
+		#{pur_memo},
+		#{sup_company_id},
+		#{sup_cpyname_cn},
+		#{sup_contact},
+		#{sup_contact_phone},
+		#{sup_contact_address},
+		#{sup_memo},
+		#{order_remark},
+		#{pur_delete_flag},
+		#{sup_delete_flag},
+		#{source_type},
+		#{lock_agreement},
+		#{delivery_date}
+	)
+</insert>
+<update id="updateMngPurchaseOrder" parameterType="manager.orderManager.model.MngPurchaseOrder">
+	update t_purchase_order
+		set
+			pur_order_id = #{pur_order_id},
+			order_bh = #{order_bh},
+			agreement_bh = #{agreement_bh},
+			order_status = #{order_status},
+			create_dt = #{create_dt},
+			category_id = #{category_id},
+			category_name = #{category_name},
+			supplier_id = #{supplier_id},
+			sum_money = #{sum_money},
+			pur_company_id = #{pur_company_id},
+			pur_cpyname_cn = #{pur_cpyname_cn},
+			pur_creator_id = #{pur_creator_id},
+			pur_creator_name = #{pur_creator_name},
+			invoice_title_id = #{invoice_title_id},
+			pur_invoice_type = #{pur_invoice_type},
+			pur_invoice_title = #{pur_invoice_title},
+			delivery_address_id = #{delivery_address_id},
+			pur_delivery_address = #{pur_delivery_address},
+			pur_delivery_contact = #{pur_delivery_contact},
+			pur_delivery_contact_phone = #{pur_delivery_contact_phone},
+			pur_memo = #{pur_memo},
+			sup_company_id = #{sup_company_id},
+			sup_cpyname_cn = #{sup_cpyname_cn},
+			sup_contact = #{sup_contact},
+			sup_contact_phone = #{sup_contact_phone},
+			sup_contact_address = #{sup_contact_address},
+			sup_memo = #{sup_memo},
+			order_remark = #{order_remark},
+			pur_delete_flag = #{pur_delete_flag},
+			sup_delete_flag = #{sup_delete_flag},
+			source_type = #{source_type},
+			lock_agreement = #{lock_agreement},
+			delivery_date = #{delivery_date}
+		where pur_order_id = #{pur_order_id}
+</update>
+<delete id="deleteMngPurchaseOrder" parameterType="manager.orderManager.model.MngPurchaseOrder">
+	delete from t_purchase_order
+	where pur_order_id = #{pur_order_id}
+</delete>
+</mapper>

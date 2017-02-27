@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.tradeManager.data.OrderAgreementFileMapper">
+
+
+<select id="getOrderAgreementFileCount" parameterType="map" resultType="Integer">
+	select
+		count(0)		
+	from
+		t_order_agreement_file
+	where
+	  t_order_agreement_file.pur_order_id = #{pur_order_id}
+	  and t_order_agreement_file.agreement_status = 1
+</select>
+<select id="getOrderAgreementFileforId" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAgreementFile">
+	select 
+	    t_order_agreement_file.agreement_id,
+	    t_order_agreement_file.pur_order_id,
+	    t_order_agreement_file.agreement_status,
+	    t_order_agreement_file.agreement_bh,
+	    t_order_agreement_file.agreement_name,	
+	    t_order_agreement_file.mogodb_id,	
+	    t_order_agreement_file.create_dt,	
+	    t_order_agreement_file.creator_id,
+	    t_order_agreement_file.creator_name,
+	    t_order_agreement_file.source_type,
+	    t_order_agreement_file.suffix_name	    
+	from
+		t_order_agreement_file
+	where
+	  t_order_agreement_file.pur_order_id = #{pur_order_id}
+	   and t_order_agreement_file.agreement_status = 1
+</select>
+<select id="getOrderAgreementFileforOne" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAgreementFile">
+	select 
+	    t_order_agreement_file.agreement_id,
+	    t_order_agreement_file.pur_order_id,
+	    t_order_agreement_file.agreement_status,
+	    t_order_agreement_file.agreement_bh,
+	    t_order_agreement_file.agreement_name,	
+	    t_order_agreement_file.mogodb_id,	
+	    t_order_agreement_file.create_dt,	
+	    t_order_agreement_file.creator_id,
+	    t_order_agreement_file.creator_name,
+	    t_order_agreement_file.source_type,
+	    t_order_agreement_file.suffix_name	    
+	from
+		t_order_agreement_file
+	where
+	  t_order_agreement_file.pur_order_id = #{pur_order_id}
+	  and t_order_agreement_file.agreement_id = #{agreement_id}
+</select>
+<select id="getOrderAgreementFile" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAgreementFile">
+	select 
+	    t_order_agreement_file.agreement_id,
+	    t_order_agreement_file.pur_order_id,
+	    t_order_agreement_file.agreement_status,
+	    t_order_agreement_file.agreement_bh,
+	    t_order_agreement_file.agreement_name,	
+	    t_order_agreement_file.mogodb_id,	
+	    t_order_agreement_file.create_dt,	
+	    t_order_agreement_file.creator_id,
+	    t_order_agreement_file.creator_name,
+	    t_order_agreement_file.source_type,
+	    t_order_agreement_file.suffix_name	    
+	from
+		t_order_agreement_file
+	where
+	  t_order_agreement_file.pur_order_id = #{pur_order_id}
+	   and t_order_agreement_file.agreement_status in (1,0)
+	   order by create_dt asc
+</select>
+<insert id="addOrderAgreementFile" parameterType="usercenter.saleManage.tradeManager.model.OrderAgreementFile" keyProperty="agreement_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="agreement_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_order_agreement_file
+	(	
+		pur_order_id,
+		agreement_bh,
+		agreement_status,
+		agreement_name,
+		mogodb_id,
+		create_dt,
+		creator_id,
+		creator_name,
+		source_type,
+		suffix_name
+	)
+	values
+	(
+		#{pur_order_id},
+		#{agreement_bh},
+		#{agreement_status},
+		#{agreement_name},
+		#{mogodb_id},
+		#{create_dt},
+		#{creator_id},
+		#{creator_name},
+		#{source_type},
+		#{suffix_name}
+	)
+</insert>
+<update id="updateOrderAgreementFile" parameterType="usercenter.saleManage.tradeManager.model.OrderAgreementFile">
+	update t_order_agreement_file
+		set
+			agreement_id = #{agreement_id},
+			pur_order_id = #{pur_order_id},
+			agreement_bh = #{agreement_bh},
+			agreement_status = #{agreement_status},
+			agreement_name = #{agreement_name},
+			mogodb_id = #{mogodb_id},
+			create_dt = #{create_dt},
+			creator_id = #{creator_id},
+			creator_name = #{creator_name},
+			source_type = #{source_type}
+		where agreement_id = #{agreement_id}
+</update>
+<delete id="deleteOrderAgreementFile" parameterType="map">
+	delete from t_order_agreement_file
+	where agreement_id = #{agreement_id}
+</delete>
+<select id="getOrderFileforId" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAgreementFile">
+	select 
+	    t_order_agreement_file.agreement_id,
+	    t_order_agreement_file.agreement_name	    	    
+	from
+		t_order_agreement_file
+	where
+	    t_order_agreement_file.agreement_id = #{agreement_id}
+	    limit 1
+</select>
+<select id="getOrderFileforPurorderid" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAgreementFile">
+	select 
+	    t_order_agreement_file.agreement_id,
+	    t_order_agreement_file.agreement_name	    	    
+	from
+		t_order_agreement_file
+	where
+	    t_order_agreement_file.pur_order_id = #{pur_order_id}
+	    and t_order_agreement_file.agreement_status = 1
+	    limit 1
+</select>
+</mapper>

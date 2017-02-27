@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.basicdata.taxmanClass.data.TaxmanClassMapper">
+
+
+<select id="getTaxmanClassList" parameterType="map" resultType="manager.basicdata.taxmanClass.model.TaxmanClass">
+	select
+		t_taxman_class.taxman_id,
+		t_taxman_class.taxman_name
+	from
+		t_taxman_class
+</select>
+<insert id="addTaxmanClass" parameterType="manager.basicdata.taxmanClass.model.TaxmanClass" keyProperty="taxman_id" useGeneratedKeys="true">
+	<selectKey keyProperty="taxman_id" resultType="int" order="BEFORE">
+		select  ifnull(max(taxman_id)+1,1) from t_taxman_class 		
+	</selectKey>
+	insert into t_taxman_class
+	(
+		taxman_id,
+		taxman_name
+	)
+	values
+	(
+		#{taxman_id},
+		#{taxman_name}
+	)
+</insert>
+<update id="updateTaxmanClass" parameterType="manager.basicdata.taxmanClass.model.TaxmanClass">
+	update t_taxman_class
+		set
+			taxman_id = #{taxman_id},
+			taxman_name = #{taxman_name}
+		where taxman_id = #{taxman_id}
+</update>
+<delete id="deleteTaxmanClass" parameterType="manager.basicdata.taxmanClass.model.TaxmanClass">
+	delete from t_taxman_class
+	where taxman_id = #{taxman_id}
+</delete>
+</mapper>

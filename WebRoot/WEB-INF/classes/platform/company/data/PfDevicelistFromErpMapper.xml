@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfDevicelistFromErpMapper">
+
+<insert id="addDevicelistFromERP" parameterType="com.outsideasy.ws.erp.supplier.vo.DeviceOut" keyProperty="device_id" useGeneratedKeys="true">
+	insert into t_access_application_devicelist
+	(
+		device_name,
+		specifications,
+		place,
+		price,
+		buy_day,
+		advanced,
+		device_num,
+		record_id
+	)
+	values
+	(
+		#{device_name},
+		#{format},
+		#{place},
+		#{price},
+		#{buy_day},
+		#{advanced},
+		#{device_num},
+		#{record_id}
+	)
+</insert>
+<update id="updateDevicelistFromERP" parameterType="map">
+	update t_access_application_devicelist
+		set
+            device_name = #{device_name}
+			,specifications = #{format}
+			,place = #{place}
+			,price = #{price}
+			,buy_day = #{buy_day}
+			,advanced = #{advanced}
+			,device_num = #{device_num}
+			,record_id = #{record_id}
+		where device_id = #{device_out_id} and record_id = #{record_id}
+</update>
+<delete id="deleteDevicelistFromERP" parameterType="map">
+	delete from t_access_application_devicelist
+	where device_id = #{device_id} and record_id = #{record_id}
+</delete>
+
+</mapper>

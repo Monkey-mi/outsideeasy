@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.ShippingRegistrationMapper">
+
+<select id="getShippingRegistrationList" parameterType="map" resultType="usercenter.externalTask.model.ShippingRegistration">
+	select
+		t_shipping_registration.shipping_id,
+		t_shipping_registration.shipping_state,
+		t_shipping_registration.shipping_number,
+		t_shipping_registration.start_date,
+		t_shipping_registration.licence_plate,
+		t_shipping_registration.driver,
+		t_shipping_registration.phone_number,
+		t_shipping_registration.remark,
+		t_shipping_registration.create_dt,
+		t_shipping_registration.shipping_company,
+		t_shipping_registration.shipping_company_id
+	from
+		t_shipping_registration
+	where 
+	    t_shipping_registration.shipping_company_id = #{company_id}
+</select>
+<insert id="addShippingRegistration" parameterType="map" keyProperty="shipping_id" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="shipping_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_shipping_registration
+	(	
+		shipping_state,
+		shipping_number,
+		start_date,
+		licence_plate,
+		driver,
+		phone_number,
+		remark,
+		shipping_company,
+		shipping_company_id
+	)
+	values
+	(	
+		#{shipping_state},
+		#{shipping_number},
+		#{start_date},
+		#{licence_plate},
+		#{driver},
+		#{phone_number},
+		#{remark},	
+		#{shipping_company},
+		#{shipping_company_id}
+	)
+</insert>
+<update id="updateShippingRegistration" parameterType="map">
+	update t_shipping_registration
+		set			
+			start_date = #{start_date},
+			licence_plate = #{licence_plate},
+			driver = #{driver},
+			phone_number = #{phone_number},
+			remark = #{remark}								
+		where shipping_number = #{shipping_number}
+</update>
+<select id="getShippingStatus" parameterType="map" resultType="Integer">
+select
+		 t_shipping_registration.shipping_state 
+	from
+		t_shipping_registration		
+	where 
+	    t_shipping_registration.shipping_number = #{shipping_number}	    
+</select>
+<select id="getShippingStatusForID" parameterType="map" resultType="Integer">
+select
+		 t_shipping_registration.shipping_state 
+	from
+		t_shipping_registration		
+	where 
+	    t_shipping_registration.shipping_id = #{shipping_id}	    
+</select>
+<select id="getShippingStatusForEdit" parameterType="map" resultType="Integer">
+select
+		 t_task_deliver_goods.deliver_state 
+	from
+		t_shipping_registration
+		left join t_task_deliver_goods on t_task_deliver_goods.shipping_id = t_shipping_registration.shipping_id
+	where 
+	    t_shipping_registration.shipping_number = #{shipping_number}
+	    and t_task_deliver_goods.is_delete = #{is_delete}	   
+</select>
+<delete id="deleteShippingRegistration" parameterType="map">
+	delete from t_shipping_registration
+	where shipping_id = #{shipping_id}
+</delete>
+<select id="getShippingForID" parameterType="map" resultType="usercenter.externalTask.model.ShippingRegistration">
+select
+        t_shipping_registration.shipping_id,
+		t_shipping_registration.shipping_state,
+		t_shipping_registration.shipping_number,
+		t_shipping_registration.start_date,
+		t_shipping_registration.licence_plate,
+		t_shipping_registration.driver,
+		t_shipping_registration.phone_number,
+		t_shipping_registration.remark,
+		t_shipping_registration.create_dt,
+		t_shipping_registration.shipping_company,
+		t_shipping_registration.shipping_company_id
+	from
+		t_shipping_registration
+	where 
+	    t_shipping_registration.shipping_id = #{shipping_id}
+</select>
+<select id="getShippingForNumber" parameterType="map" resultType="usercenter.externalTask.model.ShippingRegistration">
+select
+        t_shipping_registration.shipping_id,
+		t_shipping_registration.shipping_state,
+		t_shipping_registration.shipping_number,
+		t_shipping_registration.start_date,
+		t_shipping_registration.licence_plate,
+		t_shipping_registration.driver,
+		t_shipping_registration.phone_number,
+		t_shipping_registration.remark,
+		t_shipping_registration.create_dt,
+		t_shipping_registration.shipping_company,
+		t_shipping_registration.shipping_company_id
+	from
+		t_shipping_registration
+	where 
+	    t_shipping_registration.shipping_number = #{shipping_number}
+	    limit 1
+</select>
+<update id="updateShippingRegistrationForCancel" parameterType="map">
+	update t_shipping_registration
+		set			
+			shipping_state = #{shipping_state}										
+		where shipping_id = #{shipping_id}
+</update> 
+<select id="getShippingIdForNum"  parameterType="map" resultType="usercenter.externalTask.TaskResponse.DeStatusVo">
+select
+         t_task_deliver_goods.deliver_id,
+		 t_task_deliver_goods.deliver_state,
+		 t_task_deliver_goods.shipping_id,
+         t_task_deliver_goods.delivery_quantity,
+         t_task_deliver_goods.t_id,
+         t_task_deliver_goods.deliver_number,
+         t_task_deliver_goods.deliver_type,
+		 t_shipping_registration.shipping_state		 
+	from
+		t_shipping_registration
+		left join t_task_deliver_goods on t_task_deliver_goods.shipping_id = t_shipping_registration.shipping_id
+	where 
+	    t_shipping_registration.shipping_number = #{shipping_number}
+	    and t_task_deliver_goods.is_delete = #{is_delete}	
+
+</select>
+</mapper>

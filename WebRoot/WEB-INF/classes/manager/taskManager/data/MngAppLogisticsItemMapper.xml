@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.taskManager.data.MngAppLogisticsItemMapper">
+
+
+<select id="getAppLogisticsItemList" parameterType="map" resultType="manager.taskManager.model.MngAppLogisticsItem">
+	select
+		t_app_logistics_item.item_id,
+		t_app_logistics_item.record_id,
+		t_app_logistics_item.goods_name,
+		t_app_logistics_item.deliver_no,
+		t_app_logistics_item.arrived_no,
+		t_app_logistics_item.receive_no,
+		t_app_logistics_item.t_id,
+		t_app_logistics_item.receive_time,
+		t_app_logistics_item.qc_state
+	from
+		t_app_logistics_item
+		left join t_app_logistics_item  on t_app_logistics_item.record_id = t_app_logistics_item.record_id
+</select>
+<insert id="addAppLogisticsItem" parameterType="manager.taskManager.model.MngAppLogisticsItem" keyProperty="item_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="item_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_logistics_item
+	(
+	
+		record_id,
+		goods_name,
+		deliver_no,
+		arrived_no,
+		receive_no,
+		t_id,
+		receive_time
+	)
+	values
+	(
+		
+		#{record_id},
+		#{goods_name},
+		#{deliver_no},
+		#{arrived_no},
+		#{receive_no},
+		#{t_id},
+		#{receive_time}
+	)
+</insert>
+<update id="updateAppLogisticsItem" parameterType="manager.taskManager.model.MngAppLogisticsItem">
+	update t_app_logistics_item
+		set
+			record_id = #{record_id},
+			t_id = #{t_id},
+			goods_name = #{goods_name},
+			deliver_no = #{deliver_no},
+			arrived_no = #{arrived_no},
+			receive_no = #{receive_no},
+			receive_time = #{receive_time}
+		where item_id = #{item_id}
+</update>
+<delete id="deleteAppLogisticsItem" parameterType="manager.taskManager.model.MngAppLogisticsItem">
+	delete from t_app_logistics_item
+	where item_id = #{item_id}
+</delete>
+</mapper>

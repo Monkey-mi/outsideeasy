@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.TaskFileMapper">
+
+
+<select id="getTaskFileList" parameterType="map" resultType="usercenter.externalTask.model.TaskFile">
+	select
+		t_app_task_file.tf_id,
+		t_app_task_file.t_id,
+		t_app_task_file.file_name,
+		t_app_task_file.file_type,
+		t_app_task_file.object_id,
+		t_app_task_file.order_no,
+		t_app_task_file.file_time,
+		t_app_task_file.remark,
+		t_app_task_file.suffix_name,
+		t_app_task_file.is_delete,
+		t_app_task_file.view_no
+	from
+		t_app_task_file
+		order by file_time desc
+</select>
+<insert id="addTaskFile" parameterType="usercenter.externalTask.model.TaskFile">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="tf_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task_file
+	(	
+		t_id,
+		file_name,
+		file_type,
+		object_id,
+		order_no,
+		file_time,
+		remark,
+		suffix_name,
+		record_id,
+		operator_name
+	)
+	values
+	(
+	
+		#{t_id},
+		#{file_name},
+		#{file_type},
+		#{object_id},
+		#{order_no},
+		#{file_time},
+		#{remark},
+		#{suffix_name},
+		#{record_id},
+		#{operator_name}
+	)
+</insert>
+<update id="updateTaskFile" parameterType="map">
+	update t_app_task_file
+		set				
+			file_name = #{file_name},		   
+			remark = #{remark}		
+		where tf_id = #{tf_id}
+</update>
+<update id="updateTaskFileForRemark" parameterType="map">
+	update t_app_task_file
+		set						   
+			remark = #{remark}		
+		where tf_id = #{tf_id}
+</update>
+<delete id="deleteTaskFile" parameterType="Integer">
+	delete from t_app_task_file
+	where tf_id = #{tf_id}
+</delete>
+<select id="getTaskFile" parameterType="Integer" resultType="usercenter.externalTask.model.TaskFile">
+   select    
+        t_app_task_file.tf_id,   
+		t_app_task_file.object_id,
+		t_app_task_file.file_type		
+      from
+		t_app_task_file
+	  where 	
+		tf_id = #{tf_id}
+</select>
+<select id="getTaskFileImgList" parameterType="map" resultType="usercenter.externalTask.model.TaskFile">
+	select
+		t_app_task_file.tf_id,
+		t_app_task_file.t_id,
+		t_app_task_file.file_name,
+		t_app_task_file.file_type,
+		t_app_task_file.object_id,
+		t_app_task_file.order_no,
+		t_app_task_file.file_time,
+		t_app_task_file.remark,
+		t_app_task_file.suffix_name,
+		t_app_task_file.is_delete,
+		t_app_task_file.view_no
+	from
+		t_app_task_file
+		where 1=1
+		<if test="is_delete==0">
+			and is_delete =0
+		</if>
+		<if test="is_delete==1">
+			and is_delete =1
+		</if>
+		<if test="t_id != null and t_id != ''">
+		and t_id = #{t_id}
+		</if>
+		<if test="file_type != null and file_type != '' and file_type ==2 ">
+		and file_type in (2,45,46)
+		</if>
+		<if test="file_type != null and file_type != '' and file_type !=2 ">
+		and file_type = #{file_type}
+		</if>		
+		order by file_time desc
+</select>
+<select id="getTaskFileImgList2" parameterType="map" resultType="usercenter.externalTask.model.TaskFile">
+	select
+		t_app_task_file.tf_id,
+		t_app_task_file.t_id,
+		t_app_task_file.file_name,
+		t_app_task_file.file_type,
+		t_app_task_file.object_id,
+		t_app_task_file.order_no,
+		t_app_task_file.file_time,
+		t_app_task_file.remark,
+		t_app_task_file.suffix_name,
+		t_app_task_file.is_delete,
+		t_app_task_file.view_no
+	from
+		t_app_task_file
+		where 1=1
+		<if test="is_delete==0">
+			and is_delete =0
+		</if>
+		<if test="is_delete==1">
+			and is_delete =1
+		</if>
+		<if test="t_id != null and t_id != ''">
+		and t_id = #{t_id}
+		</if>
+		<if test="file_type != null and file_type != '' ">
+		and file_type = #{file_type}
+		</if>		
+		order by file_time desc
+</select>
+<select id="getTaskFileAllList" parameterType="map" resultType="usercenter.externalTask.model.TaskFile">
+select
+		t_app_task_file.tf_id,
+		t_app_task_file.file_name,
+		t_app_task_file.file_type,
+		t_app_task_file.object_id,		
+		t_app_task_file.view_no
+	from
+		t_app_task_file
+		where 1=1	
+		and is_delete = #{is_delete}	
+		<if test="t_id != null and t_id != ''">
+		and t_id = #{t_id}
+		</if>
+		and file_type in
+		 <foreach collection="arr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by file_time desc
+</select>
+<select id="getTaskFileImgListproduct" parameterType="map" resultType="usercenter.externalTask.model.TaskFile">
+	select
+		t_app_task_file.tf_id,
+		t_app_task_file.t_id,
+		t_app_task_file.file_name,
+		t_app_task_file.file_type,
+		t_app_task_file.object_id,
+		t_app_task_file.order_no,
+		t_app_task_file.file_time,
+		t_app_task_file.remark,
+		t_app_task_file.suffix_name,
+		t_app_task_file.is_delete,
+		t_app_task_file.view_no
+	from
+		t_app_task_file
+		where 1=1
+		<if test="t_id != null and t_id != ''">
+		and t_id = #{t_id}
+		</if>
+		<if test="file_type != null and file_type != ''">
+		and ( file_type = 7 or file_type = #{file_type} )
+		</if>
+		order by file_time desc
+</select>
+<update id="updateImgTaskFile" parameterType="map">
+	update t_app_task_file
+		set
+		   
+			<if test="t_id != null and t_id != ''">
+			t_id = #{t_id},
+			</if>
+			
+			file_name = #{file_name},
+			
+			<if test="file_type != null and file_type != ''">
+			file_type = #{file_type},
+			</if>
+			<if test="object_id != null and object_id != ''">
+			object_id = #{object_id},
+			</if>
+			<if test="order_no != null and order_no != ''">
+			order_no = #{order_no},
+			</if>
+			<if test="file_time != null and file_time != ''">
+			file_time = #{file_time},
+			</if>
+			<if test="remark != null and remark != ''">
+		    remark = #{remark}
+		    </if>
+		    <if test="suffix_name != null and suffix_name != ''">
+		    suffix_name = #{suffix_name}
+		    </if>
+			
+		where
+		    tf_id = #{tf_id}
+</update>
+<select id="getTaskFileBytime" parameterType="usercenter.externalTask.model.TaskFile" resultType="Integer">
+ select        
+		t_app_task_file.tf_id	
+      from
+		t_app_task_file
+	  where 1=1	
+	    <if test="file_time != null and file_time != ''">
+		and file_time = #{file_time}
+		</if>
+		<if test="object_id != null and object_id != ''">
+		and object_id = #{object_id}
+		</if>
+		
+
+</select>
+
+<delete id="deleteTaskFileByobject_id" parameterType="Integer">
+	delete from t_app_task_file
+	where object_id = #{object_id}
+</delete>
+<select id="getTaskFileByobject_id" parameterType="map" resultType="usercenter.externalTask.model.TaskFile">
+	select
+		t_app_task_file.*
+	from
+		t_app_task_file
+	where object_id = #{object_id}
+</select>
+<insert id="addTaskViewFile" parameterType="usercenter.externalTask.model.TaskFile" >
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="tf_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task_file
+	(		
+		t_id,
+		file_name,
+		file_type,
+		object_id,
+		order_no,
+		file_time,
+		remark,
+		suffix_name,
+		view_no
+	)
+	values
+	(
+	
+		#{t_id},
+		#{file_name},
+		#{file_type},
+		#{object_id},
+		#{order_no},
+		#{file_time},
+		#{remark},
+		#{suffix_name},
+		#{view_no}
+	)
+</insert>
+<update id="updateLogisticsImg" parameterType="map">
+	update t_app_task_file
+		set				   
+			record_id = #{record_id}		
+		where tf_id = #{tf_id}
+
+</update>
+<select id="getLogisticsImg" parameterType="map" resultType="usercenter.externalTask.model.TaskFile">
+   select
+		t_app_task_file.tf_id,
+		t_app_task_file.object_id
+	from
+		t_app_task_file
+	where file_type = #{file_type} and record_id = #{record_id} and operator_name = #{operator_name} and t_id = #{t_id}
+</select>
+<delete id="deleteLogisticsImg" parameterType="Integer">
+    delete from t_app_task_file
+	where tf_id = #{tf_id}
+</delete>
+<select id="getLogicticsFilelist" parameterType="Integer"  resultType="usercenter.externalTask.model.TaskFile">
+    select
+		t_app_task_file.tf_id,
+		t_app_task_file.object_id
+	from
+		t_app_task_file
+	where record_id = #{record_id}
+
+</select>
+<select id="getCommitFilelist" parameterType="Integer"  resultType="Integer">
+    select
+		count(0)
+	from
+		t_app_task_file
+	where record_id = #{record_id}
+</select>
+<update id="updatetaskfile2del" parameterType="map">
+	update t_app_task_file
+	set is_delete=1
+	where tf_id = #{tf_id}
+</update>
+<update id="updateCommitImg" parameterType="map">
+update t_app_task_file
+		set				   
+			record_id = #{record_id}		
+		where 
+		tf_id in
+        <foreach collection="arr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+</update>
+<select id="getTaskFileByCondition" parameterType="map" resultType="usercenter.externalTask.model.TaskFile">
+	select
+		t_app_task_file.tf_id,
+		t_app_task_file.t_id,
+		t_app_task_file.file_name,
+		t_app_task_file.file_type,
+		t_app_task_file.object_id,
+		t_app_task_file.order_no,
+		t_app_task_file.file_time,
+		t_app_task_file.remark,
+		t_app_task_file.suffix_name,
+		t_app_task_file.is_delete,
+		t_app_task_file.view_no
+	from
+		t_app_task_file
+	left join t_app_task on t_app_task_file.t_id=t_app_task.t_id
+	where 1=1
+	<if test="object_id!=null and object_id!=''">
+	and t_app_task_file.object_id=#{object_id}
+	</if>
+	<if test="rwdh!=null and rwdh!=''">
+	and t_app_task.rwdh like '%${rwdh}%'
+	</if>
+</select>
+<select id="getTaskProhibitFile" parameterType = "map" resultType="usercenter.externalTask.model.TaskFile">
+select
+		t_app_task_file.tf_id,
+		t_app_task_file.t_id,
+		t_app_task_file.file_name,
+		t_app_task_file.file_type,
+		t_app_task_file.object_id,
+		t_app_task_file.order_no,
+		t_app_task_file.file_time,
+		t_app_task_file.remark,
+		t_app_task_file.suffix_name
+	from
+		t_app_task_file
+where 
+        t_app_task_file.t_id = #{t_id}
+        and  t_app_task_file.file_type = #{file_type}
+        and  t_app_task_file.is_delete = #{is_delete}
+        limit 1
+</select>
+<select id="getTaskFileCount" parameterType="map" resultType="Integer">
+	select
+		count(0)		
+	from
+		t_app_task_file
+	where
+	  t_app_task_file.t_id = #{t_id}
+	  and  t_app_task_file.file_type = #{file_type}
+</select>
+<update id="updateForShipping" parameterType="map" >
+    update  t_app_task_file
+        set shipping_id = #{shipping_id}
+    where
+        t_app_task_file.tf_id in
+    <foreach collection="arrpic" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+    </foreach>
+</update>
+<select id="getTaskShippingFile" parameterType = "map" resultType="usercenter.externalTask.model.TaskFile">
+   select
+		t_app_task_file.tf_id,		
+		t_app_task_file.object_id
+   from
+		t_app_task_file
+   where 
+        t_app_task_file.shipping_id = #{shipping_id}
+        and  t_app_task_file.file_type = #{file_type}
+        and  t_app_task_file.is_delete = #{is_delete}
+</select>
+</mapper>

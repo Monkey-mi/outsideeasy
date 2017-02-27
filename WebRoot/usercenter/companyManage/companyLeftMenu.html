@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>左侧菜单</title>
+<!-- 
+<link href="/newresources/css/accountLeftMenu.css" rel="stylesheet" type="text/css" />
+<link href="/newresources/css/common.css" rel="stylesheet" type="text/css" />
+ -->
+ <script id="evaluationtmpl" type="text/x-dot-template">
+{{ for(var prop in it) { }}
+	<p class="title">{{= it[prop].menu_name }}</p>
+	<ul>
+	{{ for(var child in it[prop].children){ }}
+		<li><a href={{= it[prop].children[child].menu_path +".htm"}} >{{= it[prop].children[child].menu_name}}</a></li>
+	{{ } }}
+	</ul>
+{{ } }}
+</script>
+<script type="text/javascript">
+$(function(){
+var data=getMenuData(32);
+var evalText=doT.template($("#evaluationtmpl").text());
+$("#evaluation").html(evalText(data));
+});
+</script>
+</head>
+<body>
+<div id="leftMenuPage" class="account_leftMenu">
+	<div class="account_leftMenu_title">企业信息管理</div>
+	<div id="evaluation"></div>
+	<!-- 
+	<p class="title">账号信息</p>
+		<ul>
+			
+			<li><a href="/usercenter/accountManage/registerInfo.html">注册信息</a></li>
+			<li><a href="/usercenter/accountManage/updatePwd.html">修改密码</a></li>
+			<li><a href="/usercenter/accountManage/safeAccount.html">账号安全</a></li>
+		</ul>
+		<p class="title">企业信息</p>
+		<ul>
+			<li><a href="/usercenter/companyManage/baseInfo.html">基本信息</a></li>
+			<li><a href="/usercenter/companyManage/detailsInfo.html">详细信息</a></li>
+			<li><a href="/usercenter/companyManage/scalepowerInfo.html">规模能力</a></li>
+			<!-- <li><a href="#" >其他资质</a></li>  -->
+		<!--  	
+			<li><a href="/subAccount/mngSubAccount2.htm">组织结构</a></li>
+		</ul>
+		<p class="title">交易信息</p>
+		<ul>
+			<li><a href="/usercenter/tradeManage/tradeInfo.html">交易资料</a></li>
+		</ul>
+	 -->
+</div>
+</body>
+</html>

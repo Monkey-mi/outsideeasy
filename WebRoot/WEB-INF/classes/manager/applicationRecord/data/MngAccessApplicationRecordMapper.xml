@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.applicationRecord.data.MngAccessApplicationRecordMapper">
+
+
+<select id="getMngAccessApplicationRecordList" parameterType="map" resultType="manager.applicationRecord.model.MngAccessApplicationRecord">
+	select
+		t_access_application_record.record_id,
+		t_access_application_record.submit_id,
+		t_access_application_record.receive_id,
+		t_access_application_record.receive_invite_id,
+		t_access_application_record.create_dt,
+		t_access_application_record.access_status,
+		t_access_application_record.h_id,
+		sc.cpyname_cn as submit_name,
+	    rc.cpyname_cn as receive_name
+	from
+		t_access_application_record
+		left join t_app_company_info as sc on sc.company_id=t_access_application_record.submit_id
+	    left join t_app_company_info as rc on rc.company_id=t_access_application_record.receive_id
+	where 1=1
+	<if test="condition != '' and condition != null">	
+	    and (sc.cpyname_cn like '%${condition}%' or rc.cpyname_cn like  '%${condition}%')
+	</if>
+	<if test="apply_sts != '' and apply_sts != nulla and apply_sts !=5 ">	
+	    and t_access_application_record.access_status = #{apply_sts}
+	</if>		
+</select>
+
+<select id="getAccessApplication" parameterType="map" resultType="manager.applicationRecord.model.MngAccessApplicationRecord">
+select
+		t_access_application_record.record_id,
+		t_access_application_record.submit_id,
+		t_access_application_record.receive_id,
+		t_access_application_record.receive_invite_id,
+		t_access_application_record.create_dt,
+		t_access_application_record.access_status,
+		t_access_application_record.h_id,
+		sc.cpyname_cn as submit_name,
+	    rc.cpyname_cn as receive_name
+	from
+		t_access_application_record
+		left join t_app_company_info as sc on sc.company_id=t_access_application_record.submit_id
+	    left join t_app_company_info as rc on rc.company_id=t_access_application_record.receive_id
+	where 
+	   	t_access_application_record.record_id =  #{record_id}
+</select>
+
+<update id="updateStateApplication" parameterType="map">
+	update t_access_application_record
+		set	
+			access_status = #{access_status}
+		where record_id = #{record_id}
+</update>
+<insert id="addMngAccessApplicationRecord" parameterType="manager.applicationRecord.model.MngAccessApplicationRecord" keyProperty="record_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="record_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_access_application_record
+	(	
+		submit_id,
+		receive_invite_id,
+		receive_id,
+		access_status,
+		h_id
+	)
+	values
+	(
+		#{submit_id},		
+		#{receive_invite_id},
+		#{receive_id},
+		#{access_status},
+		#{h_id}
+	)
+</insert>
+<update id="updateMngAccessApplicationRecord" parameterType="manager.applicationRecord.model.MngAccessApplicationRecord">
+	update t_access_application_record
+		set
+			record_id = #{record_id},
+			submit_id = #{submit_id},
+			receive_id = #{receive_id},
+			access_status = #{access_status},
+			receive_invite_id = #{receive_invite_id},
+			h_id = #{h_id}
+		where record_id = #{record_id}
+</update>
+<delete id="deleteMngAccessApplicationRecord" parameterType="manager.applicationRecord.model.MngAccessApplicationRecord">
+	delete from t_access_application_record
+	where record_id = #{record_id}
+</delete>
+</mapper>

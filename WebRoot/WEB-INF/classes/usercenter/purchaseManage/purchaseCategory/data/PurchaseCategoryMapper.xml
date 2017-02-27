@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.purchaseManage.purchaseCategory.data.PurchaseCategoryMapper">
+
+
+<select id="getPurchaseCategoryList" parameterType="map" resultType="usercenter.purchaseManage.purchaseCategory.model.PurchaseCategory">
+	select
+		t_purchase_category.category_id,
+		t_purchase_category.category_name,
+		t_purchase_category.purchase_nature_id,
+		t_purchase_nature.purchase_nature_name,
+		t_purchase_category.f_id,
+		t_purchase_category.leaf,
+		t_purchase_category.create_dt,
+		t_purchase_category.order_by
+	from
+		t_purchase_category
+		left join t_purchase_nature on t_purchase_nature.purchase_nature_id=t_purchase_category.purchase_nature_id
+		where 1=1
+		<if test="f_id!=null">
+			and t_purchase_category.f_id=#{f_id}
+		</if>
+		
+		<if test="nature_id!=null">
+			and t_purchase_category.purchase_nature_id=#{nature_id}
+		</if>
+</select>
+<insert id="addPurchaseCategory" parameterType="map" keyProperty="category_id" useGeneratedKeys="true">
+	insert into t_purchase_category
+	(
+		category_name,
+		purchase_nature_id,
+		f_id,
+		leaf,
+		order_by
+	)
+	values
+	(
+		#{category_name},
+		#{purchase_nature_id},
+		#{f_id},
+		#{leaf},
+		#{order_by}
+	)
+</insert>
+<update id="updatePurchaseCategory" parameterType="map">
+	update t_purchase_category
+		set
+			category_id = #{category_id}
+			<if test="category_name!=null and category_name!=''">
+			,category_name = #{category_name}
+			</if>
+			<if test="purchase_nature_id!=null and purchase_nature_id!=''">
+			,purchase_nature_id = #{purchase_nature_id}
+			</if>
+			<if test="f_id!=null and f_id!=''">
+			,f_id = #{f_id}
+			</if>
+			<if test="leaf!=null and leaf!=''">
+			,leaf = #{leaf}
+			</if>
+			<if test="create_dt!=null and create_dt!=''">
+			,create_dt = #{create_dt}
+			</if>
+			<if test="order_by!=null and order_by!=''">
+			,order_by = #{order_by}
+			</if>
+		where category_id = #{category_id}
+</update>
+<update id="updatePurchaseCategoryOrder" parameterType="map">
+	update t_purchase_category
+		set
+			order_by = #{order_by}
+		where order_by = #{order_by1} and f_id=#{f_id}
+</update>
+<delete id="deletePurchaseCategory" parameterType="map">
+	delete from t_purchase_category
+	where category_id = #{category_id}
+</delete>
+<select id="getCurrPurchaseCategorybyId"  parameterType="map" resultType="usercenter.purchaseManage.purchaseCategory.model.PurchaseCategory">
+	select
+		t_purchase_category.category_id,
+		t_purchase_category.category_name,
+		t_purchase_category.purchase_nature_id,
+		t_purchase_category.f_id,
+		t_purchase_category.leaf,
+		t_purchase_category.create_dt,
+		t_purchase_category.order_by
+	from
+		t_purchase_category
+		where 1=1
+		<if test="category_id!=null">
+			and t_purchase_category.category_id=#{category_id}
+		</if>	
+</select>
+<select id="getCurrPurchaseCategorybyFId" parameterType="map" resultType="usercenter.purchaseManage.purchaseCategory.model.PurchaseCategory">
+	select
+		t_purchase_category.category_id,
+		t_purchase_category.category_name,
+		t_purchase_category.purchase_nature_id,
+		t_purchase_category.f_id,
+		t_purchase_category.leaf,
+		t_purchase_category.create_dt,
+		t_purchase_category.order_by
+	from
+		t_purchase_category
+		where 1=1
+		<if test="f_id!=null">
+			and t_purchase_category.f_id=#{f_id}
+		</if>	
+</select>
+<select id="getParentCategoryById" parameterType="map" resultType="usercenter.purchaseManage.purchaseCategory.model.PurchaseCategory">
+	select
+		t_purchase_category.category_id,
+		t_purchase_category.category_name,
+		t_purchase_category.purchase_nature_id,
+		t_purchase_category.f_id,
+		t_purchase_category.leaf,
+		t_purchase_category.create_dt,
+		t_purchase_category.order_by
+	from
+		t_purchase_category
+		where  t_purchase_category.category_id=(
+		select t_purchase_category.f_id from t_purchase_category
+		where t_purchase_category.category_id = #{category_id}
+		)
+</select>
+<select id="getPurchaseCategoryListForOrderBy" parameterType="map" resultType="usercenter.purchaseManage.purchaseCategory.model.PurchaseCategory">
+	select
+		t_purchase_category.category_id,
+		t_purchase_category.category_name,
+		t_purchase_category.purchase_nature_id,
+		t_purchase_category.f_id,
+		t_purchase_category.leaf,
+		t_purchase_category.create_dt,
+		t_purchase_category.order_by
+	from
+		t_purchase_category
+		where  t_purchase_category.f_id=#{f_id}
+		and t_purchase_category.order_by>#{order_by}
+</select>
+</mapper>

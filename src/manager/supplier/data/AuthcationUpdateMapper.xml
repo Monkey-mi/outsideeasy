@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.AuthcationUpdateMapper">
+
+
+<select id="getAuthcationUpdateList" parameterType="map" resultType="manager.supplier.model.AuthcationUpdate">
+	select
+		t_authcation_update.auth_update_id,
+		t_authcation_update.company_id,
+		t_authcation_update.class_id,
+		t_authcation_update.nature_id,
+		t_authcation_update.key_remark,
+		t_authcation_update.cpyname_cn,
+		t_authcation_update.industry_id,
+		t_authcation_update.corporation,
+		t_authcation_update.reg_fund,
+		t_authcation_update.currency_id,
+		t_authcation_update.establish_dt,
+		t_authcation_update.created_dt,
+		t_authcation_update.state,
+		t_authcation_update.auth_opinion,
+		(select t_app_reg_accout.acc_name from t_app_reg_accout where t_app_reg_accout.reg_id=
+		(SELECT t_reg_accout_company_info.reg_id from t_reg_accout_company_info where t_reg_accout_company_info.company_id=t_authcation_update.company_id limit 1)) as account
+	from
+		t_authcation_update
+		<where>
+			1=1
+			<if test="company_id!=null">
+				and t_authcation_update.company_id=#{company_id}
+			</if>
+			<if test="auth_update_id!=null">
+				and t_authcation_update.auth_update_id=#{auth_update_id}
+			</if>
+			<if test="condition!=null and condition!=''">
+			  	and t_authcation_update.cpyname_cn like '%${condition}%'
+			</if>
+			<if test="state!=null and state>0">
+				and t_authcation_update.state=#{state}
+			</if>
+		</where>
+		<if test="orderby_flag!=null and orderby_flag==1">
+			order by created_dt DESC
+		</if>
+</select>
+<insert id="addAuthcationUpdate" parameterType="manager.supplier.model.AuthcationUpdate" keyProperty="auth_update_id" useGeneratedKeys="true">
+	insert into t_authcation_update
+	(
+		company_id,
+		class_id,
+		nature_id,
+		key_remark,
+		cpyname_cn,
+		
+		industry_id,
+		
+		corporation,
+		reg_fund,
+		currency_id,
+		establish_dt,
+		created_dt,
+		state,
+		auth_opinion
+	)
+	values
+	(
+		#{company_id},
+		#{class_id},
+		#{nature_id},
+		#{key_remark},
+		#{cpyname_cn},
+		
+		#{industry_id},
+		
+		#{corporation},
+		#{reg_fund},
+		#{currency_id},
+		#{establish_dt},
+		#{created_dt},
+		#{state},
+		#{auth_opinion}
+	)
+</insert>
+<update id="updateAuthcationUpdate" parameterType="manager.supplier.model.AuthcationUpdate">
+	update t_authcation_update
+		set
+			auth_update_id = #{auth_update_id},
+			company_id = #{company_id},
+			class_id = #{class_id},
+			nature_id = #{nature_id},
+			key_remark = #{key_remark},
+			cpyname_cn = #{cpyname_cn},
+			industry_id = #{industry_id},
+			corporation = #{corporation},
+			reg_fund = #{reg_fund},
+			currency_id = #{currency_id},
+			establish_dt = #{establish_dt},
+			created_dt = #{created_dt},
+			state = #{state},
+			auth_opinion = #{auth_opinion}
+		where auth_update_id = #{auth_update_id}
+</update>
+<delete id="deleteAuthcationUpdate" parameterType="manager.supplier.model.AuthcationUpdate">
+	delete from t_authcation_update
+	where auth_update_id = #{auth_update_id}
+</delete>
+</mapper>

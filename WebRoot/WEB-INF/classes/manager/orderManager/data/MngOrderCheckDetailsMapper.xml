@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.orderManager.data.MngOrderCheckDetailsMapper">
+
+<select id="getMngOrderCheckDetailsList" parameterType="map" resultType="manager.orderManager.model.MngOrderCheckDetails">
+	select
+		     t_order_check_details.check_detail_id,
+		     t_order_check_details.check_id,
+		     t_order_check_details.order_detail_id,
+		     t_order_check_details.check_number,
+		     t_order_check_details.check_result,
+		     t_order_check_details.check_vote,
+		     t_order_check_details.create_dt
+	from
+		t_order_check_details
+	where 1=1
+	<if test="condition!=null and condition!=''">
+		and ${condition}
+	</if>
+	<if test="check_id!=null and check_id != ''">
+	    and check_id = #{check_id}
+	</if>
+	<if test="orderBySQL!=null and orderBySQL!=''">
+		order by  ${orderBySQL}
+	</if>
+</select>
+
+<insert id="addMngOrderCheckDetails" parameterType="manager.orderManager.model.MngOrderCheckDetails" keyProperty="check_detail_id" useGeneratedKeys="true">
+	<selectKey keyProperty="check_detail_id" resultType="Integer" order="BEFORE">
+		select  isnull(max(check_detail_id)+1,1) from t_order_check_details 		
+	</selectKey>
+	insert into t_order_check_details
+	(
+		     check_detail_id,
+		     check_id,
+		     order_detail_id,
+		     check_number,
+		     check_result,
+		     check_vote,
+		     create_dt
+	)
+	values
+	(
+		     #{check_detail_id},
+		     #{check_id},
+		     #{order_detail_id},
+		     #{check_number},
+		     #{check_result},
+		     #{check_vote},
+		     #{create_dt}
+	)
+</insert>
+<update id="updateMngOrderCheckDetails" parameterType="manager.orderManager.model.MngOrderCheckDetails">
+	update t_order_check_details
+		set
+		     check_detail_id=#{check_detail_id},
+		     check_id=#{check_id},
+		     order_detail_id=#{order_detail_id},
+		     check_number=#{check_number},
+		     check_result=#{check_result},
+		     check_vote=#{check_vote},
+		     create_dt=#{create_dt}
+		where check_detail_id= #{check_detail_id}
+</update>
+<delete id="deleteMngOrderCheckDetails" parameterType="manager.orderManager.model.MngOrderCheckDetails">
+	delete from t_order_check_details
+	where check_detail_id= #{check_detail_id}
+</delete>
+</mapper>

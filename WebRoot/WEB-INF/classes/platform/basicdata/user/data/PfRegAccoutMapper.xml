@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.basicdata.user.data.PfRegAccoutMapper">
+
+<select id="getPfRegAccoutList" parameterType="map" resultType="usercenter.subAccount.model.SubAccount">
+	select
+		t_app_sub_account.sa_id,
+		t_app_sub_account.reg_id,
+		t_app_sub_account.org_id,
+		t_app_sub_account.role_id,
+		t_app_sub_account.sa_name,
+		t_app_sub_account.phone,
+		t_app_sub_account.sa_password,
+		t_app_sub_account.enabled,
+		t_app_sub_account.create_date,
+		t_app_sub_account.username
+	from
+		t_app_sub_account
+	LEFT JOIN t_reg_accout_company_info on t_reg_accout_company_info.reg_id=t_app_sub_account.reg_id
+	where 1=1
+    <if test="reg_id!=null and reg_id!=''">
+       and t_app_sub_account.reg_id =#{reg_id}
+    </if>
+    <if test="org_id!=null and org_id!=''">
+       and t_app_sub_account.org_id =#{org_id}
+    </if>
+    <if test="sa_id!=null">
+    	and t_app_sub_account.sa_id =#{sa_id}
+    </if>
+    <if test="company_id!=null">
+    	and t_reg_accout_company_info.company_id=#{company_id}
+    </if>
+</select>
+</mapper>

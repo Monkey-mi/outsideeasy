@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.basicdata.companyClass.data.CompanyClassMapper">
+
+
+<select id="getCompanyClassList" parameterType="map" resultType="manager.basicdata.companyClass.model.CompanyClass">
+	select
+		t_company_class.nature_id,
+		t_company_class.nature_name,
+		t_company_class.f_id
+	from
+		t_company_class
+		where 1=1
+		<if test="nature_name!=null">
+		and t_company_class.nature_name=#{nature_name}
+	</if>
+</select>
+<insert id="addCompanyClass" parameterType="manager.basicdata.companyClass.model.CompanyClass" keyProperty="nature_id" useGeneratedKeys="true">
+	<selectKey keyProperty="nature_id" resultType="int" order="BEFORE">
+		select  ifnull(max(nature_id)+1,1) from t_company_class 		
+	</selectKey>
+	insert into t_company_class
+	(
+		nature_id,
+		nature_name,
+		f_id
+	)
+	values
+	(
+		#{nature_id},
+		#{nature_name},
+		#{f_id}
+	)
+</insert>
+<update id="updateCompanyClass" parameterType="manager.basicdata.companyClass.model.CompanyClass">
+	update t_company_class
+		set
+			nature_id = #{nature_id},
+			nature_name = #{nature_name},
+			f_id = #{f_id}
+		where nature_id = #{nature_id}
+</update>
+<delete id="deleteCompanyClass" parameterType="manager.basicdata.companyClass.model.CompanyClass">
+	delete from t_company_class
+	where nature_id = #{nature_id}
+</delete>
+
+<select id="getCountForAdd" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_company_class where f_id =#{f_id} and nature_name=#{nature_name}
+</select>
+
+<select id="getCountForUpdate" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_company_class where f_id =#{f_id} and nature_name=#{nature_name} and nature_id != #{nature_id}
+</select>
+
+<select id="getXiajiCount" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_company_class where f_id =#{nature_id}
+</select>
+</mapper>

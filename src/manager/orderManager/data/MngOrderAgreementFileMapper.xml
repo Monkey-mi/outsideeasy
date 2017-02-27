@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.orderManager.data.MngOrderAgreementFileMapper">
+
+
+<select id="getMngOrderAgreementFileList" parameterType="map" resultType="manager.orderManager.model.MngOrderAgreementFile">
+	select
+		t_order_agreement_file.agreement_id,
+		t_order_agreement_file.pur_order_id,
+		t_order_agreement_file.agreement_bh,
+		t_order_agreement_file.agreement_status,
+		t_order_agreement_file.agreement_name,
+		t_order_agreement_file.mogodb_id,
+		t_order_agreement_file.create_dt,
+		t_order_agreement_file.creator_id,
+		t_order_agreement_file.creator_name,
+		t_order_agreement_file.source_type,
+		t_order_agreement_file.suffix_name
+	from
+		t_order_agreement_file
+		where 1=1
+		<if test="pur_order_id!=null">
+			and t_order_agreement_file.pur_order_id=#{pur_order_id}
+		</if>
+</select>
+<insert id="addMngOrderAgreementFile" parameterType="manager.orderManager.model.MngOrderAgreementFile" keyProperty="agreement_id" useGeneratedKeys="true">
+	insert into t_order_agreement_file
+	(
+		agreement_id,
+		pur_order_id,
+		agreement_bh,
+		agreement_status,
+		agreement_name,
+		mogodb_id,
+		create_dt,
+		creator_id,
+		creator_name,
+		source_type,
+		suffix_name
+	)
+	values
+	(
+		#{agreement_id},
+		#{pur_order_id},
+		#{agreement_bh},
+		#{agreement_status},
+		#{agreement_name},
+		#{mogodb_id},
+		#{create_dt},
+		#{creator_id},
+		#{creator_name},
+		#{source_type},
+		#{suffix_name}
+	)
+</insert>
+<update id="updateMngOrderAgreementFile" parameterType="manager.orderManager.model.MngOrderAgreementFile">
+	update t_order_agreement_file
+		set
+			agreement_id = #{agreement_id},
+			pur_order_id = #{pur_order_id},
+			agreement_bh = #{agreement_bh},
+			agreement_status = #{agreement_status},
+			agreement_name = #{agreement_name},
+			mogodb_id = #{mogodb_id},
+			create_dt = #{create_dt},
+			creator_id = #{creator_id},
+			creator_name = #{creator_name},
+			source_type = #{source_type},
+			suffix_name = #{suffix_name}
+		where agreement_id = #{agreement_id}
+</update>
+<delete id="deleteMngOrderAgreementFile" parameterType="manager.orderManager.model.MngOrderAgreementFile">
+	delete from t_order_agreement_file
+	where agreement_id = #{agreement_id}
+</delete>
+</mapper>

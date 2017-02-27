@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.basicdata.materialClass.data.MaterialClassMapper">
+
+
+<select id="getMaterialClassList" parameterType="map" resultType="manager.basicdata.materialClass.model.MaterialClass">
+	select
+		t_app_material_class.mc_id,
+		t_app_material_class.mc_name,
+		t_app_material_class.f_id,
+		t_app_material_class.leaf,
+		t_app_material_class.level_id,
+		t_app_material_class.is_archive
+	from
+		t_app_material_class
+	where 1=1
+	<if test="node!=null">
+		and t_app_material_class.f_id=#{node}
+	</if>
+	<if test="nodeIdForGrid!=null">
+		and (t_app_material_class.f_id=#{nodeIdForGrid} or t_app_material_class.mc_id=#{nodeIdForGrid})
+	</if>
+	<if test="mc_name!=null">
+		and t_app_material_class.mc_name=#{mc_name}
+	</if>
+	<if test="level_id!=null">
+		and t_app_material_class.level_id=#{level_id}
+	</if>
+	<if test="is_archive!=null">
+		and t_app_material_class.is_archive=#{is_archive}
+	</if>
+</select>
+<insert id="addMaterialClass" parameterType="manager.basicdata.materialClass.model.MaterialClass" keyProperty="mc_id" useGeneratedKeys="true">
+	<selectKey keyProperty="mc_id" resultType="int" order="BEFORE">
+		select  ifnull(max(mc_id)+1,1) from t_app_material_class 		
+	</selectKey>
+	insert into t_app_material_class
+	(
+		mc_id,
+		mc_name,
+		f_id,
+		leaf,
+		level_id,
+		is_archive
+	)
+	values
+	(
+		#{mc_id},
+		#{mc_name},
+		#{f_id},
+		#{leaf},
+		#{level_id},
+		#{is_archive}
+	)
+</insert>
+<update id="updateMaterialClass" parameterType="manager.basicdata.materialClass.model.MaterialClass">
+	update t_app_material_class
+		set
+			mc_id = #{mc_id},
+			mc_name = #{mc_name},
+			f_id = #{f_id},
+			leaf=#{leaf},
+			level_id = #{level_id},
+			is_archive=#{is_archive}
+		where mc_id = #{mc_id}
+</update>
+<delete id="deleteMaterialClass" parameterType="manager.basicdata.materialClass.model.MaterialClass">
+	delete from t_app_material_class
+	where mc_id = #{mc_id}
+</delete>
+
+<select id="getCountForAdd" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_material_class where f_id =#{f_id} and mc_name=#{mc_name}
+</select>
+
+<select id="getCountForUpdate" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_material_class where f_id =#{f_id} and mc_name=#{mc_name} and mc_id != #{mc_id}
+</select>
+
+<select id="getXiajiCount" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_material_class where f_id =#{mc_id}
+</select>
+
+<select id="getCountBylevel" parameterType="map" resultType="java.lang.Integer">
+	select count(*) from t_app_material_class where level_id =#{level_id}
+</select>
+<select id="getMaterialClassListByFid" parameterType="map" resultType="manager.basicdata.materialClass.model.MaterialClass">
+	select
+		t_app_material_class.mc_id,
+		t_app_material_class.mc_name,
+		t_app_material_class.f_id,
+		t_app_material_class.leaf,
+		t_app_material_class.level_id,
+		t_app_material_class.is_archive
+	from
+		t_app_material_class
+	where 1=1
+	<if test="f_id!=null and f_id!=''">
+		and t_app_material_class.f_id=#{f_id}
+	</if>
+	
+</select>
+
+
+</mapper>

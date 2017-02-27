@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.taskManager.data.MngAppQcMapper">
+
+
+<select id="getAppQcList" parameterType="map" resultType="manager.taskManager.model.MngAppQc">
+	select
+		t_app_qc.qc_id,
+		t_app_qc.t_id,
+		t_app_qc.record_id,
+		t_app_qc.qc_goods,
+		t_app_qc.qc_operator,
+		t_app_qc.unqualified_no,
+		t_app_qc.qc_remark,
+		t_app_qc.is_product,
+		t_app_qc.qc_file,
+		t_app_qc.qc_time,
+		t_app_qc.qc_count,
+	    t_app_qc.send_id,
+	    t_app_qc.create_dt
+	from
+		t_app_qc
+</select>
+<insert id="addAppQc" parameterType="manager.taskManager.model.MngAppQc" keyProperty="qc_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="qc_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_qc
+	(
+		
+		t_id,
+		record_id,
+		qc_goods,
+		qc_operator,
+		unqualified_no,
+		qc_remark,
+		is_product,
+		qc_file,
+		qc_time
+	)
+	values
+	(
+		
+		#{t_id},
+		#{record_id},
+		#{qc_goods},
+		#{qc_operator},
+		#{unqualified_no},
+		#{qc_remark},
+		#{is_product},
+		#{qc_file},
+		#{qc_time}
+	)
+</insert>
+<update id="updateAppQc" parameterType="manager.taskManager.model.MngAppQc">
+	update t_app_qc
+		set
+			t_id = #{t_id},
+			record_id = #{record_id},
+			qc_goods = #{qc_goods},
+			qc_operator = #{qc_operator},
+			unqualified_no = #{unqualified_no},
+			qc_remark = #{qc_remark},
+			is_product = #{is_product},
+			qc_file = #{qc_file},
+			qc_time = #{qc_time}
+		where qc_id = #{qc_id}
+</update>
+<delete id="deleteAppQc" parameterType="manager.taskManager.model.MngAppQc">
+	delete from t_app_qc
+	where qc_id = #{qc_id}
+</delete>
+
+<!--自己编写的sql  -->
+<select id="getAppQcListbg" parameterType="map" resultType="manager.taskManager.taskResponse.MngTaskQc">
+	select
+		t_app_qc.qc_id,
+		t_app_qc.t_id,
+		t_app_qc.record_id,
+		t_app_qc.qc_goods,
+		t_app_qc.qc_operator,
+		t_app_qc.unqualified_no,
+		t_app_qc.qc_remark,
+		t_app_qc.is_product,
+		t_app_qc.qc_file,
+		t_app_qc.qc_time,
+		t_app_qc.qc_count,
+	    t_app_qc.send_id,
+	    t_app_qc.create_dt
+	from
+		t_app_qc		
+		where t_app_qc.t_id = #{t_id}
+		
+</select>
+<update id="updateQcFile" parameterType="map" >
+        update t_app_qc
+		 <set>	
+		    <if test="t_id != null">
+		    t_id = #{t_id},
+		    </if>
+		    <if test="record_id != null">
+			record_id = #{record_id},
+		    </if>
+			<if test="qc_goods != null">			
+			qc_goods = #{qc_goods},
+		    </if>
+			<if test="qc_operator != null">
+			qc_operator = #{qc_operator},
+			</if>
+			<if test="unqualified_no != null">
+			unqualified_no = #{unqualified_no},
+			</if>
+			<if test="qc_remark != null">
+			qc_remark = #{qc_remark},
+			</if>
+			<if test="is_product != null">
+			is_product = #{is_product},
+			</if>		
+			qc_file = #{qc_file},
+
+			<if test="qc_time != null">
+			qc_time = #{qc_time}
+			</if>
+		</set>						
+		where
+		    qc_id = #{qc_id}
+
+</update>
+</mapper>

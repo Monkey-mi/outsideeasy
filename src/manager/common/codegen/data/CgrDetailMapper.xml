@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.common.codegen.data.CgrDetailMapper">
+
+
+<select id="getCgrDetailList" parameterType="map" resultType="manager.common.codegen.model.CgrDetail">
+	select
+		t_sys_cgr_detail.id,
+		t_sys_cgr_detail.cgr_id,
+		t_sys_cgr_detail.code,
+		t_sys_cgr_detail.field_code,
+		t_sys_cgr_detail.data_type,
+		t_sys_cgr_detail.fixed_text,
+		t_sys_cgr_detail.date_format,
+		t_sys_cgr_detail.uparam_type,
+		t_sys_cgr_detail.len,
+		t_sys_cgr_detail.is_substr,
+		t_sys_cgr_detail.sub_start,
+		t_sys_cgr_detail.sub_end,
+		t_sys_cgr_detail.fill_char,
+		t_sys_cgr_detail.is_fillafter,
+		t_sys_cgr_detail.seed,
+		t_sys_cgr_detail.step,
+		t_sys_cgr_detail.step_jmp,
+		t_sys_cgr_detail.min_value,
+		t_sys_cgr_detail.max_value,
+		t_sys_cgr_detail.reset_mode,
+		t_sys_cgr_detail.order_seq
+	from
+		t_sys_cgr_detail
+	<where>
+		<if test="cgr_id!=null">
+			cgr_id=#{cgr_id}
+		</if>
+	</where>	
+</select>
+<insert id="addCgrDetail" parameterType="manager.common.codegen.model.CgrDetail" keyProperty="id" useGeneratedKeys="true">
+	<selectKey keyProperty="id" resultType="int" order="BEFORE">
+		select ifnull(max(id)+1,1) from t_sys_cgr_detail
+	</selectKey>
+	insert into t_sys_cgr_detail
+	(
+		id,
+		cgr_id,
+		code,
+		field_code,
+		data_type,
+		fixed_text,
+		date_format,
+		uparam_type,
+		len,
+		is_substr,
+		sub_start,
+		sub_end,
+		fill_char,
+		is_fillafter,
+		seed,
+		step,
+		step_jmp,
+		min_value,
+		max_value,
+		reset_mode,
+		order_seq
+	)
+	values
+	(
+		#{id},
+		#{cgr_id},
+		#{code},
+		#{field_code},
+		#{data_type},
+		#{fixed_text},
+		#{date_format},
+		#{uparam_type},
+		#{len},
+		#{is_substr},
+		#{sub_start},
+		#{sub_end},
+		#{fill_char},
+		#{is_fillafter},
+		#{seed},
+		#{step},
+		#{step_jmp},
+		#{min_value},
+		#{max_value},
+		#{reset_mode},
+		#{order_seq}
+	)
+</insert>
+<update id="updateCgrDetail" parameterType="manager.common.codegen.model.CgrDetail">
+	update t_sys_cgr_detail
+		set
+			id = #{id},
+			cgr_id = #{cgr_id},
+			code = #{code},
+			field_code = #{field_code},
+			data_type = #{data_type},
+			fixed_text = #{fixed_text},
+			date_format = #{date_format},
+			uparam_type = #{uparam_type},
+			len = #{len},
+			is_substr = #{is_substr},
+			sub_start = #{sub_start},
+			sub_end = #{sub_end},
+			fill_char = #{fill_char},
+			is_fillafter = #{is_fillafter},
+			seed = #{seed},
+			step = #{step},
+			step_jmp = #{step_jmp},
+			min_value = #{min_value},
+			max_value = #{max_value},
+			reset_mode = #{reset_mode},
+			order_seq = #{order_seq}
+		where id = #{id}
+</update>
+<delete id="deleteCgrDetail" parameterType="manager.common.codegen.model.CgrDetail">
+	delete from t_sys_cgr_detail
+	where id = #{id}
+</delete>
+</mapper>

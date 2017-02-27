@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.templet.data.MngAccessTempletHeadMapper">
+
+
+<select id="getMngAccessTempletHeadList" parameterType="map" resultType="manager.templet.model.MngAccessTempletHead">
+	select
+		t_access_templet_head.h_id,
+		t_access_templet_head.table_name,
+		t_access_templet_head.owner,
+		t_access_templet_head.version,
+		t_access_templet_head.create_dt,
+		t_app_company_info.cpyname_cn
+	from
+		t_access_templet_head
+		left join t_app_company_info on t_access_templet_head.owner = t_app_company_info.company_id
+	
+</select>
+<insert id="addMngAccessTempletHead" parameterType="manager.templet.model.MngAccessTempletHead" keyProperty="h_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="h_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_access_templet_head
+	(
+		table_name,
+		owner,
+		version	
+	)
+	values
+	(
+		#{table_name},
+		#{owner},
+		#{version}	
+	)
+</insert>
+<update id="updateMngAccessTempletHead" parameterType="manager.templet.model.MngAccessTempletHead">
+	update t_access_templet_head
+		set
+			h_id = #{h_id},
+			table_name = #{table_name},
+			owner = #{owner},
+			version = #{version}
+
+		where h_id = #{h_id}
+</update>
+<delete id="deleteMngAccessTempletHead" parameterType="manager.templet.model.MngAccessTempletHead">
+	delete from t_access_templet_head
+	where h_id = #{h_id}
+</delete>
+<select id="checkAdd" parameterType="map" resultType="Integer">
+select
+		count(*)
+	from
+	    t_access_templet_head
+	where
+	    owner = #{owner} and version = #{version}
+</select>
+<select id="checkUpdatebg" parameterType="map" resultType="Integer">
+select
+		count(*)
+	from
+	    t_access_templet_head
+	where
+	    owner = #{owner} and version = #{version} and h_id != #{h_id}
+</select>
+<select id="searchCompanyName" parameterType="map" resultType="manager.templet.searchResponse.SearchCompany">
+ select		
+	    t_app_company_info.company_id as company_id,
+		t_app_company_info.cpyname_cn as cpyname_cn		
+	from
+		t_app_company_info
+	where
+	     1=1
+		<if test="search!=null and search!=''">
+		  and ( t_app_company_info.cpyname_cn like '%${search}%' or	t_app_company_info.company_id like '%${search}%')
+		</if>
+</select>
+<select id="searchModelt" parameterType="map" resultType="manager.templet.model.MngAccessTempletHead">
+ select		
+	    t_access_templet_head.h_id,
+		t_access_templet_head.table_name  		
+	from
+		t_access_templet_head
+	where
+	     1=1
+		<if test="search!=null and search!=''">
+		  and (t_access_templet_head.h_id like '%${search}%' or	t_access_templet_head.table_name like '%${search}%')
+		</if>
+</select>
+</mapper>

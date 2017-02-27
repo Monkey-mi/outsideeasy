@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.webPublish.data.WebContentModuleMapper">
+
+
+<select id="getWebContentModuleList" parameterType="map" resultType="manager.webPublish.model.WebContentModule">
+	select
+		t_web_content_module.module_id,
+		t_web_content_module.content_type,
+		t_web_content_module.module_name,
+		t_web_content_module.create_dt
+	from
+		t_web_content_module
+		where 1=1
+		<if test="content_type!=null">
+		and t_web_content_module.content_type=#{content_type}
+		</if>
+</select>
+<insert id="addWebContentModule" parameterType="manager.webPublish.model.WebContentModule" keyProperty="" useGeneratedKeys="true">
+	insert into t_web_content_module
+	(
+		module_id,
+		content_type,
+		module_name,
+		create_dt
+	)
+	values
+	(
+		#{module_id},
+		#{content_type},
+		#{module_name},
+		#{create_dt}
+	)
+</insert>
+<update id="updateWebContentModule" parameterType="manager.webPublish.model.WebContentModule">
+	update t_web_content_module
+		set
+			module_id = #{module_id},
+			content_type = #{content_type},
+			module_name = #{module_name},
+			create_dt = #{create_dt}
+		where  = #{}
+</update>
+<delete id="deleteWebContentModule" parameterType="manager.webPublish.model.WebContentModule">
+	delete from t_web_content_module
+	where  = #{}
+</delete>
+</mapper>

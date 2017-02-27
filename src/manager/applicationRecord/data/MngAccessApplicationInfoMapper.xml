@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.applicationRecord.data.MngAccessApplicationInfoMapper">
+
+
+<select id="getMngAccessApplicationInfoList" parameterType="map" resultType="manager.applicationRecord.model.MngAccessApplicationInfo">
+	select
+		t_access_application_info.info_id,
+		t_access_application_info.templet_id,
+		t_access_application_info.record_id,
+		t_access_application_info.content,
+		t_access_application_info.create_dt,
+		t_access_templet.templet_name,
+	  t_templet_classify.classify_name
+	from
+		t_access_application_info
+		left join t_access_templet on t_access_application_info.templet_id = t_access_templet.templet_id
+    left join t_templet_classify on t_templet_classify.classify_id = t_access_templet.classify_id
+	where     
+	    t_access_application_info.record_id = #{record_id}
+	    and t_templet_classify.classify_name = #{classify_name}
+</select>
+<insert id="addMngAccessApplicationInfo" parameterType="manager.applicationRecord.model.MngAccessApplicationInfo" keyProperty="info_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="info_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_access_application_info
+	(	
+		templet_id,
+		record_id,
+		content
+	)
+	values
+	(
+		#{templet_id},
+		#{record_id},
+		#{content}
+	)
+</insert>
+<update id="updateMngAccessApplicationInfo" parameterType="manager.applicationRecord.model.MngAccessApplicationInfo">
+	update t_access_application_info
+		set
+			templet_id = #{templet_id},
+			record_id = #{record_id},
+			content = #{content},
+		where info_id = #{info_id}
+</update>
+<delete id="deleteMngAccessApplicationInfo" parameterType="manager.applicationRecord.model.MngAccessApplicationInfo">
+	delete from t_access_application_info
+	where info_id = #{info_id}
+</delete>
+</mapper>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.materialConfirmation.data.MaterialConfirmationMapper">
+
+
+<select id="getMaterialConfirmationList" parameterType="map" resultType="manager.materialConfirmation.model.MaterialConfirmation">
+	select
+		t_app_material_confirmation.confirmation_id,
+		t_app_material_confirmation.company_id,
+		t_app_material_confirmation.company_name,
+		t_app_material_confirmation.contacts,
+		t_app_material_confirmation.f_phone,
+		t_app_material_confirmation.addr,
+		t_app_material_confirmation.fax,
+		t_app_material_confirmation.m_phone,
+		t_app_material_confirmation.proposer,
+		t_app_material_confirmation.apply_companyid,
+		t_app_material_confirmation.apply_companyname,
+		t_app_material_confirmation.apply_date,
+		t_app_material_confirmation.mc_id,
+		t_app_material_confirmation.mc_name,
+		t_app_material_confirmation.isreplace_material,
+		t_app_material_confirmation.replace_material,
+		t_app_material_confirmation.former_supplierid,
+		t_app_material_confirmation.former_suppliername,
+		t_app_material_confirmation.submit_reason,
+		t_app_material_confirmation.submit_item,
+		t_app_material_confirmation.ismatch_item,
+		t_app_material_confirmation.integrity_status,
+		t_app_material_confirmation.nomeet_explan,
+		t_app_material_confirmation.confirm_integrity_date,
+		t_app_material_confirmation.confirmation_status,
+		t_app_material_confirmation.confirm_result,
+		t_app_material_confirmation.final_confirrmor,
+		t_app_material_confirmation.confirm_date
+	from
+		t_app_material_confirmation
+		where 1=1
+	<if test="confirmation_id!=null">
+		and t_app_material_confirmation.confirmation_id=#{confirmation_id}
+	</if>
+	<if test="company_id!=null">
+		and t_app_material_confirmation.company_id=#{company_id}
+	</if>
+	<if test="condition!=null and condition!=''">
+		and t_app_material_confirmation.company_name like '%${condition}%'
+	</if>
+	<if test="mc_id!=null">
+		and t_app_material_confirmation.mc_id=#{mc_id}
+	</if>
+</select>
+<insert id="addMaterialConfirmation" parameterType="manager.materialConfirmation.model.MaterialConfirmation" keyProperty="confirmation_id" useGeneratedKeys="true">
+	<selectKey keyProperty="confirmation_id" resultType="int" order="BEFORE">
+		select  ifnull(max(confirmation_id)+1,1) from t_app_material_confirmation 		
+	</selectKey>
+	insert into t_app_material_confirmation
+	(
+		confirmation_id,
+		company_id,
+		company_name,
+		contacts,
+		f_phone,
+		addr,
+		fax,
+		m_phone,
+		proposer,
+		apply_companyid,
+		apply_companyname,
+		apply_date,
+		mc_id,
+		mc_name,
+		isreplace_material,
+		replace_material,
+		former_supplierid,
+		former_suppliername,
+		submit_reason,
+		submit_item,
+		ismatch_item,
+		integrity_status,
+		nomeet_explan,
+		confirm_integrity_date,
+		confirmation_status,
+		confirm_result,
+		final_confirrmor,
+		confirm_date
+	)
+	values
+	(
+		#{confirmation_id},
+		#{company_id},
+		#{company_name},
+		#{contacts},
+		#{f_phone},
+		#{addr},
+		#{fax},
+		#{m_phone},
+		#{proposer},
+		#{apply_companyid},
+		#{apply_companyname},
+		#{apply_date},
+		#{mc_id},
+		#{mc_name},
+		#{isreplace_material},
+		#{replace_material},
+		#{former_supplierid},
+		#{former_suppliername},
+		#{submit_reason},
+		#{submit_item},
+		#{ismatch_item},
+		#{integrity_status},
+		#{nomeet_explan},
+		#{confirm_integrity_date},
+		#{confirmation_status},
+		#{confirm_result},
+		#{final_confirrmor},
+		#{confirm_date}
+	)
+</insert>
+<update id="updateMaterialConfirmation" parameterType="manager.materialConfirmation.model.MaterialConfirmation">
+	update t_app_material_confirmation
+		set
+			confirmation_id = #{confirmation_id},
+			company_id = #{company_id},
+			company_name = #{company_name},
+			contacts = #{contacts},
+			f_phone = #{f_phone},
+			addr = #{addr},
+			fax = #{fax},
+			m_phone = #{m_phone},
+			proposer = #{proposer},
+			apply_companyid = #{apply_companyid},
+			apply_companyname = #{apply_companyname},
+			apply_date = #{apply_date},
+			mc_id = #{mc_id},
+			mc_name = #{mc_name},
+			isreplace_material = #{isreplace_material},
+			replace_material = #{replace_material},
+			former_supplierid = #{former_supplierid},
+			former_suppliername = #{former_suppliername},
+			submit_reason = #{submit_reason},
+			submit_item = #{submit_item},
+			ismatch_item=#{ismatch_item},
+			integrity_status = #{integrity_status},
+			nomeet_explan = #{nomeet_explan},
+			confirm_integrity_date = #{confirm_integrity_date},
+			confirmation_status = #{confirmation_status},
+			confirm_result = #{confirm_result},
+			final_confirrmor = #{final_confirrmor},
+			confirm_date = #{confirm_date}
+		where confirmation_id = #{confirmation_id}
+</update>
+<delete id="deleteMaterialConfirmation" parameterType="manager.materialConfirmation.model.MaterialConfirmation">
+	delete from t_app_material_confirmation
+	where confirmation_id = #{confirmation_id}
+</delete>
+</mapper>

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.common.communication.data.AppCommunicationMapper">
+
+<select id="getAppCommunicationList" parameterType="map" resultType="usercenter.common.communication.model.AppCommunication">
+	select
+		tac.id,
+		tac.bus_id,
+		tac.parent_id,
+		tac.create_time,
+		tac.company_id,
+		tac.com_message,
+		tara.mogodb_id,
+		tsf.cpyname_cn
+	from
+		t_app_communication tac
+		left join
+		t_app_register_attched tara
+		on 	
+			tara.file_type_id = #{fileTypeId}
+		and 
+			tac.company_id = tara.company_id,
+		t_app_company_info tsf
+	where
+		tac.company_id = tsf.company_id
+		and 
+		tac.module_type = #{moduleType}
+		<if test="id != null and id != ''">
+			and id = #{id}
+		</if>
+		<if test="parentId != null">
+			and parent_id = #{parentId}
+		</if>
+		<if test="companyId != null and companyId != ''">
+			and company_id = #{companyId}
+		</if>
+		<if test="comMessage != null and comMessage != ''">
+			and com_message = #{comMessage}
+		</if>
+		order by tac.create_time asc
+</select>
+
+<select id="getAppCommunicationParentList" parameterType="map" resultType="usercenter.common.communication.model.AppCommunication">
+	select
+		tac.id,
+		tac.bus_id,
+		tac.parent_id,
+		tac.create_time,
+		tac.company_id,
+		tac.com_message,
+		tara.mogodb_id,
+		tsf.cpyname_cn,
+		tac.module_type,
+		tac.is_look
+	from
+		t_app_communication tac
+		left join
+			t_app_register_attched tara
+		on 
+			tara.file_type_id = #{fileTypeId}
+		and 
+			tac.company_id = tara.company_id,
+		t_app_company_info tsf
+	where
+		1=1
+		and tac.company_id = tsf.company_id
+		and tac.module_type = #{moduleType}
+		<if test="parentId != null">
+			and	parent_id = #{parentId}
+		</if>
+		<if test="taskId != null">
+			and bus_id = #{taskId}
+		</if>
+		order by tac.create_time desc
+</select>
+
+<!-- 增加一条信息  -->
+<insert id="addAppCommunication" parameterType="usercenter.common.communication.model.AppCommunication">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+		SELECT LAST_INSERT_ID() AS id
+	</selectKey>
+	insert into t_app_communication
+	(
+		bus_id,
+		parent_id,
+		create_time,
+		company_id,
+		com_message,
+		module_type
+	)
+	values
+	(
+		#{task_id},
+		#{parent_id},
+		#{create_time},
+		#{company_id},
+		#{com_message},
+		#{module_type}
+	)
+</insert>
+<update id="updateAppCommunication" parameterType="usercenter.common.communication.model.AppCommunication">
+	update t_app_communication
+		set
+			id = #{id},
+			bus_id = #{task_id},
+			parent_id = #{parent_id},
+			create_id = #{create_time},
+			company_id = #{company_id},
+			com_message = #{com_message}
+		where id = #{id}
+</update>
+<delete id="deleteAppCommunication" parameterType="usercenter.common.communication.model.AppCommunication">
+	delete from t_app_communication
+	where id = #{id}
+</delete>
+
+
+<select id="getAppCommunicationCount" parameterType="map" resultType="Integer">
+select count(0)
+from
+  t_app_communication
+where
+  t_app_communication.bus_id = #{pur_order_id}
+  and t_app_communication. module_type = #{module_type}
+  and company_id != #{company_id}
+  and t_app_communication.id not IN (
+	select 
+		t_account_commun_del.commu_id 
+	FROM t_account_commun_del 
+	where 
+	t_account_commun_del.account_id=#{account_id}	
+	and	t_account_commun_del.account_type=#{account_type}	
+	and t_account_commun_del.commu_type=#{commu_type}
+	)
+</select>
+
+<select id="getLastThreeOrderAppCommunication" parameterType="map" resultType="usercenter.common.communication.model.AppCommunication">
+	select
+		tac.id,
+		tac.bus_id,
+		tac.parent_id,
+		tac.create_time,
+		tac.company_id,
+		tac.com_message,
+		tsf.cpyname_cn
+	from
+		t_app_communication tac
+		LEFT JOIN t_purchase_order  on tac.bus_id=t_purchase_order.pur_order_id,
+		t_app_company_info tsf
+	
+where module_type=#{module_type} 
+and tac.company_id = tsf.company_id
+<if test="sup_company_id!=null and sup_company_id!=''">
+	and t_purchase_order.sup_company_id=#{sup_company_id}
+	and tac.company_id!=#{sup_company_id}
+</if>
+<if test="pur_company_id!=null and pur_company_id!=''">
+	and t_purchase_order.pur_company_id=#{pur_company_id}
+	and tac.company_id!=#{pur_company_id}
+</if> 
+and tac.id not IN (
+	select 
+		commu_id 
+	FROM t_account_commun_del 
+	where 1=1
+	<if test="reg_id!=null and reg_id!=''">
+	and	account_id=#{reg_id}
+	</if>
+	<if test="sa_id!=null and sa_id!=''">
+	and	account_id=#{sa_id}
+	</if>
+	and commu_type=1
+	)
+order by create_time desc LIMIT 3;
+</select>
+<select id="getLastThreeTaskrAppCommunication" parameterType="map" resultType="usercenter.common.communication.model.AppCommunication">
+	select
+		tac.id,
+		tac.bus_id,
+		tac.parent_id,
+		tac.create_time,
+		tac.company_id,
+		tac.com_message,
+		tsf.cpyname_cn
+	from
+		t_app_communication tac
+		LEFT JOIN t_app_task  on tac.bus_id=t_app_task.t_id
+		<if test="pur_company_id!=null and pur_company_id!='' and  sa_id!=null and sa_id!='' ">
+		left join t_supplier_files as ts on ts.company_id = t_app_task.receive_company
+   		 left join t_subaccount_supplier_info as tu on tu.supplier_id = ts.supplier_id
+		</if> 
+		,t_app_company_info tsf
+where module_type=#{module_type} 
+and tac.company_id = tsf.company_id
+<if test="sup_company_id!=null and sup_company_id!=''">
+	and t_app_task.receive_company=#{sup_company_id}
+	and tac.company_id!=#{sup_company_id}
+</if>
+<if test="pur_company_id!=null and pur_company_id!=''">
+	and t_app_task.send_company=#{pur_company_id}
+	and tac.company_id!=#{pur_company_id}
+</if> 
+<if test="pur_company_id!=null and pur_company_id!='' and  sa_id!=null and sa_id!='' ">
+		and tu.is_delete = 0
+        and tu.sa_id = #{sa_id}
+</if> 
+and tac.id not IN (
+	select 
+		commu_id 
+	FROM t_account_commun_del 
+	where 1=1
+	<if test="reg_id!=null and reg_id!=''">
+	and	account_id=#{reg_id}
+	</if>
+	<if test="sa_id!=null and sa_id!=''">
+	and	account_id=#{sa_id}
+	</if>
+	and commu_type=1
+	)
+order by create_time desc LIMIT 3;
+</select>
+</mapper>

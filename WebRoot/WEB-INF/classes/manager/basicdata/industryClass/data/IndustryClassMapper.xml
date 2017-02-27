@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.basicdata.industryClass.data.IndustryClassMapper">
+
+
+<select id="getIndustryClassList" parameterType="map" resultType="manager.basicdata.industryClass.model.IndustryClass">
+	select
+		t_industry_class.industry_id,
+		t_industry_class.industry_name
+	from
+		t_industry_class
+</select>
+<insert id="addIndustryClass" parameterType="manager.basicdata.industryClass.model.IndustryClass" keyProperty="industry_id" useGeneratedKeys="true">
+	<selectKey keyProperty="industry_id" resultType="int" order="BEFORE">
+		select  ifnull(max(industry_id)+1,1) from t_industry_class 		
+	</selectKey>
+	insert into t_industry_class
+	(
+		industry_id,
+		industry_name
+	)
+	values
+	(
+		#{industry_id},
+		#{industry_name}
+	)
+</insert>
+<update id="updateIndustryClass" parameterType="manager.basicdata.industryClass.model.IndustryClass">
+	update t_industry_class
+		set
+			industry_id = #{industry_id},
+			industry_name = #{industry_name}
+		where industry_id = #{industry_id}
+</update>
+<delete id="deleteIndustryClass" parameterType="manager.basicdata.industryClass.model.IndustryClass">
+	delete from t_industry_class
+	where industry_id = #{industry_id}
+</delete>
+</mapper>

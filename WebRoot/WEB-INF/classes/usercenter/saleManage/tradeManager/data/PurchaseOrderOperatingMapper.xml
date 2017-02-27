@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.tradeManager.data.PurchaseOrderOperatingMapper">
+
+
+<select id="getPurchaseOrderOperatingList" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.PurchaseOrderOperating">
+	select
+		t_purchase_order_operating.operating_id,
+		t_purchase_order_operating.pur_order_id,
+		t_purchase_order_operating.opreate_dt,
+		t_purchase_order_operating.order_status
+	from
+		t_purchase_order_operating
+</select>
+<insert id="addPurchaseOrderOperating" parameterType="map" keyProperty="operating_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="operating_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_purchase_order_operating
+	(
+		pur_order_id,
+		order_status
+	)
+	values
+	(
+		#{pur_order_id},
+		#{order_status}
+	)
+</insert>
+<update id="updatePurchaseOrderOperating" parameterType="usercenter.saleManage.tradeManager.model.PurchaseOrderOperating">
+	update t_purchase_order_operating
+		set			
+			pur_order_id = #{pur_order_id},
+			order_status = #{order_status}
+		where operating_id = #{operating_id}
+</update>
+<delete id="deletePurchaseOrderOperating" parameterType="usercenter.saleManage.tradeManager.model.PurchaseOrderOperating">
+	delete from t_purchase_order_operating
+	where operating_id = #{operating_id}
+</delete>
+</mapper>

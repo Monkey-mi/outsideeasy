@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.common.data.CurrencyForPlatMapper">
+
+
+<select id="getCurrencyList" parameterType="map" resultType="platform.common.model.CurrencyForPlat">
+	select
+		t_currency.currency_id,
+		t_currency.currency_name
+	from
+		t_currency
+</select>
+<insert id="addCurrency" parameterType="platform.common.model.CurrencyForPlat" keyProperty="currency_id" useGeneratedKeys="true">
+	insert into t_currency
+	(
+		currency_id,
+		currency_name
+	)
+	values
+	(
+		#{currency_id},
+		#{currency_name}
+	)
+</insert>
+<update id="updateCurrency" parameterType="platform.common.model.CurrencyForPlat">
+	update t_currency
+		set
+			currency_id = #{currency_id},
+			currency_name = #{currency_name}
+		where currency_id = #{currency_id}
+</update>
+<delete id="deleteCurrency" parameterType="platform.common.model.CurrencyForPlat">
+	delete from t_currency
+	where currency_id = #{currency_id}
+</delete>
+</mapper>

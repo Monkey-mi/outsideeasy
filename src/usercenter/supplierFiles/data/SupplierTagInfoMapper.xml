@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.supplierFiles.data.SupplierTagInfoMapper">
+
+<select id="getSupplierTagInfoList" parameterType="map" resultType="usercenter.supplierFiles.model.SupplierTagInfo">
+	select
+		t_supplier_tag_info.id,
+		t_supplier_tag_info.supplier_id,
+		t_supplier_tag_info.tag_id,
+		t_supplier_tag_info.create_dt
+	from
+		t_supplier_tag_info
+</select>
+
+<!-- 增加标签和供应商关联关系 -->
+<insert id="addSupplierTagInfo" parameterType="map">
+	insert into t_supplier_tag_info
+	(
+		supplier_id,
+		tag_id
+	)
+	values
+	(
+		#{supplierId},
+		#{tagId}
+	)
+</insert>
+
+<update id="updateSupplierTagInfo" parameterType="usercenter.supplierFiles.model.SupplierTagInfo">
+	update t_supplier_tag_info
+		set
+			id = #{id},
+			supplier_id = #{supplier_id},
+			tag_id = #{tag_id},
+			create_dt = #{create_dt}
+		where id = #{id}
+</update>
+
+<!-- 根据tagId删除标签和供应商关系 -->
+<delete id="deleteSupplierTagInfoByTagId" parameterType="map">
+	delete from 
+		t_supplier_tag_info
+	where
+		tag_id = #{tagId}
+</delete>
+
+<!-- 根据 tagId 和 supplier_id 删除标签和供应商关系 -->
+<delete id="deleteSupplierTagInfo" parameterType="map">
+	delete from 
+		t_supplier_tag_info
+	where
+		tag_id = #{tagId}
+		and
+		supplier_id = #{supplierId}
+</delete>
+
+<!-- 获取供应商拥有的标签 -->
+<select id="getSupplierTag" parameterType="map" resultType="usercenter.supplierFiles.model.SupplierTagInfo">
+	select
+		tsti.id,
+		tsti.supplier_id,
+		tsti.tag_id,
+		tst.tag_name,
+		tsti.create_dt
+	from
+		t_supplier_tag_info tsti
+		left join t_supplier_tag tst on tsti.tag_id = tst.tag_id
+	where 
+			supplier_id = #{supplierId}
+		and
+			tst.tag_type = #{tagType}
+		and
+			tst.account_id = #{accountId}
+</select>
+
+</mapper>

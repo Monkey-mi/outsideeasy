@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.orderManager.data.MngCommunicationMapper">
+
+
+<select id="getMngCommunicationList" parameterType="map" resultType="manager.orderManager.model.MngCommunication">
+	select
+		t_app_communication.id,
+		t_app_communication.bus_id,
+		t_app_communication.parent_id,
+		t_app_communication.create_time,
+		t_app_communication.company_id,
+		t_app_company_info.cpyname_cn as company_name,
+		t_app_communication.com_message,
+		t_app_communication.module_type,
+		t_app_communication.is_look
+	from
+		t_app_communication
+		left join t_app_company_info on t_app_company_info.company_id=t_app_communication.company_id
+		where 1=1
+		<if test="t_id!=null and t_id !=''">
+		and t_app_communication.bus_id=#{t_id} 
+		</if>
+		<if test="module_type!=null and module_type !=''  ">
+		and t_app_communication.module_type=#{module_type}
+		</if>
+		<if test="pur_order_id!=null">
+		and t_app_communication.bus_id=#{pur_order_id}
+		</if>
+		<if test="parent_id!=null">
+		and t_app_communication.parent_id=#{parent_id}
+		</if>
+		order by t_app_communication.create_time desc
+</select>
+<insert id="addMngCommunication" parameterType="manager.orderManager.model.MngCommunication" keyProperty="id" useGeneratedKeys="true">
+	insert into t_app_communication
+	(
+		id,
+		bus_id,
+		parent_id,
+		create_time,
+		cp_name,
+		com_message,
+		module_type,
+		is_look
+	)
+	values
+	(
+		#{id},
+		#{bus_id},
+		#{parent_id},
+		#{create_time},
+		#{cp_name},
+		#{com_message},
+		#{module_type},
+		#{is_look}
+	)
+</insert>
+<update id="updateMngCommunication" parameterType="manager.orderManager.model.MngCommunication">
+	update t_app_communication
+		set
+			id = #{id},
+			bus_id = #{bus_id},
+			parent_id = #{parent_id},
+			create_time = #{create_time},
+			cp_name = #{cp_name},
+			com_message = #{com_message},
+			module_type = #{module_type},
+			is_look = #{is_look}
+		where id = #{id}
+</update>
+<delete id="deleteMngCommunication" parameterType="manager.orderManager.model.MngCommunication">
+	delete from t_app_communication
+	where id = #{id}
+</delete>
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.supplierFiles.data.SupplierFactoryCycleInfoMapper">
+
+
+<select id="getSupplierFactoryCycleInfoList" parameterType="map" resultType="usercenter.supplierFiles.model.SupplierFactoryCycleInfo">
+	select
+		t_supplier_factory_cycle_info.id,
+		t_supplier_factory_cycle_info.supplier_id,
+		t_supplier_factory_cycle_info.factory_cycle_id,
+		t_supplier_factory_cycle_info.create_dt,
+		t_supplier_factory_cycle_info.next_check_dt
+	from
+		t_supplier_factory_cycle_info
+</select>
+
+<!-- 判断是否存在验厂周期 -->
+<select id="getSupplierIdExist" parameterType="map" resultType="Integer">
+	select
+		count(*)
+	from
+		t_supplier_factory_cycle_info
+	where
+		supplier_id = #{supplier_id}
+</select>
+
+<insert id="addSupplierFactoryCycleInfo" parameterType="usercenter.supplierFiles.model.SupplierFactoryCycleInfo" keyProperty="id" useGeneratedKeys="true">
+	insert into t_supplier_factory_cycle_info
+	(
+		id,
+		supplier_id,
+		factory_cycle_id,
+		next_check_dt
+	)
+	values
+	(
+		#{id},
+		#{supplier_id},
+		#{factory_cycle_id},
+		#{next_check_dt}
+	)
+</insert>
+
+<!-- 更新验厂周期 -->
+<update id="updateSupplierFactoryCycleInfo" parameterType="map">
+	update 
+		t_supplier_factory_cycle_info
+	set
+		factory_cycle_id = #{factoryCycleId},
+		next_check_dt = #{nextCheckDt}
+	where 
+		supplier_id = #{supplier_id}
+</update>
+
+<delete id="deleteSupplierFactoryCycleInfo" parameterType="usercenter.supplierFiles.model.SupplierFactoryCycleInfo">
+	delete from t_supplier_factory_cycle_info
+	where id = #{id}
+</delete>
+</mapper>

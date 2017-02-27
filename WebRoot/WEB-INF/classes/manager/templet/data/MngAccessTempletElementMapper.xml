@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.templet.data.MngAccessTempletElementMapper">
+
+
+<select id="getMngAccessTempletElementList" parameterType="map" resultType="manager.templet.model.MngAccessTempletElement">
+	select
+		t_access_templet_element.e_id,
+		t_access_templet_element.e_name,
+		t_access_templet_element.e_type_id,
+		t_access_templet_element.controller_type_id,
+		t_access_templet_element.validate_type,
+		t_access_templet_element.validate_text,
+		t_access_templet_element.e_length,
+		t_access_templet_element.e_decimal_length,
+		t_access_templet_element.create_dt
+		
+	from
+		t_access_templet_element
+</select>
+<insert id="addMngAccessTempletElement" parameterType="manager.templet.model.MngAccessTempletElement" keyProperty="e_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="e_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_access_templet_element
+	(
+		e_name,
+		e_type_id,
+		controller_type_id,
+		validate_type,
+		validate_text,
+		e_length,
+		e_decimal_length
+	
+	)
+	values
+	(
+		#{e_name},
+		#{e_type_id},
+		#{controller_type_id},
+		#{validate_type},
+		#{validate_text},
+		#{e_length},
+		#{e_decimal_length}
+
+	)
+</insert>
+<update id="updateMngAccessTempletElement" parameterType="manager.templet.model.MngAccessTempletElement">
+	update t_access_templet_element
+		set
+			e_id = #{e_id},
+			e_name = #{e_name},
+			e_type_id = #{e_type_id},
+			controller_type_id = #{controller_type_id},
+			validate_type = #{validate_type},
+			validate_text = #{validate_text},
+			e_length = #{e_length},
+			e_decimal_length = #{e_decimal_length}
+		
+		where e_id = #{e_id}
+</update>
+<delete id="deleteMngAccessTempletElement" parameterType="manager.templet.model.MngAccessTempletElement">
+	delete from t_access_templet_element
+	where e_id = #{e_id}
+</delete>
+<select id="getElementList" parameterType="map" resultType="manager.templet.model.MngAccessTempletElement">
+	select
+		t_access_templet_element.e_id,
+		t_access_templet_element.e_name
+	from
+		t_access_templet_element
+	where
+	     1=1
+		<if test="search!=null and search!=''">
+		  and ( t_access_templet_element.e_id like '%${search}%' or	t_access_templet_element.e_name like '%${search}%')
+		</if>
+</select>
+</mapper>

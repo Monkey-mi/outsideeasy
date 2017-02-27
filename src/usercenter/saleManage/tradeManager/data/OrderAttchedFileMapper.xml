@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.tradeManager.data.OrderAttchedFileMapper">
+
+
+<select id="getOrderAttchedFileList" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAttchedFile">
+	select
+		t_order_attched_file.order_attched_id,
+		t_order_attched_file.pur_order_id,
+		t_order_attched_file.order_bh,
+		t_order_attched_file.order_attched_name,
+		t_order_attched_file.ft_id,
+		t_order_attched_file.suffix_name,
+		t_order_attched_file.order_attched_remark,
+		t_order_attched_file.mogodb_id,
+		t_order_attched_file.create_dt,
+		t_order_attched_file.source_type,
+		t_order_attched_file.creator_id,
+		t_order_attched_file.creator_name,
+		t_order_attched_file.status,
+		t_order_attched_file.is_look
+	from
+		t_order_attched_file
+</select>
+<select id="getOrderAttchedFileListSub" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAttchedFile">
+	select
+		t_order_attched_file.order_attched_id,
+		t_order_attched_file.mogodb_id		
+	from
+		t_order_attched_file
+	where	
+	    order_attched_id = #{order_attched_id}
+</select>
+<select id="getOrderAttchedFileForSub" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAttchedFile">
+	select
+		t_order_attched_file.order_attched_id,
+		t_order_attched_file.order_attched_name,
+		t_order_attched_file.suffix_name,
+		t_order_attched_file.order_attched_remark,
+		t_order_attched_file.mogodb_id,
+		t_order_attched_file.create_dt,
+		t_order_attched_file.status,
+		t_order_attched_file.is_look,
+		t_order_attched_file.ft_id
+	from
+		t_order_attched_file
+	where	
+		pur_order_id = #{pur_order_id}
+	    <if test="ft_id != null and ft_id !='' and  ft_id == 37">
+	 	and ft_id in(35,36,37)
+	    </if>	
+	    <if test="status != null and status !=''">	
+	    and t_order_attched_file.status = #{status}
+	    </if>
+</select>
+<select id="getOrderAttchedFileForSubForLook" parameterType="map" resultType="Integer">
+	select
+		count(0)
+	from
+		t_order_attched_file
+	where	
+		pur_order_id = #{pur_order_id}	 
+	 	and ft_id in(35,36,37)	
+	    and t_order_attched_file.status = #{status}
+	    and t_order_attched_file.is_look = #{is_look}
+</select>
+
+<select id="getOrderAttchedFileForOne" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAttchedFile">
+	select
+		t_order_attched_file.order_attched_id,
+		t_order_attched_file.order_attched_name,
+		t_order_attched_file.suffix_name,
+		t_order_attched_file.order_attched_remark,
+		t_order_attched_file.mogodb_id,
+		t_order_attched_file.create_dt,
+		t_order_attched_file.status,
+		t_order_attched_file.is_look
+	from
+		t_order_attched_file
+	where	
+		pur_order_id = #{pur_order_id}		
+		and ft_id = #{ft_id}
+	    and t_order_attched_file.status = #{status}
+	limit 1
+</select>
+<select id="getOrderAttchedFileForList" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAttchedFile">
+	select
+		t_order_attched_file.order_attched_id,
+		t_order_attched_file.order_attched_name,
+		t_order_attched_file.suffix_name,
+		t_order_attched_file.order_attched_remark,
+		t_order_attched_file.mogodb_id,
+		t_order_attched_file.create_dt,
+		t_order_attched_file.status,
+		t_order_attched_file.is_look,
+		t_order_attched_file.view_no
+		
+	from
+		t_order_attched_file
+	where	
+		pur_order_id = #{pur_order_id}		
+		and ft_id = #{ft_id}
+	    and t_order_attched_file.status = #{status}
+</select>
+<select id="getOrderAttchedFileForOneOther" parameterType="map" resultType="usercenter.saleManage.tradeManager.model.OrderAttchedFile">
+	select
+		t_order_attched_file.order_attched_id,
+		t_order_attched_file.order_attched_name,
+		t_order_attched_file.suffix_name,
+		t_order_attched_file.order_attched_remark,
+		t_order_attched_file.mogodb_id,
+		t_order_attched_file.create_dt,
+		t_order_attched_file.status,
+		t_order_attched_file.is_look
+	from
+		t_order_attched_file
+	where	
+		order_attched_id = #{order_attched_id}		
+</select>
+<select id="addOrderAttchedFileCount" parameterType="map" resultType="Integer">
+	select
+		count(0)		
+	from
+		t_order_attched_file
+	where
+	  t_order_attched_file.pur_order_id = #{pur_order_id}
+	  and t_order_attched_file.status = 0
+	  and t_order_attched_file.ft_id = #{ft_id}
+</select>
+
+<insert id="addOrderAttchedFile" parameterType="usercenter.saleManage.tradeManager.model.OrderAttchedFile" keyProperty="order_attched_id" useGeneratedKeys="true">
+	insert into t_order_attched_file
+	(
+		pur_order_id,
+		order_bh,
+		order_attched_name,
+		ft_id,
+		suffix_name,
+		order_attched_remark,
+		mogodb_id,
+		source_type,
+		creator_id,
+		creator_name
+	)
+	values
+	(
+		#{pur_order_id},
+		#{order_bh},
+		#{order_attched_name},
+		#{ft_id},
+		#{suffix_name},
+		#{order_attched_remark},
+		#{mogodb_id},
+		#{source_type},
+		#{creator_id},
+		#{creator_name}
+	)
+</insert>
+<update id="updateOrderAttchedFile" parameterType="usercenter.saleManage.tradeManager.model.OrderAttchedFile">
+	update t_order_attched_file
+		set
+			order_attched_id = #{order_attched_id},
+			pur_order_id = #{pur_order_id},
+			order_bh = #{order_bh},
+			order_attched_name = #{order_attched_name},
+			ft_id = #{ft_id},
+			suffix_name = #{suffix_name},
+			order_attched_remark = #{order_attched_remark},
+			mogodb_id = #{mogodb_id},
+			create_dt = #{create_dt},
+			source_type = #{source_type},
+			creator_id = #{creator_id},
+			creator_name = #{creator_name},
+			status = #{status}
+		where order_attched_id = #{order_attched_id}
+</update>
+<delete id="deleteOrderAttchedFile" parameterType="usercenter.saleManage.tradeManager.model.OrderAttchedFile">
+	delete from t_order_attched_file
+	where order_attched_id = #{order_attched_id}
+</delete>
+<update id="updateOrderAttchedFileForLook" parameterType="map">
+update t_order_attched_file
+set		
+	  is_look = #{is_look}
+where pur_order_id = #{pur_order_id}
+	  and ft_id in(35,36,37)	
+	  and is_look = 0
+</update>
+<update id="updateOrderAttchedFileForStop" parameterType="map">
+update t_order_attched_file
+		set		
+			status = #{status}
+where pur_order_id = #{pur_order_id}
+	  and ft_id = #{ft_id}		 
+</update>
+<update id="updateOrderAttchedFileStop" parameterType="map">
+update t_order_attched_file
+		set		
+			status = #{status}
+where 
+	   order_attched_id = #{order_attched_id}		 
+</update>
+</mapper>

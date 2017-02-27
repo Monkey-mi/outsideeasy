@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.basicdata.checkFactory.data.CheckFactoryMapper">
+
+
+<select id="getCheckFactoryList" parameterType="map" resultType="manager.basicdata.checkFactory.model.CheckFactory">
+	select
+		t_check_factory_cycle.factory_cycle_id,
+		t_check_factory_cycle.factory_cycle_name,
+		t_check_factory_cycle.create_dt
+	from
+		t_check_factory_cycle
+</select>
+<insert id="addCheckFactory" parameterType="manager.basicdata.checkFactory.model.CheckFactory" keyProperty="factory_cycle_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="factory_cycle_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_check_factory_cycle
+	(
+		factory_cycle_name
+	
+	)
+	values
+	(
+		#{factory_cycle_name}
+	)
+</insert>
+<update id="updateCheckFactory" parameterType="manager.basicdata.checkFactory.model.CheckFactory">
+	update t_check_factory_cycle
+		set
+			factory_cycle_name = #{factory_cycle_name}
+		where factory_cycle_id = #{factory_cycle_id}
+</update>
+<delete id="deleteCheckFactory" parameterType="manager.basicdata.checkFactory.model.CheckFactory">
+	delete from t_check_factory_cycle
+	where factory_cycle_id = #{factory_cycle_id}
+</delete>
+</mapper>

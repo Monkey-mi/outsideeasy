@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.orderManager.data.MngOrderDeliveryNoticeMapper">
+
+
+<select id="getMngOrderDeliveryNoticeList" parameterType="map" resultType="manager.orderManager.model.MngOrderDeliveryNotice">
+	select
+		t_order_delivery_notice.delivery_notice_id,
+		t_order_delivery_notice.delivery_notice_bh,
+		t_order_delivery_notice.notice_dt,
+		t_order_delivery_notice.notice_status,
+		t_order_delivery_notice.source_type,
+		t_order_delivery_notice.creator_id,
+		t_order_delivery_notice.creator_name,
+		d.cpyname_cn as  send_cpyname_cn,		
+		t.cpyname_cn as receive_cpyname_cn,
+		t_order_delivery_notice.supplier_id,
+		t_order_delivery_notice.update_dt
+	from	  
+		t_order_delivery_notice
+		left join t_app_company_info as t on t_order_delivery_notice.pur_company_id = t.company_id
+		left join t_app_company_info as d on t_order_delivery_notice.sup_company_id = d.company_id
+		left join t_order_delivery_noticedetails on t_order_delivery_noticedetails.delivery_notice_id = t_order_delivery_notice.delivery_notice_id
+		left join t_purchase_order on  t_purchase_order.pur_order_id =  t_order_delivery_noticedetails.pur_order_id 
+		left join t_purchase_order_detail on t_purchase_order_detail.order_detail_id = t_order_delivery_noticedetails.order_detail_id
+	where 1=1
+		<if test="condition != null and condition != ''">
+		 and (t_purchase_order_detail.product_name like '%${condition}%' 
+		 or t_purchase_order.order_bh like '%${condition}%'
+		 or t_purchase_order.agreement_bh like '%${condition}%'
+		 or t_order_delivery_notice.delivery_notice_bh like '%${condition}%')	
+		</if>
+		<if test="status != null and status != ''">
+		 and t_order_delivery_notice.notice_status = #{status} 	 
+		</if>
+		
+		order by delivery_notice_id desc
+</select>
+<insert id="addMngOrderDeliveryNotice" parameterType="manager.orderManager.model.MngOrderDeliveryNotice" keyProperty="delivery_notice_id" useGeneratedKeys="true">
+	insert into t_order_delivery_notice
+	(
+		delivery_notice_id,
+		delivery_notice_bh,
+		notice_dt,
+		notice_status,
+		source_type,
+		creator_id,
+		creator_name,
+		pur_company_id,
+		sup_company_id,
+		supplier_id,
+		update_dt
+	)
+	values
+	(
+		#{delivery_notice_id},
+		#{delivery_notice_bh},
+		#{notice_dt},
+		#{notice_status},
+		#{source_type},
+		#{creator_id},
+		#{creator_name},
+		#{pur_company_id},
+		#{sup_company_id},
+		#{supplier_id},
+		#{update_dt}
+	)
+</insert>
+<update id="updateMngOrderDeliveryNotice" parameterType="manager.orderManager.model.MngOrderDeliveryNotice">
+	update t_order_delivery_notice
+		set
+			delivery_notice_id = #{delivery_notice_id},
+			delivery_notice_bh = #{delivery_notice_bh},
+			notice_dt = #{notice_dt},
+			notice_status = #{notice_status},
+			source_type = #{source_type},
+			creator_id = #{creator_id},
+			creator_name = #{creator_name},
+			pur_company_id = #{pur_company_id},
+			sup_company_id = #{sup_company_id},
+			supplier_id = #{supplier_id},
+			update_dt = #{update_dt}
+		where delivery_notice_id = #{delivery_notice_id}
+</update>
+<delete id="deleteMngOrderDeliveryNotice" parameterType="manager.orderManager.model.MngOrderDeliveryNotice">
+	delete from t_order_delivery_notice
+	where delivery_notice_id = #{delivery_notice_id}
+</delete>
+</mapper>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>左侧菜单</title>
+<!-- <link href="/newresources/css/saleLeftMenu.css" rel="stylesheet" type="text/css" />
+<link href="/newresources/css/common.css" rel="stylesheet" type="text/css" />
+ -->
+<script id="evaluationtmpl" type="text/x-dot-template">
+{{ for(var prop in it) { }}
+	<p class="title">{{= it[prop].menu_name }}</p>
+	<ul>
+	{{ for(var child in it[prop].children){ }}
+		{{? it[prop].children[child].id==61}}
+			<li><a onclick="go_skip('{{= it[prop].children[child].menu_path}}')" ><span >{{= it[prop].children[child].menu_name}}</span></a></li>
+		{{??}}
+			<li><a onclick="go_skip('{{= it[prop].children[child].menu_path}}')">{{= it[prop].children[child].menu_name}}</a></li>
+		{{?}}
+	{{ } }}
+	</ul>
+{{ } }}
+</script>
+<script type="text/javascript">
+$(function(){
+var data=getMenuData(15);
+var evalText=doT.template($("#evaluationtmpl").text());
+$("#evaluation").html(evalText(data));
+});
+
+function go_skip(url){
+	addParamsToWindowName(null);
+	window.location.href=getwebroot()+url.slice(1)+'.htm';
+}
+</script>
+</head>
+<body>
+<div id="leftMenuPage" class="vip_sale_left_menu">
+	<div class="vip_sale_left_block_title">
+		<img src="/vip/resources/images/title.png" />
+	</div>
+	<div id="evaluation"></div>
+	<!--  
+	<p class="title">客户管理</p>
+	<ul>
+		<li><a href="/usercenter/saleManage/accessManage/applyAccessList.html">准入申请</a></li>
+		<li><a href="/usercenter/saleManage/accessManage/accessMaterialcheckList.html">物料确认</a></li>
+		<li><a href="/usercenter/saleManage/accessManage/accessCheckfactoryList.html">线下验厂</a></li>
+		<li><a href="/usercenter/saleManage/accessManage/customerfilesList.html">客户库</a></li>
+	</ul>
+	<p class="title">交易管理</p>
+	<ul>
+		<li><a>订单管理</a></li>	
+	</ul>
+	<p class="title">外协任务</p>
+	<ul>
+		<li><a href="/usercenter/producTaskManage/taskList.html"><img src="/newresources/images/page/new_sale.png" class="f_l" /><span style="margin-left:-40px;">生产任务</span></a></li>	
+	</ul>
+	<p class="title">交易资料</p>
+	<ul>
+		<li><a>交易协议</a></li>	
+	</ul>
+	
+	<p class="title">销售协议</p>
+	-->
+</div>
+</body>
+</html>

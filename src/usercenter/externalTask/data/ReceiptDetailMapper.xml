@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.externalTask.data.ReceiptDetailMapper">
+
+
+<select id="getReceiptDetailList" parameterType="map" resultType="usercenter.externalTask.model.ReceiptDetail">
+	select
+		t_receipt_detail.receipt_id,
+		t_receipt_detail.t_id,
+		t_receipt_detail.deliver_id,
+		t_receipt_detail.deliver_no,
+		t_receipt_detail.receive_no,
+		t_receipt_detail.create_dt
+	from
+		t_receipt_detail
+</select>
+<insert id="addReceiptDetail" parameterType="map" keyProperty="receipt_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="receipt_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_receipt_detail
+	(
+		t_id,
+		deliver_id,
+		deliver_no,
+		receive_no
+	)
+	values
+	(
+		#{t_id},
+		#{deliver_id},
+		#{deliver_no},
+		#{receive_no}
+	)
+</insert>
+<update id="updateReceiptDetail" parameterType="usercenter.externalTask.model.ReceiptDetail">
+	update t_receipt_detail
+		set
+			receipt_id = #{receipt_id},
+			t_id = #{t_id},
+			deliver_id = #{deliver_id},
+			deliver_no = #{deliver_no},
+			receive_no = #{receive_no},
+			create_dt = #{create_dt}
+		where receipt_id = #{receipt_id}
+</update>
+<delete id="deleteReceiptDetail" parameterType="usercenter.externalTask.model.ReceiptDetail">
+	delete from t_receipt_detail
+	where receipt_id = #{receipt_id}
+</delete>
+</mapper>

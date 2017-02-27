@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.shortmessage.data.AppSendShortmessageMapper">
+
+<select id="getAppSendShortmessageList" parameterType="map" resultType="common.shortmessage.model.AppSendShortmessage">
+	select
+		t_app_send_shortmessage.id,
+		t_app_send_shortmessage.module_id,
+		t_app_send_shortmessage.receive_phones,
+		t_app_send_shortmessage.message,
+		t_app_send_shortmessage.send_type,
+		t_app_send_shortmessage.result,
+		t_app_send_shortmessage.description,
+		t_app_send_shortmessage.faillist,
+		t_app_send_shortmessage.task_id,
+		t_app_send_shortmessage.create_dt,
+		t_app_send_shortmessage.send_time,
+		t_app_send_shortmessage.ip
+	from
+		t_app_send_shortmessage
+</select>
+<insert id="addAppSendShortmessage" parameterType="common.shortmessage.model.AppSendShortmessage" keyProperty="id" useGeneratedKeys="true">
+	insert into t_app_send_shortmessage
+	(
+		module_id,
+		receive_phones,
+		message,
+		send_type,
+		result,
+		description,
+		faillist,
+		task_id,
+		send_time,
+		ip
+	)
+	values
+	(
+		#{module_id},
+		#{receive_phones},
+		#{message},
+		#{send_type},
+		#{result},
+		#{description},
+		#{faillist},
+		#{task_id},
+		#{send_time},
+		#{ip}
+	)
+</insert>
+<update id="updateAppSendShortmessage" parameterType="common.shortmessage.model.AppSendShortmessage">
+	update t_app_send_shortmessage
+		set
+			id = #{id},
+			module_id = #{module_id},
+			receive_phones = #{receive_phones},
+			message = #{message},
+			send_type = #{send_type},
+			result = #{result},
+			description = #{description},
+			faillist = #{faillist},
+			task_id = #{task_id},
+			create_dt = #{create_dt},
+			send_time = #{send_time},
+			ip = #{ip}
+		where id = #{id}
+</update>
+<delete id="deleteAppSendShortmessage" parameterType="common.shortmessage.model.AppSendShortmessage">
+	delete from t_app_send_shortmessage
+	where id = #{id}
+</delete>
+
+<!-- 查询指定ip在24小时内发送的短信条数 -->
+<select id="ipSendCountOneDay" parameterType="map" resultType="java.lang.Integer">
+	select
+		count(*)
+	from
+		t_app_send_shortmessage
+	where 
+		ip = #{ip}
+	and 
+		<![CDATA[ send_time > #{send_time_limit}]]>
+</select>
+
+</mapper>

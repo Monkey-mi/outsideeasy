@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.company.data.PfMetarialMapper">
+
+
+<select id="getMetarialOutList" parameterType="map" resultType="com.outsideasy.ws.erp.supplier.vo.MetarialOut">
+	select
+		t_app_metarial.material_id,
+		t_app_metarial.material_name,
+		t_app_metarial.material_brand,
+		t_app_metarial.company_id
+	from
+		t_app_metarial
+		where 1=1
+	<if test="company_id!=null">
+		and t_app_metarial.company_id=#{company_id}
+	</if>
+</select>
+
+<!-- 查询购买材料对象 -->
+<select id="getBuyModelByCompanyId" parameterType="java.lang.Integer" resultType="platform.company.model.PfMaterial">
+	select
+		material_id,
+		material_name,
+		material_brand
+	from
+		t_app_metarial
+	where
+		company_id = #{companyId}
+</select> 
+<!-- 查询购买材料对象 -->
+<select id="getBuyModelMapByCompanyId" parameterType="map" resultType="map">
+	select
+		material_id,
+		material_name,
+		material_brand
+	from
+		t_app_metarial
+	where
+		company_id = #{companyId}
+</select> 
+
+<!-- 更新原材料信息  -->
+<update id="updateMetarialById" parameterType="map">
+	update 
+		t_app_metarial
+	<set>
+		material_id = #{materialId}	
+		<if test="materialName != null">
+			,material_name = #{materialName}
+		</if>
+		<if test="materialBrand != null">
+			,material_brand = #{materialBrand}
+		</if>
+	</set>
+	where
+		material_id = #{materialId}	
+</update>
+
+<!-- 增加原材料 -->
+<insert id="addMetarial" parameterType="map" keyProperty="material_id" useGeneratedKeys="true">
+	insert into 
+		t_app_metarial(material_name,material_brand,company_id)
+	value
+		(#{materialName},#{materialBrand},#{companyId})
+</insert>
+
+<delete id="deleteMetarial">
+	delete from
+		t_app_metarial
+	where
+		material_id = #{metarialId}	
+</delete>
+
+<!-- 批量删除原材料 -->
+<delete id="deleteMetarials">
+	delete from
+		t_app_metarial
+	where
+		material_id in
+	<foreach collection="goodsIds" item="item" index="index" open="(" separator="," close=")">
+		#{item}
+	</foreach>	
+</delete>
+
+<delete id="deleteMetarialByCompanyId">
+	delete from
+		t_app_metarial
+	where
+		company_id = #{companyId}	
+</delete>
+</mapper>

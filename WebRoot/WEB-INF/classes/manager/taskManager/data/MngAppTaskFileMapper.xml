@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.taskManager.data.MngAppTaskFileMapper">
+
+
+<select id="getAppTaskFileList" parameterType="map" resultType="manager.taskManager.taskResponse.MngTaskFile">
+	select
+		t_app_task_file.tf_id,
+		t_app_task_file.t_id,
+		t_app_task_file.file_name,
+		t_app_task_file.file_type,
+		t_base_file_type.type_name,
+		t_app_task_file.object_id,
+		t_app_task_file.order_no,
+		t_app_task_file.file_time,
+		t_app_task_file.remark,
+		t_app_task_file.suffix_name	,
+        t_app_task_file.view_no,
+	    t_app_task_file.record_id,
+	    t_app_task_file.operator_name,
+		t_app_task_file.is_delete
+	from
+		t_app_task_file
+		left out join t_base_file_type on t_base_file_type.ft_id = t_app_task_file.file_type
+</select>
+<insert id="addAppTaskFile" parameterType="manager.taskManager.model.MngAppTaskFile" keyProperty="tf_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="tf_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_task_file
+	(
+		
+		t_id,
+		file_name,
+		file_type,
+		object_id,
+		order_no,
+		file_time,
+		remark,
+		suffix_name
+	)
+	values
+	(
+		
+		#{t_id},
+		#{file_name},
+		#{file_type},
+		#{object_id},
+		#{order_no},
+		#{file_time},
+		#{remark},
+		#{suffix_name}
+		
+	)
+</insert>
+<update id="updateAppTaskFile" parameterType="manager.taskManager.model.MngAppTaskFile">
+	update t_app_task_file
+		set		
+			t_id = #{t_id},
+			file_name = #{file_name},
+			file_type = #{file_type},
+			object_id = #{object_id},
+			order_no = #{order_no},
+			file_time = #{file_time},
+			remark = #{remark},
+			suffix_name = #{suffix_name}
+		where tf_id = #{tf_id}
+</update>
+<delete id="deleteAppTaskFile" parameterType="manager.taskManager.model.MngAppTaskFile">
+	delete from t_app_task_file
+	where tf_id = #{tf_id}
+</delete>
+
+<!--自己编写的sql  -->
+<select id="getAppTaskFileListbg" parameterType="map" resultType="manager.taskManager.taskResponse.MngTaskFile">
+	select
+		t_app_task_file.tf_id,
+		t_app_task_file.t_id,
+		t_app_task_file.file_name,
+		t_app_task_file.file_type,
+		t_base_file_type.type_name,
+		t_app_task_file.object_id,
+		t_app_task_file.order_no,
+		t_app_task_file.file_time,
+		t_app_task_file.remark,
+		t_app_task_file.suffix_name,
+		t_app_task_file.view_no,
+	    t_app_task_file.record_id,
+	    t_app_task_file.operator_name,
+		t_app_task_file.is_delete
+	from
+		t_app_task_file
+		left join t_base_file_type on t_app_task_file.file_type = t_base_file_type.ft_id
+		where t_app_task_file.t_id = #{t_id}		
+</select>
+<update id="updateTaskFile" parameterType="map">
+	update
+	t_app_task_file
+	<set>
+	    <if test="t_id != null">	
+		t_id = #{t_id},
+		</if>
+		<if test="t_id != null and t_id !=''">	
+		file_name=#{file_name},
+		</if>
+		<if test="t_id != null and t_id !=''">	
+		file_type=#{file_type},
+		</if>
+		<if test="t_id != null and t_id !=''">	
+		type_name=#{type_name},
+		</if>		
+		object_id=#{object_id},
+		<if test="t_id != null and t_id !=''">	
+		order_no=#{order_no}
+		</if>
+		<if test="file_time != null and file_time !=''">
+		file_time = #{file_time}
+		</if>
+		<if test="remark != null and remark !=''">
+		remark = #{remark}
+		</if>
+		<if test="remark != null and remark !=''">
+		suffix_name = #{suffix_name}
+		</if>>
+	</set>
+		where tf_id = #{tf_id}		
+</update>
+</mapper>

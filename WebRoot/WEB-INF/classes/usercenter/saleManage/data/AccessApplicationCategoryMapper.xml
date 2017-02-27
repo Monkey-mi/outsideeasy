@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AccessApplicationCategoryMapper">
+
+
+<select id="getAccessApplicationCategoryList" parameterType="map" resultType="usercenter.saleManage.model.AccessApplicationCategory">
+	select
+		t_access_application_category.id,
+		t_access_application_category.category_id,
+		t_purchase_category.category_name,
+		t_purchase_category.f_id,
+		t_access_application_category.record_id,
+		t_access_application_category.create_dt
+	from
+		t_access_application_category
+		left join t_purchase_category on t_purchase_category.category_id=t_access_application_category.category_id
+		<where>
+		<if test="record_id!=null and record_id!=''">
+		record_id=#{record_id}
+		</if>
+		<if test="supplier_id!=null and supplier_id!=''">
+		or	supplier_id=#{supplier_id}
+		</if>
+		</where>
+</select>
+<insert id="addAccessApplicationCategory" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+	insert into t_access_application_category
+	(
+		category_id,
+		record_id
+		<if test="supplier_id != null">
+		,supplier_id
+		</if>
+	)
+	values
+	(
+		#{category_id},
+		#{record_id}
+		<if test="supplier_id != null">
+		,#{supplier_id}
+		</if>
+	)
+</insert>
+<update id="updateAccessApplicationCategory" parameterType="map">
+	update t_access_application_category
+		set
+			id = #{id},
+			category_id = #{category_id},
+			record_id = #{record_id},
+			create_dt = #{create_dt}
+		where id = #{id}
+</update>
+<delete id="deleteAccessApplicationCategory" parameterType="map">
+	delete from t_access_application_category
+	where id = #{id}
+</delete>
+<delete id="deleteAccessApplicationCategoryBySupplierId" parameterType="map">
+	delete from t_access_application_category
+	where supplier_id = #{supplier_id}
+</delete>
+<delete id="deleteAccessApplicationCategoryByRecordId" parameterType="map">
+	delete from t_access_application_category
+	where record_id = #{record_id}
+</delete>
+<update id="updateSupplierIdByRecordId" parameterType="map">
+	update 
+		t_access_application_category
+	set
+		supplier_id = #{supplier_id}
+	where
+		record_id = #{record_id}
+</update>
+</mapper>

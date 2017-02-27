@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.supplierAccess.data.PfAccessBasetableMapper">
+
+
+<select id="getPfAccessBasetableList" parameterType="map" resultType="platform.supplierAccess.model.PfAccessBasetable">
+	select
+		t_app_supplier_access_basetable.item_id,
+		t_app_supplier_access_basetable.item_name,
+		t_app_supplier_access_basetable.f_id,
+		t_app_supplier_access_basetable.weightValue,
+		t_app_supplier_access_basetable.Activity_status
+	from
+		t_app_supplier_access_basetable
+	where 1=1
+	<if test="f_id!=null and f_id>=0">
+		and t_app_supplier_access_basetable.f_id=#{f_id}
+	</if>
+	<if test="item_id!=null and item_id>=0">
+		and t_app_supplier_access_basetable.item_id=#{item_id}
+	</if>
+	<!-- 以下几个是节点树相关查询条件 -->
+	<if test="node!=null">
+		and t_app_supplier_access_basetable.f_id=#{node}
+	</if>
+	
+	<if test="class_name!=null">
+		and t_app_supplier_access_basetable.item_name=#{class_name}
+	</if>
+</select>
+</mapper>

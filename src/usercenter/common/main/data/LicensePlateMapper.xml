@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.common.main.data.LicensePlateMapper">
+
+
+<select id="getLicensePlateList" parameterType="map" resultType="usercenter.common.main.model.LicensePlate">
+	select
+		t_license_plate.license_id,
+		t_license_plate.license_name,
+		t_license_plate.enable,
+		t_license_plate.create_dt,
+		t_license_plate.company_id
+	from
+		t_license_plate
+	where
+	    t_license_plate.company_id = #{company_id}
+</select>
+<select id="getLicensePlateForSelect" parameterType="map" resultType="usercenter.common.main.model.LicensePlate">
+	select
+		t_license_plate.license_id,
+		t_license_plate.license_name
+	from
+		t_license_plate
+	where
+	    t_license_plate.company_id = #{company_id}
+	    and t_license_plate.enable = #{enable}
+</select>
+<insert id="addLicensePlate" parameterType="map" keyProperty="license_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="license_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_license_plate
+	(	
+		license_name,
+		enable,	
+		company_id
+	)
+	values
+	(
+		#{license_name},
+		#{enable},
+		#{company_id}
+	)
+</insert>
+<select id="regLicensePlate" parameterType="map" resultType="Integer">
+    select
+		count(0)
+	from
+		t_license_plate
+	where
+	    t_license_plate.license_name = #{license_name} 
+	    <if test="driver_id!=null and driver_id != ''">
+	    and t_license_plate.license_id != #{license_id}
+	    </if>
+	    and t_license_plate.company_id = #{company_id}
+</select>  
+<update id="updateLicensePlate" parameterType="map">
+	update t_license_plate
+		set
+		 <if test="license_name != null and license_name != ''">
+			license_name = #{license_name}
+		 </if>					
+		<if test="enable != null and enable != ''">
+			enable = #{enable}
+		</if>
+	where license_id = #{license_id}
+</update>
+<delete id="deleteLicensePlate" parameterType="usercenter.common.main.model.LicensePlate">
+	delete from t_license_plate
+	where license_id = #{license_id}
+</delete>
+</mapper>

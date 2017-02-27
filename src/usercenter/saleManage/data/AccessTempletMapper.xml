@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AccessTempletMapper">
+
+
+<select id="getAccessTempletList" parameterType="map" resultType="usercenter.saleManage.model.AccessTemplet">
+	select
+		t_access_templet.templet_id,
+		t_access_templet.is_must,
+		t_access_templet.order_by,
+		t_access_templet.classify_id,
+		t_access_templet.templet_name,
+		t_access_templet.seize_length,
+		t_access_templet.create_dt,
+		t_access_templet_head.h_id,
+		t_access_templet_head.table_name,
+		t_access_templet_head.owner,
+		t_app_company_info.cpyname_cn as owner_name,
+		t_access_templet_head.version,
+		t_templet_classify.classify_name
+	from
+		t_access_templet_head
+	left join t_app_company_info on t_app_company_info.company_id=t_access_templet_head.owner
+	left join t_access_templet on t_access_templet.h_id=t_access_templet_head.h_id
+	left join t_templet_classify on t_access_templet.classify_id=t_templet_classify.classify_id
+	where 1=1
+	<if test="hId!=null">
+		and t_access_templet_head.h_id=#{hId}
+	</if>
+	<if test="classifyId!=null">
+		and t_access_templet.classify_id=#{classifyId}
+	</if>
+</select>
+</mapper>

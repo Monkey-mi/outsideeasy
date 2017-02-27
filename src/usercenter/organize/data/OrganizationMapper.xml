@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.organize.data.OrganizationMapper">
+
+
+<select id="getOrganizationList" parameterType="map" resultType="usercenter.organize.model.Organization">
+	select
+		t_app_organization.org_id,
+		t_app_organization.name,
+		t_app_organization.parentId,
+		t_app_organization.isvalid,
+		t_app_organization.reg_id,
+		t_app_organization.isParent
+	from
+		t_app_organization
+	where 1=1
+	<if test="node!=null and node!=''">
+       and t_app_organization.parentId = #{node}
+    </if>
+    <if test="reg_id!=null and reg_id!=''">
+       and t_app_organization.reg_id = #{reg_id}
+    </if>
+    <if test="org_id!=null and org_id!=''">
+       and t_app_organization.org_id = #{org_id}
+    </if>
+    <if test="name!=null and name!=''">
+       and t_app_organization.name like '%${name}%'
+    </if>
+</select>
+<insert id="addOrganization" parameterType="usercenter.organize.model.Organization">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="org_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_organization
+	(
+		
+		reg_id,
+		name,
+		parentId,
+		isvalid,
+		isParent
+	)
+	values
+	(
+		
+		#{reg_id},
+		#{name},
+		#{parentId},
+		#{isvalid},
+		#{isParent}
+	)
+</insert>
+<delete id="deleteOrganizationbg" parameterType="usercenter.organize.model.Organization">
+	delete from t_app_organization
+	where org_id = #{org_id}
+</delete>
+<update id="updateOrganization" parameterType="map">
+	update t_app_organization
+		set
+			name = #{name},
+			parentId = #{parentId}
+		where org_id = #{org_id}
+</update>
+
+<update id="updateOrganizationParentId" parameterType="map">
+	update t_app_organization
+		set
+			parentId = #{parentId}
+		where org_id = #{org_id}
+</update>
+<delete id="deleteOrganization" parameterType="map">
+	delete from t_app_organization
+	where org_id = #{org_id}
+</delete>
+<select id="getTreeRoot" parameterType="map" resultType="usercenter.organize.model.Organization">
+	select *
+	from t_app_organization
+	where parentId = 0 and reg_id=#{reg_id}
+</select>
+<select id="findOrganization" parameterType="map" resultType="java.lang.Integer">
+	select count(*)
+	from t_app_organization
+	where parentId =#{parentId} and name = #{name} and org_id != #{org_id}
+</select>
+<select id="findOrganizationByName" parameterType="map" resultType="usercenter.organize.model.Organization">
+	select *
+	from t_app_organization
+	where  t_app_organization.name = #{name} 
+	and t_app_organization.reg_id = #{reg_id} 
+</select>
+<select id="findChildrenOrganization" parameterType="map" resultType="java.lang.Integer">
+	select count(*)
+	from t_app_organization
+	where parentId =#{org_id} 
+</select>
+<select id="findChildren" parameterType="map" resultType="java.lang.Integer">
+	select t_app_organization.org_id
+	from t_app_organization
+	where parentId =#{org_id} 
+</select>
+<select id="findChildrenOrganizations" parameterType="map" resultType="usercenter.organize.model.Organization">
+	select *
+	from t_app_organization
+	where parentId =#{org_id} 
+</select>
+<select id="findMaxNumByRegId" parameterType="map" resultType="usercenter.organize.model.MaxLimit">
+	select * 
+	from t_subaccount_maxlimit a 
+	JOIN  t_supplier_subaccount_maxnum_info b 
+	ON a.limit_id=b.limit_id
+	where b.reg_id=#{reg_id}
+</select>
+<select id="getOrganizationByOrg_id" parameterType="java.lang.Integer" resultType="usercenter.organize.model.Organization">
+	select *
+	from t_app_organization
+	where  t_app_organization.org_id = #{org_id} 
+</select>
+</mapper>

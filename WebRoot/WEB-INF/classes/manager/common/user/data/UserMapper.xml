@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.common.user.data.UserMapper">
+
+ <select id="getUserList" parameterType="map" resultType="UserInfo">
+    select *
+    from t_user_info
+    <where>
+    	1=1
+    	<if test="login_id!=null">
+    		and login_id=#{login_id}
+    	</if>
+    	<if test="hasAD=='false'">
+    		and login_id!='admin'
+    	</if>
+    	<if test="pwd!=null">
+    		and pwd=#{pwd}
+    	</if>
+    	<if test="company_id!=null and company_id!=''">
+			and t_user_info.company_id=#{company_id}
+		</if>
+		<if test="search!=null and search!=''">
+			and (t_user_info.login_id like '%${search}%' or t_user_info.name like '%${search}%')
+		</if>
+		<if test="searchOrg!=null and searchOrg!=''">
+			and t_user_info.orgnization like '%${searchOrg}%'
+		</if>
+    </where>
+ </select> 
+ 
+<sql id="valueColumns">
+    	#{login_id},#{pwd},#{u_type},#{login_type},#{login_def},#{name},#{sex},#{birthday},#{tel},#{email},#{post},#{address},#{create_dt},#{modify_dt},#{last_login},#{nickname},#{nick_portrait},#{is_valid},#{company_id},#{cpyname_cn},#{orgnization}
+    </sql>
+ <insert id="addUser" parameterType="UserInfo" keyProperty="u_id" useGeneratedKeys="true">
+        insert into t_user_info(login_id,pwd,u_type,login_type,login_def,name,sex,birthday,tel,email,post,address,create_dt,modify_dt,last_login,nickname,nick_portrait,is_valid,company_id,cpyname_cn,orgnization) 
+        values(<include refid="valueColumns" />)
+  </insert>
+  
+<update id="updateUser" parameterType="UserInfo" >
+        update t_user_info set 
+        	<if test="login_id!=null">
+        		login_id    =#{login_id},
+        	</if>
+            <if test="u_type!=null">
+        		u_type      =#{u_type},
+        	</if>
+            <if test="login_type!=null">
+        		login_type  =#{login_type},
+        	</if>
+            <if test="login_def!=null">
+        		login_def   =#{login_def},
+        	</if>
+            <if test="name!=null">
+        		name        =#{name},
+        	</if>
+            <if test="sex!=null">
+        		 sex         =#{sex},
+        	</if>
+            <if test="birthday!=null">
+        		 birthday    =#{birthday},
+        	</if>
+            <if test="tel!=null">
+        		  tel         =#{tel},
+        	</if>
+           <if test="email!=null">
+        		 email       =#{email},
+        	</if>
+            <if test="post!=null">
+        		 post        =#{post},
+        	</if>
+        	<if test="address!=null">
+        		 address     =#{address},
+        	</if>
+            <if test="create_dt!=null">
+        		 create_dt   =#{create_dt},
+        	</if>
+            <if test="modify_dt!=null">
+        		 modify_dt   =#{modify_dt},
+        	</if>
+            <if test="last_login!=null">
+        		 last_login  =#{last_login},
+        	</if>
+            <if test="nickname!=null">
+        		 nickname  =#{nickname},
+        	</if>
+        	<if test="is_valid!=null">
+        		 is_valid  =#{is_valid},
+        	</if>
+        	<if test="company_id!=null">
+        		 company_id  =#{company_id},
+        	</if>
+        	<if test="cpyname_cn!=null">
+        		 cpyname_cn  =#{cpyname_cn},
+        	</if>
+        	<if test="orgnization!=null">
+        		orgnization=#{orgnization},
+        	</if>
+        	u_id=#{u_id}
+        where u_id=#{u_id}
+  </update>
+  <update id="updateUserPwd" parameterType="UserInfo">
+        update t_user_info set pwd=#{pwd},modify_dt=#{modify_dt}
+        <if test="last_login!=null">
+        		,last_login  =#{last_login} 
+        </if>
+        where login_id=#{login_id}
+        <if test="name != null">
+            and pwd=#{name}
+        </if> 
+  </update>
+  <update id="update_company_id" parameterType="map" >
+        update t_user_info set 
+        	company_id=#{company_id},
+        	cpyname_cn=#{cpyname_cn}
+        where u_id=#{u_id}
+  </update>
+  <!-- 从用户表里获取所有所属部门 -->
+  <select id="getAllOrgnization" parameterType="map" resultType="UserInfo">
+  	select distinct orgnization from t_user_info 
+  	<where>
+  	 orgnization is not NULL
+  	<if test="condition!=null and condition!=''">
+  		and orgnization like '%${condition}%'
+  	</if>
+  	</where>
+  </select>
+  
+  <delete id="deleteUser" parameterType="UserInfo">
+        delete from t_user_info where u_id=#{u_id}
+  </delete>
+
+ <delete id="deleteUserMenuByUid" parameterType="int">
+ 	delete from t_user_menu where u_id=#{value}
+ </delete>
+ 
+ <delete id="deleteUserRoleByUid" parameterType="int">
+	delete from t_user_role_ref where u_id=#{value}
+</delete>
+
+<delete id="deleteUserFuncByUid" parameterType="int">
+	delete from t_user_func where u_id=#{value}
+</delete>
+<delete id="deleteUserFuncByfid" parameterType="int">
+	delete from t_user_func where f_id=#{value}
+</delete> 
+<delete id="deleteUserModuleByUid" parameterType="int">
+delete from t_user_module where u_id=#{value}
+</delete>
+ 
+ <select id="getUserOrgList" parameterType="map"  resultType="UserOrg">
+ 		select *
+ 		  from t_user_org
+ 		<where>
+ 			1=1
+ 			<if test="u_id!=null">
+ 				and u_id=#{u_id}
+ 			</if>
+ 			<if test="ou_code!=null">
+ 				and ou_code=#{u_id}
+ 			</if>
+ 		</where> 
+ </select>
+ 
+  <select id="getUserOrgListByUid" parameterType="int"  resultType="UserOrg">
+ 		select *
+ 		  from t_user_org
+ 		<where>
+ 			 u_id=#{value}
+ 		</where> 
+ </select>
+  
+  <resultMap id="RoleFuncMap" type="RoleFunc">
+        <id property="id" column="id" />
+        <result property="role_id" column="role_id"></result>
+        <result property="f_id" column="f_id"></result>
+        <collection property="Roles" ofType="Role" >
+            <id property="role_id" column="role_id"></id>
+            <result property="role_name" column="role_name"></result>
+        </collection>
+        <collection property="Funcs" ofType="Function" >
+            <id property="f_id" column="f_id"></id>
+            <result property="mod_id" column="mod_id"></result>
+            <result property="code" column="code"></result>
+            <result property="name" column="name"></result>
+            <result property="type" column="type"></result>
+        </collection>
+  </resultMap> 
+  <select id="getRoleFuncList" parameterType="map" resultMap="RoleFuncMap">
+        select  a.id as id,
+                b.role_id as role_id,
+                b.role_name as role_name,
+                c.f_id as f_id,
+                c.mod_id as mod_id,
+                c.code as code,
+                c.name as name,
+                c.type as type
+        from t_user_role_func a left outer join t_user_role b on a.role_id=b.role_id
+             left outer join t_sys_func c on a.f_id=c.f_id
+        <where>
+            <if test="role_id != null">
+                a.role_id =#{role_id}
+            </if>
+            <if test="f_id != null">
+                or a.f_id =#{f_id}
+            </if>
+            
+        </where>
+  </select> 
+  <insert id="addRoleFunc" parameterType="RoleFunc" keyProperty="id" useGeneratedKeys="true">
+        insert into t_user_role_func(role_id,f_id)
+        values(#{role_id},#{f_id})
+  </insert>
+  <delete id="deleteRoleFunc" parameterType="RoleFunc">
+        delete from t_user_role_func
+        where id=#{id}
+  </delete>
+    <resultMap id="RoleModuleMap" type="RoleModule">
+        <id property="id" column="id" />
+        <result property="role_id" column="role_id"></result>
+        <result property="mod_id" column="mod_id"></result>
+        <collection property="Roles" ofType="Role" >
+            <id property="role_id" column="role_id"></id>
+            <result property="role_name" column="role_name"></result>
+        </collection>
+        <collection property="Modules" ofType="Module" >
+            <id property="id" column="mod_id"></id>
+            <result property="text" column="text"></result>
+        </collection>
+  </resultMap> 
+  <select id="getRoleModuleList" parameterType="map" resultMap="RoleModuleMap">
+        select  a.id as id,
+                b.role_id as role_id,
+                b.role_name as role_name,
+                c.id as mod_id,
+                c.text as text
+        from t_user_role_model a left outer join t_user_role b on a.role_id=b.role_id
+             left outer join t_sys_module c on a.model_id=c.id
+        <where>
+            <if test="role_id != null">
+                a.role_id =#{role_id}
+            </if>
+            <if test="mod_id != null">
+                or a.mod_id =#{mod_id}
+            </if>
+            
+        </where>
+  </select>
+   <insert id="addRoleModule" parameterType="RoleModule" keyProperty="id" useGeneratedKeys="true">
+        insert into t_user_role_model(role_id,model_id)
+        values(#{role_id},#{mod_id})
+  </insert>
+  <delete id="deleteRoleModule" parameterType="RoleModule">
+        delete from t_user_role_model
+        where id=#{id}
+  </delete>
+ <select id="getUserByDefaultOu" parameterType="map" resultType="UserInfo">
+			select *
+			  from t_user_info u
+			 <where>
+			 	<if test="ou_id!=null">
+				 	exists (
+				 		select *
+				 		  from t_user_org ou
+				 		 where ou_id = #{ou_id}
+				 		   and  ou.u_id =u.u_id
+				 	)
+			 	</if>
+			 	
+			 </where> 
+			 	
+ </select>
+ 
+  
+
+<select id="getRoleListByLoginId" parameterType="map" resultType="Role">
+        select DISTINCT 
+        		a.role_id,
+        		a.role_name,
+        		a.role_desc,
+        		a.order_seq,
+        		a.creator
+        from 	t_user_role a
+        inner join t_user_role_ref b on a.role_id = b.role_id
+        inner join t_user_info c on b.u_id = c.u_id
+	    where	c.login_id = #{login_id}
+  </select>
+
+<select id="getUserFuncList" parameterType="map" resultType="UserFunc">
+select id,u_id,f_id from t_user_func
+<where>
+		<if test="id!=null">
+		id=#{id}
+		</if>
+		<if test="u_id!=null">
+		and u_id=#{u_id}
+		</if>
+		<if test="f_id!=null">
+		and f_id=#{f_id}
+		</if>
+		<if test="ou_id!=null">
+		and ou_id=#{ou_id}
+		</if>
+</where>
+</select>
+
+<insert id="addUserFunc" parameterType="UserFunc">
+<selectKey keyProperty="id" resultType="int" order="BEFORE">
+              select ifnull(max(id)+1,1) from t_user_func
+</selectKey>
+insert into t_user_func values(#{id},#{u_id},#{f_id})
+</insert>
+ <delete id="deleteUserFunc" parameterType="UserFunc">
+delete from t_user_func 
+<where>
+        id=#{id} 
+        <if test="u_id != null">
+          or(
+           	u_id=#{u_id}
+          )
+        </if>
+        
+</where> 
+</delete>
+<select id="getUserModuleList" parameterType="map" resultType="UserModule">
+	select id,u_id,mod_id from t_user_module
+	<where>
+		<if test="id!=null">
+		id=#{id}
+		</if>
+		<if test="u_id!=null">
+		and u_id=#{u_id}
+		</if>
+		<if test="ou_id!=null">
+		and ou_id=#{ou_id}
+		</if>
+	</where>
+</select>
+<insert id="addUserModule" parameterType="UserModule">
+<selectKey keyProperty="id" resultType="int" order="BEFORE">
+              select ifnull(max(id)+1,1) from t_user_module
+</selectKey>
+insert into t_user_module values(#{id},#{u_id},#{mod_id})
+</insert>
+
+<delete id="deleteUserModule" parameterType="UserModule">
+delete from t_user_module where id=#{id}
+</delete>
+<select id="getCanChooseRoleList" parameterType="map" resultType="Role">
+           	select role_id,
+                       role_name
+                from t_user_role
+                where
+                    role_name!='admins'
+  </select>
+
+<delete id="deleteRoleFuncByFId" parameterType="int">
+        delete from t_user_role_func
+        where f_id =#{value}
+  </delete>
+  
+<select id="getFuncListByUserModule" parameterType="map" resultType="Function">
+        select distinct f_id,mod_id,code,name,type
+        from (
+	        select  
+	            c.f_id,c.mod_id,c.code,c.name,c.type
+		    from t_user_func b , t_sys_func c
+		    <where>
+		       b.f_id=c.f_id
+		       and b.u_id = #{u_id}
+		       and c.mod_id = #{mod_id} 
+		    </where>
+		    union
+		    select 
+		       c.f_id,c.mod_id,c.code,c.name,c.type
+		    from t_user_role_ref a,t_user_role_func b,t_sys_func c
+		    <where>
+		       a.role_id=b.role_id and b.f_id=c.f_id
+		       and a.u_id=#{u_id}
+		       and c.mod_id = #{mod_id} 
+		    </where>
+		) xx
+  </select>
+  
+  <delete id="deleteUserMenuByMid" parameterType="int">
+  		delete from t_user_module where mod_id=#{value}
+ </delete>
+ 
+  <delete id="deleteRoleModuleByMId" parameterType="int">
+        delete from t_user_role_model
+        where model_id =#{value}
+  </delete>
+  
+  
+   <select id="getRoleList" parameterType="map" resultType="Role">
+        select 
+            role_id,
+            role_name,
+            role_desc,
+            order_seq,
+            creator,
+            ou_code
+        from t_user_role
+        <where>
+            <if test="role_name!=null and mode == 'exists' ">
+	           and role_name=#{role_name}
+	        </if>
+	        <if test="hasAD=='false'">
+	    		and role_name !='admins'
+	    	</if>
+	        <if test="mode !='exists' ">
+               and role_name !='admins'
+            </if>
+	        <if test="mode =='allSearch' ">
+	           and role_name like #{role_name}
+	        </if>
+        </where>
+  </select>
+  <select id="getSupplierRegisterRole"  resultType="Role">
+        select 
+            role_id,
+            role_name,
+            role_desc,
+            order_seq,
+            creator,
+            ou_code
+        from t_user_role
+        where role_name="SupplierRegister"
+         limit 1
+  </select>
+  <insert id="addRole" parameterType="Role">
+        <selectKey keyProperty="role_id" resultType="int" order="BEFORE">
+                      select ifnull(max(role_id)+1,1) from t_user_role
+        </selectKey>
+        insert into t_user_role(
+            role_id,
+            role_name,
+            role_desc,
+            order_seq,
+            creator,
+            ou_code
+        ) 
+        values(
+            #{role_id},
+            #{role_name},
+            #{role_desc},
+            #{order_seq},
+            #{creator},
+            #{ou_code}
+        )
+  </insert>
+  <update id="updateRole" parameterType="Role">
+        update t_user_role 
+        set 
+        <if test="role_name!=null">
+        	role_name=#{role_name},
+        </if>
+         <if test="role_desc!=null">
+        	role_desc=#{role_desc},
+        </if>  
+        <if test="order_seq!=null and order_seq!=0">
+        	 order_seq=#{order_seq},
+        </if>  
+        <if test="creator!=null">  
+            creator=#{creator},
+        </if>
+          role_id=role_id
+        where role_id=#{role_id}
+  </update>
+  <delete id="deleteRole" parameterType="Role">
+        delete from  t_user_role 
+        where role_id=#{role_id}
+  </delete>
+    <delete id="deleteRoleFuncByRId" parameterType="int">
+        delete from t_user_role_func
+        where role_id =#{value}
+  </delete>
+   <delete id="deleteRoleModuleByRId" parameterType="int">
+        delete from t_user_role_model
+        where role_id =#{value}
+  </delete>
+  
+  <!-- 用户角色 -->
+<select id="getUserRoleList" parameterType="map" resultType="UserRole">
+		select 
+		t_user_role_ref.id,
+		t_user_role_ref.u_id,
+		t_user_role_ref.role_id, 
+		t_user_info.name,
+		t_user_info.login_id
+			from t_user_role_ref
+		left join t_user_info on t_user_info.u_id=t_user_role_ref.u_id
+		<where>
+		t_user_role_ref.role_id != 1
+		<if test="id!=null">
+		 and t_user_role_ref.id=#{id}  
+		</if>
+		<if test="u_id!=null">
+		and t_user_role_ref.u_id=#{u_id}
+		</if>
+		<if test="role_id!=null">
+		and t_user_role_ref.role_id=#{role_id}
+		</if>
+		</where>
+</select>
+<select id="getUserRoleCount" parameterType="map" resultType="java.lang.Integer">
+		select count(0) from t_user_role_ref
+		where u_id=#{u_id} and role_id=#{role_id}
+</select>
+
+<insert id="addUserRole" parameterType="UserRole">
+insert into t_user_role_ref(u_id,role_id) values(#{u_id},#{role_id})
+</insert>
+<delete id="deleteUserRole" parameterType="UserRole">
+    delete from t_user_role_ref 
+    <where>
+        id=#{id} 
+        <if test="u_id != null and role_id!=null">
+          or(
+            u_id=#{u_id} and role_id=#{role_id}
+          )
+        </if>
+        
+    </where> 
+</delete>
+  <!-- 角色配置管理 -->
+  <select id="getRoleCfgList" parameterType="map" resultType="RoleConfig">
+  select id,role_id,con_id from t_user_role_config
+  <where>
+  <if test="role_id!=null">
+ 	and role_id=#{role_id}
+  </if>
+  <if test="con_id!=null">
+ 	and con_id=#{con_id}
+  </if>
+  </where>
+</select>
+<select id="getRoleCfgByUid" parameterType="map" resultType="RoleConfig">
+ select id,role_id,con_id from t_user_role_config
+ where
+    role_id in(
+	    select role_id
+	    from user_role
+    	where u_id=#{u_id} 
+    	and ou_id=#{ou_id} 
+    )
+</select>
+<insert id="addRoleCfg" parameterType="RoleConfig">
+	insert into t_user_role_config(id,role_id,con_id)
+	                 values(#{id},#{role_id},#{con_id})
+</insert>
+<update id="updateRoleCfg" parameterType="RoleConfig">
+update t_user_role_config set con_id=#{con_id}
+<where>
+<if test="id!=null">
+id=#{id}
+</if>
+</where>
+</update>
+<delete id="deleteRoleCfg" parameterType="RoleConfig">
+delete from t_user_role_config
+<where>
+<if test="id!=null">
+id=#{id}
+</if>
+<if test="role_id!=null">
+and role_id=#{role_id}
+</if>
+<if test="con_id!=null">
+and con_id=#{con_id}
+</if>
+</where>
+</delete>
+
+ <select id="getEmailCount" parameterType="map" resultType="java.lang.Integer">
+	select count(0) from t_user_info
+	where email = #{email} and is_valid="true"
+</select>
+
+ <select id="getLogin_idCount" parameterType="map" resultType="java.lang.Integer">
+	select count(0) from t_user_info
+	where login_id = #{login_id} and is_valid="true"
+</select>
+<select id="getInvalidUserByEmail" parameterType="map" resultType="UserInfo">
+	select * from t_user_info
+	where email = #{email} and is_valid="false"
+</select>
+<select id="getUserCount" parameterType="map" resultType="int">
+        select count(*)
+        from t_user_info
+        <where>
+            <if test="login_id != null">
+                login_id =#{login_id}
+            </if>
+            <if test="u_type != null">
+                and u_type =#{u_type}
+            </if>
+            <if test="login_type != null">
+                and login_type =#{login_type}
+            </if>
+            <if test="name != null">
+                and name like #{name}
+            </if>
+            <if test="pwd != null">
+                and pwd=#{pwd}
+            </if>
+            <if test="is_valid != null">
+                and is_valid=#{is_valid}
+            </if>
+        </where>
+  </select>
+</mapper>

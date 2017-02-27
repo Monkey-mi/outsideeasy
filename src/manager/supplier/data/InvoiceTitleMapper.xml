@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplier.data.InvoiceTitleMapper">
+
+
+<select id="getInvoiceTitleList" parameterType="map" resultType="manager.supplier.model.InvoiceTitle">
+	select
+		t_app_invoice_title.invoice_title_id,
+		t_app_invoice_title.invoice_title_name,
+		t_app_invoice_title.company_id,
+		
+		case when t_app_invoice_title.default_id=1 then 'true' else 'false' END as default_id
+	from
+		t_app_invoice_title
+		where 1=1
+	<if test="company_id!=null">
+		and t_app_invoice_title.company_id=#{company_id}
+	</if>
+</select>
+<insert id="addInvoiceTitle" parameterType="manager.supplier.model.InvoiceTitle" keyProperty="invoice_title_id" useGeneratedKeys="true">
+	<selectKey keyProperty="invoice_title_id" resultType="int" order="BEFORE">
+		select  ifnull(max(invoice_title_id)+1,1) from t_app_invoice_title 		
+	</selectKey>
+	insert into t_app_invoice_title
+	(
+		invoice_title_id,
+		invoice_title_name,
+		company_id,
+		default_id
+	)
+	values
+	(
+		#{invoice_title_id},
+		#{invoice_title_name},
+		#{company_id},
+		<if test="default_id==true">
+			1
+		</if>
+		<if test="default_id==false">
+			0
+		</if>
+	)
+</insert>
+<update id="updateInvoiceTitle" parameterType="manager.supplier.model.InvoiceTitle">
+	update t_app_invoice_title
+		set
+			invoice_title_id = #{invoice_title_id},
+			invoice_title_name = #{invoice_title_name},
+			company_id = #{company_id},
+			<if test="default_id==true">
+				default_id=1
+			</if>
+			<if test="default_id==false">
+				default_id=0
+			</if>
+		where invoice_title_id = #{invoice_title_id}
+</update>
+<delete id="deleteInvoiceTitle" parameterType="manager.supplier.model.InvoiceTitle">
+	delete from t_app_invoice_title
+	where invoice_title_id = #{invoice_title_id}
+</delete>
+</mapper>

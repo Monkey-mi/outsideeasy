@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="platform.contract.data.PfOrderAttchedFileMapper">
+
+
+<select id="getPfOrderAttchedFileList" parameterType="map" resultType="platform.contract.model.PfOrderAttchedFile">
+	select
+		t_order_attched_file.order_attched_id,
+		t_order_attched_file.pur_order_id,
+		t_order_attched_file.order_bh,
+		t_order_attched_file.order_attched_name,
+		t_order_attched_file.ft_id,
+		t_order_attched_file.suffix_name,
+		t_order_attched_file.order_attched_remark,
+		t_order_attched_file.mogodb_id,
+		t_order_attched_file.create_dt,
+		t_order_attched_file.source_type,
+		t_order_attched_file.creator_id,
+		t_order_attched_file.creator_name
+	from
+		t_order_attched_file
+</select>
+<insert id="addPfOrderAttchedFile" parameterType="platform.contract.model.PfOrderAttchedFile" keyProperty="" useGeneratedKeys="true">
+	insert into t_order_attched_file
+	(
+		order_attched_id,
+		pur_order_id,
+		order_bh,
+		order_attched_name,
+		ft_id,
+		suffix_name,
+		order_attched_remark,
+		mogodb_id,
+		create_dt,
+		source_type,
+		creator_id,
+		creator_name
+	)
+	values
+	(
+		#{order_attched_id},
+		#{pur_order_id},
+		#{order_bh},
+		#{order_attched_name},
+		#{ft_id},
+		#{suffix_name},
+		#{order_attched_remark},
+		#{mogodb_id},
+		#{create_dt},
+		#{source_type},
+		#{creator_id},
+		#{creator_name}
+	)
+</insert>
+<update id="updatePfOrderAttchedFile" parameterType="platform.contract.model.PfOrderAttchedFile">
+	update t_order_attched_file
+		set
+			order_attched_id = #{order_attched_id},
+			pur_order_id = #{pur_order_id},
+			order_bh = #{order_bh},
+			order_attched_name = #{order_attched_name},
+			ft_id = #{ft_id},
+			suffix_name = #{suffix_name},
+			order_attched_remark = #{order_attched_remark},
+			mogodb_id = #{mogodb_id},
+			create_dt = #{create_dt},
+			source_type = #{source_type},
+			creator_id = #{creator_id},
+			creator_name = #{creator_name}
+		where  = #{}
+</update>
+<delete id="deletePfOrderAttchedFile" parameterType="platform.contract.model.PfOrderAttchedFile">
+	delete from t_order_attched_file
+	where  = #{}
+</delete>
+</mapper>

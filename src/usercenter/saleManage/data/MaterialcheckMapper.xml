@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.MaterialcheckMapper">
+
+
+<select id="getMaterialcheckList" parameterType="map" resultType="usercenter.saleManage.model.Materialcheck">
+	select
+		t_supplier_materialcheck.materialcheck_id,
+		t_supplier_materialcheck.file_type_id,
+		t_supplier_materialcheck.file_name,
+		t_supplier_materialcheck.create_dt,
+		t_supplier_materialcheck.remark,
+		t_supplier_materialcheck.mogodb_id,
+		t_supplier_materialcheck.supplier_id
+	from
+		t_supplier_materialcheck
+		where 1=1
+		<if test="supplier_id!='' and supplier_id!=null">
+			and t_supplier_materialcheck.supplier_id=#{supplier_id}
+		</if>
+		<if test="end_date != null and end_date !='' ">
+			and t_supplier_materialcheck.create_dt&lt;=#{end_date}
+		</if>
+		<if test="start_date != null and start_date !='' ">
+			and t_supplier_materialcheck.create_dt&gt;=#{start_date}
+		</if>
+		order by t_supplier_materialcheck.create_dt DESC
+</select>
+<select id="getAllMaterialcheckList" parameterType="map" resultType="usercenter.saleManage.model.Materialcheck">
+	select
+		t_supplier_materialcheck.materialcheck_id,
+		t_supplier_materialcheck.file_type_id,
+		t_supplier_materialcheck.file_name,
+		t_supplier_materialcheck.create_dt,
+		t_supplier_materialcheck.remark,
+		t_supplier_materialcheck.send_company_id as owner_id,
+		t_app_company_info.cpyname_cn as owner_cpyname,
+		t_supplier_materialcheck.mogodb_id,
+		t_supplier_materialcheck.supplier_id
+	from
+		t_supplier_materialcheck
+		left join t_app_company_info on t_app_company_info.company_id=t_supplier_materialcheck.send_company_id
+		where t_supplier_materialcheck.supplier_id IN (SELECT supplier_id from t_supplier_files where company_id=#{company_id})
+		order by t_supplier_materialcheck.create_dt DESC
+</select>
+<insert id="addMaterialcheck" parameterType="usercenter.saleManage.model.Materialcheck" keyProperty="materialcheck_id" useGeneratedKeys="true">
+	insert into t_supplier_materialcheck
+	(
+		materialcheck_id,
+		file_type_id,
+		file_name,
+		create_dt,
+		remark,
+		mogodb_id,
+		supplier_id
+	)
+	values
+	(
+		#{materialcheck_id},
+		#{file_type_id},
+		#{file_name},
+		#{create_dt},
+		#{remark},
+		#{mogodb_id},
+		#{supplier_id}
+	)
+</insert>
+<update id="updateMaterialcheck" parameterType="usercenter.saleManage.model.Materialcheck">
+	update t_supplier_materialcheck
+		set
+			materialcheck_id = #{materialcheck_id},
+			file_type_id = #{file_type_id},
+			file_name = #{file_name},
+			create_dt = #{create_dt},
+			remark = #{remark},
+			mogodb_id = #{mogodb_id},
+			supplier_id = #{supplier_id}
+		where materialcheck_id = #{materialcheck_id}
+</update>
+<delete id="deleteMaterialcheck" parameterType="usercenter.saleManage.model.Materialcheck">
+	delete from t_supplier_materialcheck
+	where materialcheck_id = #{materialcheck_id}
+</delete>
+<select id="getLastThreeMaterialCheck" parameterType="map" resultType="usercenter.saleManage.model.Materialcheck">
+	select
+		t_supplier_materialcheck.materialcheck_id,
+		t_supplier_materialcheck.file_type_id,
+		t_supplier_materialcheck.file_name,
+		t_supplier_materialcheck.create_dt,
+		t_supplier_materialcheck.remark,
+		t_supplier_materialcheck.send_company_id as owner_id,
+		t_app_company_info.cpyname_cn as owner_cpyname,
+		t_supplier_materialcheck.mogodb_id,
+		t_supplier_materialcheck.supplier_id
+	from
+		t_supplier_materialcheck
+		left join t_app_company_info on t_app_company_info.company_id=t_supplier_materialcheck.send_company_id
+		where t_supplier_materialcheck.supplier_id IN (SELECT supplier_id from t_supplier_files where company_id=#{sup_company_id})
+		order by t_supplier_materialcheck.create_dt DESC limit 3
+</select>
+<select id="hasMaterialCheck" parameterType="map" resultType="java.lang.Integer">
+	select
+		count(0)
+	from
+		t_supplier_materialcheck
+		where t_supplier_materialcheck.supplier_id=#{supplier_id}
+</select>
+</mapper>

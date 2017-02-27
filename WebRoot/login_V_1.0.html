@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>登录页面</title>
+<link href="/newresources/css/common.css" rel="stylesheet">
+<link href="/newresources/css/login.css" rel="stylesheet">
+<link href="/newresources/css/xcConfirm.css" rel="stylesheet">
+</head>
+<body>
+<div id="login_l_wrap" class="login_l_wrap">
+	<img class="bimg" src="/newresources/images/login/bg_login.jpg" />
+</div>
+<!--  <img class="bg_img" src="/newresources/images/login/bg_login.jpg" />-->
+<div id="login_r_wrap" class="login_r_wrap">
+	<div class="login_r_inner">
+		<div class="login_form">
+			<div class="logo_wrap">
+				<div class="title_img_wrap f_l">
+					<img src="/newresources/images/logo/logo_login.png" style="cursor:pointer" onclick="go_redirect('index.jsp')"/>
+					<!--<img src="/newresources/images/login/logo_2.jpg" />  -->
+					<div class="logo_text"><p class="font1 logo_color">账号登录</p><p class="font2 logo_color">Outsideasy.com</p></div>
+					
+				</div>
+				<div class="f_l title_right">
+					<span class="bata_span">内测版</span>
+					<button class="beta_img">Beta</button>
+				</div>
+			</div>
+			<div class="logininner_wrap mt30">
+				<input type="text" class="input_wrap" id="data_loginAccount" placeholder="邮箱账号/用户名" />
+			</div>
+			<div class="logininner_wrap mt30" style=" position:relative;">
+				<input type="password" class="input_wrap" id="data_pwd"  placeholder="密码" />
+				<img src="/newresources/images/login/pwd_r.jpg" class="pwd_icon" />
+			</div>
+			<div id="vCode_change"  class="logininner_wrap mt30 clearfix" style="display:none;">
+				<input type="text" class="input_vcode" id="data_vcode" />
+				<a href="#" title="如看不清楚,请点击图片更换"  class="vcodeImg_wrap" onclick="getNewVCode(1);"> 
+					<img height="38px" width="100px" id="vCodeImg1" src=""/>
+					<img src="/newresources/images/new/refresh.png" />
+				</a>
+			</div>
+			<!--  此项先注释掉，可能之后使用   -->
+			<!-- <div class="mt10">   
+				<input id="saveCookie" type="checkbox" class="input_checkbox" value="" checked="checked" />一周内自动登录  
+			</div> -->
+			<div class="reg-explain">
+			</div>
+		
+			<div class="logininner_wrap">
+				<input type="button" class="login_button" id="login_button" value="立即登录" onClick="doLogin()" />
+			</div>
+			<div class="link_a_wrap mt10">
+				<a href="/findPwd.html">忘记密码</a>|
+				<a class="maincolor" href="/register.html">企业注册</a>	
+			</div>
+		</div>
+		<div class="login_bottom_dsc">Industrial Data Online Bus &middot;工业数据总线</div>
+		<div class="login_bottom_wrap">
+			Copyright  2016-2017<br />版权所有  outsideasy.com   <a href="javascript:void(0)">备案编号：浙ICP备15003965号</a>
+		</div>
+	</div>
+</div>
+<div class="invalidIpTip"><!-- 无效IP提示  -->
+	<div class="mask"></div>
+	<div class="tipWindow">
+		<div class="title">异常提示<span id="closeTip" class="closeTip">X</span></div>
+		<div class="tipShow">
+			<div class="pl10 pt15 lh18 b"><img src="/newresources/images/OrangeSigh.png"><span class="pl6">您的账号存在登录异常，在陌生地址或设备登录</span></div>
+			<div class="pl34 pt15">为了您的账号安全，请先进行安全验证：</div>
+			<div class="sendModel">
+				<div class="bundleInfo">
+					<span id="sendInfoTip">您绑定的邮箱为：</span>
+					<span id="sendInfo">***</span>
+					<span id="sendBotton">发送</span>
+					<span class="countDownWrap"><span id="countDownTime">30</span><span>秒</span></span>
+				</div>
+				<div class="sendedTip mt10"><img id="sendedTipIcon" src="/newresources/images/greenOk.png"><span id="sendedTipMessage">验证码已成功发送至验证邮箱上，请查收</span></div>
+				<div class="validCode">输入验证码：<input id="validCodeValue" type="text" name="validCode" /><span id="wrongTip"></span></div>
+				<div class="oftenIp"><input id="oftenIp" type="checkbox">将此次登录保存为常用地址</div>
+				<div class="confirmWrap"><span id="confirmBotton">确定</span><a id="changeSendWay"></a></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="/newresources/js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="/newresources/js/md5.js"></script>
+<script type="text/javascript" src="/newresources/js/base.js"></script>
+<script type="text/javascript" src="/newresources/js/jquery.placeholder.min.js"></script>
+<script type="text/javascript" src="/newresources/js/xcConfirm.js"></script>
+<!-- <script type="text/javascript" src="/newresources/js/jquery.cookie.js"></script> --> <!-- API:https://github.com/carhartl/jquery-cookie -->
+
+<script type="text/javascript">
+var loginAccount_flag=false;
+var pwd_flag=false;
+var vcode_flag=true;
+var errorNum = 0;//输入账号密码的错误次数
+var ipCheckWay = 1;//ip异常验证方式  //发送类型  1：手机  2：邮箱
+var regPhone = null;//用户绑定的手机
+var regEmail = null;//用户绑定的邮箱
+
+$(function(){
+	//设置页面高度
+	var r_width=$("#login_r_wrap").width();
+	$(".tipWindow").css("left",($(window).width()-495)/2+"px");//IP异常提示层
+	$(".tipWindow").css("top",($(window).height()-400)/2+"px");
+	
+	/*if(r_width<400){
+		r_width=400;
+		$(".login_r_wrap").width(400);
+	}*/
+	$("#login_l_wrap").width($(window).width()-r_width);
+	$("#login_l_wrap").css("line-height",$(window).height()+"px");
+	window.onresize=function(){
+		var r_width=$("#login_r_wrap").width();
+		/*if(r_width<400){
+			r_width=400;
+			$(".login_r_wrap").width(400);
+		}*/
+		$("#login_l_wrap").width($(window).width()-r_width);
+		$("#login_l_wrap").css("line-height",$(window).height()+"px");
+		$(".tipWindow").css("left",($(window).width()-495)/2+"px");
+		$(".tipWindow").css("top",($(window).height()-400)/2+"px");
+	};
+	$(".reg-explain").html("");
+	//默认第一步的颜色变化
+	$('.stepInfo_wrap').find('.step_index').eq(0).css("background-color","#ff9900");
+	//初始化placeholder控件
+	$('input, textarea').placeholder();
+	
+	$("#data_loginAccount").on("blur",function(){
+		var loginAccount=$(this).val();
+		if(loginAccount=="")
+		{
+			$(".reg-explain").html("登录账号不为空");
+			loginAccount_flag=false;
+		}
+		else
+		{
+			loginAccount_flag=true;
+		}
+			
+	});
+	
+	$("#data_pwd").on("blur",function(){
+		var data_pwd=$(this).val();
+		if(data_pwd=="")
+		{
+			$(".reg-explain").html("密码不为空");
+			pwd_flag=false;
+		}
+		else
+		{
+			pwd_flag=true;
+		}
+	});
+	$("#data_vcode").on("blur",function(){
+		var data_vcode=$(this).val();
+		if(data_vcode=="" && errorNum>1)
+		{
+			$(".reg-explain").html("验证码不为空");
+			vcode_flag=false;
+		}
+		else
+		{
+			vcode_flag=true;
+		}
+	});
+	
+	ipTipAll();//ip异常提示窗中的操作
+});
+
+//点击Enter键触发doLogin登录  mishengliang 2016-04-19
+$(function () {
+    $("input").keyup(function (event){
+    	if (event.keyCode == "13") {
+            $("#login_button").click();   
+            return;
+        }
+
+    });
+
+});  
+
+//登录方法
+function doLogin(){
+	if(!loginAccount_flag&&$("#data_loginAccount").val()==""){
+		$("#data_loginAccount").focus();
+	}else if(!pwd_flag&&$("#data_pwd").val()==""){
+		$("#data_pwd").focus();
+	}else if(!vcode_flag){
+		$("#data_vcode").focus();
+	}else{
+		var nameOrEmail = $("#data_loginAccount").val();
+		var pwd = $("#data_pwd").val();
+		var vCode = $("#data_vcode").val();
+		var isLogin = 0;//未记住账号
+		
+ 		/*if($("#saveCookie")[0].checked){//勾选了记住账号 此功能先注释
+			isLogin = 1;
+		}else{
+			isLogin = 0;
+		} */
+		
+		var url = "userInfo/doLogin.do";
+		var params = {};
+		params.nameOrEmail=nameOrEmail;//用户名或邮箱
+		params.password=hex_md5(pwd);
+		params.verify_code=vCode;
+		params.errorNum=errorNum;
+		params.isLogin=isLogin;
+		
+		var isasync = true;
+		var fn = function(result){
+			$("body #spin_wrap").remove();
+			if(result.ajaxErrorCode!=200){
+				$(".reg-explain").css("display","block");
+				$(".reg-explain").html("发生错误，代码："+result.ajaxErrorCode);
+				getNewVCode();
+			}else{
+				if(result.loginName==""||typeof (result.loginName)=="undefined"||result.loginName==null){
+					if(result.emailValid == "false"){//邮箱未验证直接跳转到验证页面
+						regIdAndEmail = "regId=" + result.regId + "&email=" + result.regEmail;//跨域传输数据
+						var param ={"regIdAndEmail":regIdAndEmail};
+						addParamsToWindowName(param);
+						go_redirect("userInfo/emailValid.htm");
+					}
+					
+					if(typeof (result.phone)!="undefined" && result.phone != null){//默认为手机验证IP
+						regPhone = result.phone;
+						$("#sendInfoTip").html("您绑定的手机为：");
+						$("#sendInfo").html(result.phone);
+						$("#sendedTipMessage").html("验证码已成功发送至绑定手机上，请查收");
+						$(".reg-explain").html("");
+						
+						if(typeof (result.email)!="undefined" && result.email != null){$("#changeSendWay").html("更换为邮箱验证"); regEmail = result.email;}
+						$(".invalidIpTip").fadeIn("fast");
+						ipCheckWay = 1;
+						return;
+					}else if(typeof (result.email)!="undefined" && result.email != null){//邮箱验证IP
+						$("#sendInfoTip").html("您绑定的邮箱为：");
+						$("#sendInfo").html(result.email);
+						$("#sendedTipMessage").html("验证码已成功发送至指定邮箱上，请查收");
+						$(".reg-explain").html("");
+						
+						if(typeof (result.phone)!="undefined" && result.phone != null){$("#changeSendWay").html("更换为邮箱验证");}
+						$(".invalidIpTip").fadeIn("fast");
+						ipCheckWay = 2;
+						return;
+					}
+					
+					errorNum ++;
+					$(".reg-explain").css("display","block");
+					$(".reg-explain").html(result.message);
+					if(errorNum >= 2){//mishengliang 在第二次错误之后显示出验证码校验框 2016-03-04
+						$(".login_wrap").css({height:370});
+						$("#vCode_change").css({display:'block'});
+						$("#vCodeImg1").attr("src","common/getVerifyCode.do");
+					}
+					return;
+				}else if(result.emailValid == "true"){
+					var redirect=getQueryString("redirect");
+					if(isNullOrEmptyOrUndefined(redirect)){
+						redirect="index.jsp";
+					}else{
+						redirect=decodeURIComponent(redirect);
+					}
+					go_redirect(redirect);
+				}
+			}
+		};
+		asyncAjaxMethod(url,params,isasync,fn);
+	}
+}
+
+//获取新的验证码
+function getNewVCode(num){
+	var vcode_img=$("#vCodeImg"+num);
+	if(vcode_img){
+		vcode_img.attr("src","common/getVerifyCode.do?_dc="+new Date().getTime());
+	}
+}
+
+//ip异常窗口操作
+function ipTipAll(){
+	sendCount = 0;//发送次数标记位
+	$("#closeTip").click(function(){//关闭IP异常提示窗
+		$(".invalidIpTip").css("display","none");
+	});
+	
+	$("#sendBotton").click(function(){//发送键
+		$("#sendBotton").css("display","none");
+		$(".countDownWrap").css("display","inline-block");
+		
+		countDownShow(30);//倒计时
+		sendEmailOrShortMessage();
+		sendCount++;
+	});
+	
+	$("#confirmBotton").click(function(){//点击确定登录
+		var validCode = $("#validCodeValue").val();
+		if(sendCount == 0){
+			$("#wrongTip").html("还未发送验证码"); 
+			$("#wrongTip").css("display","inline-block");
+			return;
+		}
+		if(validCode == ""){
+			$("#wrongTip").html("验证码不为空"); 
+			$("#wrongTip").css("display","inline-block");
+			return;
+		}
+		
+		differIpLogin();//登录
+	});
+	
+	//改变IP验证方式
+	$("#changeSendWay").click(function(){
+		if($("#changeSendWay").html() == "更换为邮箱验证"){
+			$(".tipWindow").css("display","none");
+			$("#sendInfoTip").html("您绑定的邮箱为：");
+			$("#sendInfo").html(regEmail);
+			$("#sendedTipMessage").html("验证码已成功发送至指定邮箱上，请查收");
+			$(".sendedTip").css("display","none");
+			$("#changeSendWay").html("更换为手机验证");
+			$(".reg-explain").html("");
+			$(".tipWindow").css("display","block");
+			ipCheckWay = 2;
+		}else if($("#changeSendWay").html() == "更换为手机验证"){
+			$(".tipWindow").css("display","none");
+			$("#sendInfoTip").html("您绑定的手机为：");
+			$("#sendInfo").html(regPhone);
+			$("#sendedTipMessage").html("验证码已成功发送至绑定手机上，请查收");
+			$(".sendedTip").css("display","none");
+			$("#changeSendWay").html("更换为邮箱验证");
+			$(".reg-explain").html("");
+			$(".tipWindow").css("display","block");
+			ipCheckWay = 1;
+		}
+	});
+}
+
+//计时器
+function countDownShow(num){
+	c=num;
+	$("#countDownTime").html(c);
+	c=c-1;
+	if(c>=0){
+		timeOutFlag = setTimeout("countDownShow(c)",1000);
+	}else{
+		clearTimeout(timeOutFlag);
+		$("#sendBotton").html("重新发送");
+		$(".countDownWrap").css("display","none");
+		$("#sendBotton").css("display","inline-block");
+	}
+}
+
+//发送短信或邮件
+function sendEmailOrShortMessage(){
+	var url = "userInfo/sendEmailOrShortMessage.do";
+	var params = {};
+	params.accName = $("#data_loginAccount").val();//用户名或邮箱
+	params.sendType = ipCheckWay;//发送类型  1：手机  2：邮箱
+	
+	var isasync = true;
+	var fn = function(result){//无操作，只是发送信息
+		if(result.resultType == 32 || result.resultType == -1){
+			$("#sendedTipIcon").attr("src","/newresources/images/er.png");
+			$("#sendedTipMessage").html(result.message);
+		}
+		$(".sendedTip").css("display","block");
+	};
+	asyncAjaxMethod(url,params,isasync,fn);
+}
+
+//异地登录
+function differIpLogin(){
+	var nameOrEmail = $("#data_loginAccount").val();
+	var pwd = $("#data_pwd").val();
+	var validCode = $("#validCodeValue").val();
+	var isLogin = 0;//未记住账号
+	var isOftenIp = true;
+	if($("#oftenIp").is(":checked") == false) {isOftenIp = false;}
+
+	var url = "userInfo/differIpLogin.do";
+	var params = {};
+	params.nameOrEmail=nameOrEmail;//用户名或邮箱
+	params.password=hex_md5(pwd);
+	params.isLogin=isLogin;
+	params.validCode=validCode;
+	params.isOftenIp=isOftenIp;
+	
+	var isasync = true;
+	var fn = function(result){
+		if(typeof(result.validCodeRight) != "undefined" && result.validCodeRight == "false"){//验证码不正确
+			$("#wrongTip").html("您的验证码有误");
+			$("#wrongTip").css("display","inline-block");
+			return;
+		}
+		
+		var redirect=getQueryString("redirect");
+		if(isNullOrEmptyOrUndefined(redirect)){
+			redirect="index.jsp";
+		}else{
+			redirect=decodeURIComponent(redirect);
+		}
+		go_redirect(redirect);
+	};
+	asyncAjaxMethod(url,params,isasync,fn);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+@CHARSET "UTF-8";
+.plug_wrap{margin:0; padding:0;}
+.plug_wrap .pop_wrap{ position:fixed; top:50%; left:50%; z-index:20; background-color:#fff; width:300px; min-height:400px; padding-bottom:10px; margin-top:-200px; margin-left:-150px; }
+.plug_wrap .pop_wrap .title_wrap{ position:relative; background-color:#58749c; color:#fff; font-size:14px; padding-left:10px; letter-spacing:2px; width:auto; height:40px; line-height:40px;}
+.plug_wrap .pop_wrap .title_wrap .close_btn{ position:absolute; width:20px; height:30px; line-height:30px; top:0px; right:0px; font-size:16px; color:#fff; font-weight:normal;opacity:0.8;filter:alpha(opacity=80); text-decoration:none;}
+.plug_wrap .pop_wrap .title_wrap .close_btn:hover{opacity:1;filter:alpha(opacity=100); text-decoration:none; font-weight:bold;}
+.plug_wrap .pop_wrap .checkAll_wrap{ width:auto; height:36px; line-height:36px; margin-left:10px; }
+.plug_wrap .pop_wrap .ul_list{ margin:0px 10px 10px 10px; width:auto; height:300px; overflow-y:auto;}
+.plug_wrap .pop_wrap .ul_list li{ height:34px; line-height:34px; width:auto; border:1px solid #ccc;}
+.plug_wrap .pop_wrap input[type=checkbox]{padding:0px; margin-right:6px; }
+.plug_wrap .pop_wrap .pop_wrap_btn{ text-align:center; width:100px; height:30px; font-size:14px;background-color:#f1af27; color:#fff; letter-spacing:6px;}
+.plug_wrap .pop_wrap .pop_wrap_btn:hover{opacity:0.8;filter:alpha(opacity=80);}
+
+.plug_wrap .pop_mask{ position:fixed; top:0px; left:0px; width:100%; height:100%; background-color:#000;opacity:0.5;filter:alpha(opacity=50);z-index:1;}
+.plug_wrap .t_algin_c{text-align:center; width:auto;height:auto;}

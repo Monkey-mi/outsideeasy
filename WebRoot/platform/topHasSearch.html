@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>顶部</title>
+<link href="/newresources/css/top.css" rel="stylesheet" type="text/css" />
+<!--  <link href="/newresources/css/page.css" rel="stylesheet" type="text/css" />
+<link href="/newresources/css/xcConfirm.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/newresources/js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="/newresources/js/base.js"></script>
+<script type="text/javascript" src="/newresources/js/xcConfirm.js"></script>-->
+<script  type="text/javascript">
+$(function(){
+	 //验证登录信息
+		var result = isLoginForPlateForm();
+		if(result.isLogin == true){
+			var account = result.data;
+			
+			$("#loginName_span").html(account.login_name);
+			$(".dologin").css("display","none");
+			$(".haslogin").css("display","block");
+			$(".doregister").css("display","none");
+		}
+		$("#mainNav li").on("click",function(){
+				$("#mainNav").children(".curr").removeClass("curr");
+				$(this).addClass("curr");
+			});
+	});
+
+function go_index(url)
+{
+	window.location.href="/index.jsp";
+}
+
+/**
+* getCompanyListBySts
+* @returns returnData
+* @author yukai
+* 2016-8-3 上午11:14:40
+*/
+/*
+function getCompanyListBySts()
+{
+	var returnData={};
+	var url="supplierForPlateForm/getCompanyListByRegId.do";
+	var params={};
+	params.apply_sts=15;
+	var fn=function(result){
+		returnData=result.data;
+	};
+	asyncAjaxMethod(url,params,false,fn);
+	return returnData;
+}
+*/
+function changeCompany(){
+	var companyName=$("#company option:selected").text();
+	$(".showSelect").text(companyName);
+	companyId=$("#company").val();
+	var param ={"companyIdForAll":companyId,tabNum:getParamFromWindowName("tabNum")};
+	addParamsToWindowName(param);
+	window.location.reload(true);
+}
+var firstCompanyId;
+function go_company()
+{
+	var auth=hasRolePageAuth("/supplierForPlateForm/baseInfo");
+	
+	if(auth==1)
+	{
+	if(getParamFromWindowName("companyIdForAll")==""){
+		var param ={"companyIdForAll":firstCompanyId};
+		addParamsToWindowName(param);
+	}
+	window.location.href="/supplierForPlateForm/baseInfo.htm";
+	}
+	else if(auth==0)
+	{
+		var option ={title:"提示",btn:parseInt("0001",2)};
+		window.wxc.xcConfirm("对不起,您当前未开通此功能", window.wxc.xcConfirm.typeEnum.custom,option);
+	}
+}
+//是否有页面权限
+function hasAuthHref(page_path)
+{
+	var hasAuth=hasRolePageAuth(page_path);
+	
+	if(hasAuth==1)
+	{
+		window.location.href=page_path+".htm";
+	}
+	else if(hasAuth==0)
+	{
+		var option ={title:"提示",btn:parseInt("0001",2)};
+		window.wxc.xcConfirm("对不起,您当前未开通此功能", window.wxc.xcConfirm.typeEnum.custom,option);
+	}
+	else if(hasAuth==-1)
+	{
+	}
+}
+//是否有页面权限
+function hasAuthHref1(page_path)
+{
+	
+	var hasAuth=hasRolePageAuth(page_path);
+	
+	if(hasAuth==1)
+	{
+		window.location.href=page_path+".htm";
+	}
+	else if(hasAuth==0)
+	{
+		var option ={title:"提示",btn:parseInt("0001",2)};
+		window.wxc.xcConfirm("对不起,您还未分配该权限，请联系管理员", window.wxc.xcConfirm.typeEnum.custom,option);
+	}
+	
+}
+/**
+ * 跳转网页详细页面
+* goHelpContent
+* @param url,web_id
+* @return void
+* @author yukai
+* 2016-11-17
+ */
+ function goHelpContent(url,web_id){
+ 	var param ={"webId":web_id};
+	addParamsToWindowName(param);
+	window.location.href=getwebroot()+url;
+ }
+</script>
+</head>
+<body class="bg_grey">
+<div id="topPage">
+	<div class="top_1_wrap">
+		<div class="div_1024_c_wrap">
+			<div class="top_1_float f_l">
+				<div class="dologin"><a id="doLoginIn" href="/login.html">登录</a></div>
+				<div class="haslogin">
+					<span id="loginName_span"></span>
+					<a id="doLoginout" href="javaScript:void(0)" onClick="doLoginOut()">退出</a>
+					<div class="select_wrap  f_r ml10 "> 
+						<span class="f_l mr10">|</span>
+						<div class="test"><span class="showSelect"></span></div>
+						<select id="company" onchange="changeCompany()">
+							<!-- <option>浙江泰普森控股集团</option>
+							<option>浙江泰普森休闲用品有限公司</option>
+							<option>泰普森休闲有限公司</option> -->
+						</select>
+					</div>
+				</div>
+				<div class="doregister"><a href="/userInfo/register.htm">免费注册</a></div>
+			</div>
+			<div class="top_1_float f_r">
+				<a href="/index.jsp">首页</a>
+				<a href="/supplierForPlateForm/registerInfo.htm">企业中心</a>
+				<a href="/CommonUse/aboutUs.htm">关于我们</a>
+				<a onclick="goHelpContent('announcement/helpCenterContent.htm',12)">帮助</a>
+				<button class="beta">Beta</button>
+			</div>
+		</div>
+	</div>
+	
+	<div class="top_logon_wrap">
+		<div class="div_1024_c_wrap">
+			<div class="logo_img_wrap">
+				<img src="/newresources/images/logo/logo_main.png" style="cursor:pointer" onclick="go_index()"/>
+			</div>
+			<div class="logo_right_wrap">
+				<div class="main_nav_wrap">
+					<ul id="mainNav">
+						<!-- <li><a  href="javascript:void(0)">企业中心</a></li> -->
+						<li><a href="javascript:void(0)" onclick="hasAuthHref('/purchaseCenterCtrl/purchaseCenter')">采购</a>
+							 <ul>
+								<li><a  href="javascript:void(0)" onclick="hasAuthHref1('/externalTask/outsourceTaskList')">外协任务</a></li>
+							</ul> 
+						</li>
+						<li><a href="javascript:void(0)" onclick="hasAuthHref('/saleCenterCtrl/saleCenter')">销售</a>
+							 <ul>
+								<li><a href="javascript:void(0)" onclick="hasAuthHref1('/externalTask/producTaskList')">生产任务</a></li>
+							</ul> 
+						</li>
+						
+						<li><a href="/supplierForPlateForm/registerInfo.htm" >账号管理</a></li>
+						<li><a style="cursor:default" class="hover_down">服务</a>
+							<ul>
+								<li><a href="javascript:void(0)" onclick="go_company()">企业信息</a></li>
+								<!--  <li><a href="javascript:void(0)" onclick="go_sub()">组织结构</a></li>-->
+								<li><a href="javascript:void(0)" onclick="hasAuthHref('/subAccount/mngSubAccount2')">组织结构</a></li>
+							</ul>
+						</li>
+					</ul>
+					<!-- 
+					<div class="search_wrap">
+						<input type="text" placeholder="输入名称、行业关键字查找优质企业"/>
+						<button></button>
+					</div> -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.regAccount.data.MngSubAccountMapper">
+
+
+<select id="getMngSubAccountList" parameterType="map" resultType="manager.regAccount.model.MngSubAccount">
+	select
+		t_app_sub_account.sa_id,
+		t_app_sub_account.org_id,
+		t_app_sub_account.role_id,
+		t_app_sub_account.reg_id,
+		t_app_sub_account.sa_name,
+		t_app_sub_account.sa_password,
+		t_app_sub_account.enabled,
+		t_app_sub_account.create_date,
+		t_app_sub_account.username,
+		t_app_sub_account.phone,
+		t_sys_role.role_name,
+		t_app_sub_account.last_login_ip,
+		t_app_organization.name,
+		t_app_sub_account.emp_no,
+		t_app_sub_account.is_delete
+	from
+		t_app_sub_account
+		left join t_sys_role on t_app_sub_account.role_id = t_sys_role.role_id
+		left join t_app_organization on t_app_organization.org_id = t_app_sub_account.org_id
+    where 1=1
+        <if test="reg_id != null and reg_id != ''">	
+         and t_app_sub_account.reg_id = #{reg_id}
+        </if>	
+
+</select>
+<insert id="addMngSubAccount" parameterType="map" keyProperty="sa_id" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="sa_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_sub_account
+	(
+		org_id,
+		role_id,
+		reg_id,
+		sa_name,
+		sa_password,
+		enabled,
+		create_date,
+		username,
+		phone,
+		last_login_ip,
+		emp_no
+	)
+	values
+	(
+		#{org_id},
+		#{role_id},
+		#{reg_id},
+		#{sa_name},
+		#{sa_password},
+		#{enabled},
+		#{create_date},
+		#{username},
+		#{phone},
+		#{last_login_ip},
+		#{emp_no}
+	)
+</insert>
+<update id="updateMngSubAccount" parameterType="map">
+	update t_app_sub_account
+		set
+			org_id = #{org_id},					
+			sa_name = #{sa_name},			
+			enabled = #{enabled},
+			username = #{username},
+			phone = #{phone},
+			enabled = #{enabled},
+			emp_no = #{emp_no}
+		where sa_id = #{sa_id}
+</update>
+<delete id="deleteMngSubAccount" parameterType="manager.regAccount.model.MngSubAccount">
+	delete from t_app_sub_account
+	where sa_id = #{sa_id}
+</delete>
+<select id="getSubaccountForSupplier" parameterType="map" resultType="manager.regAccount.model.MngdSupplierFiles">
+select 
+  t_supplier_files.supplier_id,
+  t_supplier_files.supplier_cpyname  
+from
+  t_supplier_files
+  left join t_subaccount_supplier_info on t_subaccount_supplier_info.supplier_id = t_supplier_files.supplier_id
+where 
+  t_subaccount_supplier_info.sa_id = #{sa_id}
+  and t_subaccount_supplier_info.is_delete = 0
+  and t_supplier_files.file_status = 0
+</select>
+<select id="getAllSubaccountForSupplier" parameterType="map" resultType="manager.regAccount.model.MngdSupplierFiles">
+select 
+  t_subaccount_supplier_info.supplier_id,
+  t_subaccount_supplier_info.is_delete
+from
+  t_subaccount_supplier_info 
+where 
+  t_subaccount_supplier_info.sa_id = #{sa_id}
+</select>
+<update id="updateSubForSupplier" parameterType="map">
+update t_subaccount_supplier_info
+set
+		is_delete = #{is_delete}
+where   sa_id = #{sa_id}
+		and supplier_id = #{supplier_id}
+</update> 
+<update id="updateSubForCompany" parameterType="map">
+update t_app_subacc_company_authority
+set
+		is_delete = #{is_delete}
+where   sa_id = #{sa_id}
+		and company_id = #{company_id}
+</update> 
+<insert id="addSubaccountCompany" parameterType="map" keyProperty="ba_id" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="ba_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_app_subacc_company_authority
+	(
+		company_id,
+		is_delete,
+		sa_id	
+	)
+	values
+	(
+		#{company_id},
+		#{is_delete},
+		#{sa_id}
+	)
+</insert>
+<insert id="addSubaccountSupplier" parameterType="map" keyProperty="subaccount_supplier_id" useGeneratedKeys="true">
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="subaccount_supplier_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_subaccount_supplier_info
+	(
+		supplier_id,
+		is_delete,
+		sa_id	
+	)
+	values
+	(
+		#{supplier_id},
+		#{is_delete},
+		#{sa_id}
+	)
+</insert>
+<select id="getSubForCompany" parameterType="map" resultType="manager.supplier.model.SupplierFile">
+select 
+     t_app_company_info.company_id,
+     t_app_company_info.cpyname_cn
+from t_app_company_info
+     left join t_app_subacc_company_authority on t_app_subacc_company_authority.company_id = t_app_company_info.company_id
+where 
+     t_app_subacc_company_authority.sa_id = #{sa_id}
+     and t_app_subacc_company_authority.is_delete = 0
+</select>
+<select id="getAllSubForCompany" parameterType="map" resultType="manager.regAccount.model.MngdSupplierFiles">
+select
+    t_app_subacc_company_authority.company_id,
+    t_app_subacc_company_authority.is_delete
+from t_app_subacc_company_authority
+where 
+    t_app_subacc_company_authority.sa_id = #{sa_id}
+</select>
+<select id="checkSubName" parameterType="map" resultType="Integer">
+select  count(0)
+from    t_app_sub_account
+where 
+        t_app_sub_account.sa_name = #{sa_name}
+        and t_app_sub_account.sa_id != #{sa_id}
+</select>
+<update id="updateMngSubAccoutForID" parameterType="map">
+	update t_app_sub_account
+		set					
+			enabled = #{enabled}		
+		where 
+            sa_id in
+        <foreach collection="sa_id" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+</update>
+<update id="updateMngSubAccoutForReset" parameterType="map">
+	update t_app_sub_account
+		set					
+			sa_password = #{sa_password}		
+		where 
+            sa_name = #{sa_name}
+</update>
+<select id="checkEmpNo" parameterType="map" resultType="Integer">
+select  count(0)
+from    t_app_sub_account
+where 
+        t_app_sub_account.reg_id = #{reg_id}
+        and t_app_sub_account.emp_no = #{emp_no}
+        and t_app_sub_account.sa_id != #{sa_id}
+</select>
+</mapper>

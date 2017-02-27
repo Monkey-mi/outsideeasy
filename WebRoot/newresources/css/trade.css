@@ -1,0 +1,26 @@
+@CHARSET "UTF-8";
+.sub_title_wrap{width:auto; height:38px; line-height:38px;margin-left:10px; margin-right:10px;}
+.sub_title_wrap span{letter-spacing:2px; font-weight:bold; margin:0px 4px;}
+.green_button{ background-color:#8ec165; color:#fff; width:auto; padding:3px 9px; border-radius:5px;-webkit-border-radius: 5px; -moz-border-radius: 5px;}
+.trade_tablelist{ width:100%; height:auto; border-collapse:collapse; border:1px solid #ccc; border-bottom:none;}
+.trade_tablelist tr{border-bottom:1px solid #ccc; height:38px;}
+.trade_tablelist th{ color:#777;  background-color:#f6f6f6; font-weight:normal; text-align:center; height:38px;}
+.trade_tablelist td{word-break: break-all; text-align:center;line-height:30px;}
+.trade_tablelist td.left{ text-align:left; padding-left:10px;}
+.trade_tablelist td.center{text-align:center;}
+.trade_tablelist td.right{ text-align:right;}
+.trade_tablelist td input.edit{border:1px solid #ccc; height:28px; line-height:28px; width:90%;}
+.trade_tablelist td select{border:1px solid #ccc; height:30px; line-height:30px; width:90%;}
+.trade_tablelist td a{color:#0072c4; margin-right:10px;}
+.trade_tablelist td a.edit,.tablelist td a.save,.tablelist td a.del{color:#0072c4;margin-right:10px;}
+.trade_tablelist td input[type=checkbox]{margin:0px; padding:0px;}
+
+.blue_button{ background-color:#58749c; color:#fff; width:auto; padding:3px 9px; border-radius:5px;-webkit-border-radius: 5px; -moz-border-radius: 5px;}
+.white_button{ background-color:#fff; color:#f1af27; border:1px solid #f1af27; width:auto; padding:3px 9px; border-radius:5px;-webkit-border-radius: 5px; -moz-border-radius: 5px;}
+.maincolor_button{background-color:#f1af27; color:#fff;width:auto; padding:3px 9px; border-radius:5px;-webkit-border-radius: 5px; -moz-border-radius: 5px;}
+.grey_button{background-color:#e5e5e5; color:#777;width:auto; padding:3px 9px; border-radius:5px;-webkit-border-radius: 5px; -moz-border-radius: 5px;}
+
+.setDefault{width:68px;height:22px;padding:3px 9px;border:1px solid #58749c;border-radius:5px;color:#58749c;background:#fff;line-height:15px;vertical-align:middle;}
+.defaultAccount{background:#58749c;color:#fff;width:68px;height:22px;border-radius:5px;line-height:22px;}
+.bluecolor{color:#58749c;}
+.hide{display:none;}

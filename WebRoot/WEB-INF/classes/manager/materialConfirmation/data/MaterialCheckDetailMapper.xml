@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.materialConfirmation.data.MaterialCheckDetailMapper">
+
+
+<select id="getMaterialCheckDetailList" parameterType="map" resultType="manager.materialConfirmation.model.MaterialCheckDetail">
+	select
+		t_app_material_check_detail.check_id,
+		t_app_material_check_detail.check_order,
+		t_app_material_check_detail.check_item,
+		t_app_material_check_detail.check_request,
+		t_app_material_check_detail.check_report,
+		t_app_material_check_detail.check_result,
+		t_app_material_check_detail.check_person,
+		t_app_material_check_detail.chec_date,
+		t_app_material_check_detail.checkclass_id,
+		t_app_material_check_detail.sample_id,
+		t_app_material_check_detail.material_name,
+		t_app_material_check_detail.remark
+	from
+		t_app_material_check_detail
+		where 1=1
+	<if test="sample_id!=null">
+		and t_app_material_check_detail.sample_id=#{sample_id}
+	</if>
+</select>
+<insert id="addMaterialCheckDetail" parameterType="manager.materialConfirmation.model.MaterialCheckDetail" keyProperty="check_id" useGeneratedKeys="true">
+	<selectKey keyProperty="check_id" resultType="int" order="BEFORE">
+		select  ifnull(max(check_id)+1,1) from t_app_material_check_detail 		
+	</selectKey>
+	insert into t_app_material_check_detail
+	(
+		check_id,
+		check_order,
+		check_item,
+		check_request,
+		check_report,
+		check_result,
+		check_person,
+		chec_date,
+		checkclass_id,
+		sample_id,
+		material_name,
+		remark
+	)
+	values
+	(
+		#{check_id},
+		#{check_order},
+		#{check_item},
+		#{check_request},
+		#{check_report},
+		#{check_result},
+		#{check_person},
+		#{chec_date},
+		#{checkclass_id},
+		#{sample_id},
+		#{material_name},
+		#{remark}
+	)
+</insert>
+<update id="updateMaterialCheckDetail" parameterType="manager.materialConfirmation.model.MaterialCheckDetail">
+	update t_app_material_check_detail
+		set
+			check_id = #{check_id},
+			check_order = #{check_order},
+			check_item = #{check_item},
+			check_request = #{check_request},
+			check_report = #{check_report},
+			check_result = #{check_result},
+			check_person = #{check_person},
+			chec_date = #{chec_date},
+			checkclass_id = #{checkclass_id},
+			sample_id = #{sample_id},
+			material_name=#{material_name},
+			remark=#{remark}
+		where check_id = #{check_id}
+</update>
+<delete id="deleteMaterialCheckDetail" parameterType="manager.materialConfirmation.model.MaterialCheckDetail">
+	delete from t_app_material_check_detail
+	where check_id = #{check_id}
+</delete>
+</mapper>

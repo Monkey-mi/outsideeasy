@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+        
+   
+    <!--自动扫描该包下所有的组件,根据标注处理-->
+    <!-- enable autowire -->
+    <context:annotation-config /> 
+    
+    <context:component-scan base-package="manager,platform,usercenter,util,common" > 
+    	<!-- 不扫描service，避免事务失效 -->
+    	<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />   
+    	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" />
+    </context:component-scan>
+    
+    <mvc:annotation-driven />  
+
+  	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+		value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/" />
+		<property name="suffix" value=".jsp" />
+	</bean> 
+	<bean class="util.UTF8StringBeanPostProcessor"></bean> 
+	<!-- 访问请求日志处理-->
+    <bean id="requestLogger" class="util.web.RequestLogger"></bean>
+    <aop:config>
+    	<aop:aspect ref="requestLogger">
+    		<aop:pointcut id="requestLoggerPointcutAfter" expression="execution(* *.*..controller.*.*(..))" />
+    		<aop:after method="doLogger" pointcut-ref="requestLoggerPointcutAfter"/>
+    	</aop:aspect>
+    </aop:config>
+    <aop:config><!-- 登出需要在方法执行前执行，已确保可以获取到用户的信息 -->
+    	<aop:aspect ref="requestLogger">
+    		<aop:pointcut id="requestLoggerPointcutBefore" expression="execution(* *.*..controller.*.doLogout(..))" />
+    		<aop:before method="doLogger" pointcut-ref="requestLoggerPointcutBefore"/>
+    	</aop:aspect>
+    </aop:config>
+</beans>

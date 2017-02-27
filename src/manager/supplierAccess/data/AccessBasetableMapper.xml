@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.supplierAccess.data.AccessBasetableMapper">
+
+
+<select id="getAccessBasetableList" parameterType="map" resultType="manager.supplierAccess.model.AccessBasetable">
+	select
+		t_app_supplier_access_basetable.item_id,
+		t_app_supplier_access_basetable.item_name,
+		t_app_supplier_access_basetable.f_id,
+		t_app_supplier_access_basetable.Activity_status
+	from
+		t_app_supplier_access_basetable
+	where 1=1
+	<if test="f_id!=null and f_id>=0">
+		and t_app_supplier_access_basetable.f_id=#{f_id}
+	</if>
+	<if test="item_id!=null and item_id>=0">
+		and t_app_supplier_access_basetable.item_id=#{item_id}
+	</if>
+	<!-- 以下几个是节点树相关查询条件 -->
+	<if test="node!=null">
+		and t_app_supplier_access_basetable.f_id=#{node}
+	</if>
+	
+	<if test="class_name!=null">
+		and t_app_supplier_access_basetable.item_name=#{class_name}
+	</if>
+</select>
+
+
+<insert id="addAccessBasetable" parameterType="manager.supplierAccess.model.AccessBasetable" keyProperty="item_id" useGeneratedKeys="true">
+	<selectKey keyProperty="item_id" resultType="int" order="BEFORE">
+		select  ifnull(max(item_id)+1,1) from t_app_supplier_access_basetable 		
+	</selectKey>
+	insert into t_app_supplier_access_basetable
+	(
+		item_id,
+		item_name,
+		f_id,
+		Activity_status
+	)
+	values
+	(
+		#{item_id},
+		#{item_name},
+		#{f_id},
+		#{Activity_status}
+	)
+</insert>
+<update id="updateAccessBasetable" parameterType="manager.supplierAccess.model.AccessBasetable">
+	update t_app_supplier_access_basetable
+		set
+			item_id = #{item_id},
+			item_name = #{item_name},
+			f_id = #{f_id},
+			Activity_status = #{Activity_status}
+		where item_id = #{item_id}
+</update>
+<delete id="deleteAccessBasetable" parameterType="manager.supplierAccess.model.AccessBasetable">
+	delete from t_app_supplier_access_basetable
+	where item_id = #{item_id}
+</delete>
+</mapper>

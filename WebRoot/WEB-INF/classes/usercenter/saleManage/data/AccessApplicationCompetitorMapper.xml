@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usercenter.saleManage.data.AccessApplicationCompetitorMapper">
+
+
+<select id="getAccessApplicationCompetitorList" parameterType="map" resultType="usercenter.saleManage.model.AccessApplicationCompetitor">
+	select
+		t_access_application_Competitor.competitor_id,
+		t_access_application_Competitor.competitor_name,
+		t_access_application_Competitor.create_dt,
+		t_access_application_Competitor.app_competitor_id,
+		t_access_application_Competitor.record_id
+	from
+		t_access_application_Competitor
+		<where>
+		<if test="record_id!=null or supplier_id!=null">
+			and (record_id=#{record_id} or supplier_id=#{supplier_id})
+		</if>
+		<if test="competitorId!=null">
+			and competitor_id=#{competitorId}
+		</if>
+		</where>
+</select>
+<insert id="addAccessApplicationCompetitor" parameterType="map" keyProperty="competitor_id" useGeneratedKeys="true">
+	insert into t_access_application_Competitor
+	(
+		competitor_name,
+		app_competitor_id,
+		record_id,
+		supplier_id
+	)
+	values
+	(
+		#{competitorName},
+		#{AppCompetitorId},
+		#{record_id},
+		#{supplier_id}
+	)
+</insert>
+<update id="updateAccessApplicationCompetitor" parameterType="map">
+	update t_access_application_Competitor
+		<set>
+			<if test="competitorName != null and competitorName != ''">
+				competitor_name = #{competitorName},
+			</if>
+			<if test="record_id != null and record_id != ''">
+				record_id = #{record_id}
+			</if>
+		</set>
+		where competitor_id = #{competitorId}
+</update>
+<delete id="deleteAccessApplicationCompetitor" parameterType="map">
+	delete from t_access_application_Competitor
+	where competitor_id = #{competitorId}
+</delete>
+<delete id="deleteAccessApplicationCompetitorByRI" parameterType="map">
+	delete from t_access_application_Competitor
+	where record_id=#{record_id}
+</delete>
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager.templet.data.MngTempletElemnetControllTypeMapper">
+
+
+<select id="getMngTempletElemnetControllTypeList" parameterType="map" resultType="manager.templet.model.MngTempletElemnetControllType">
+	select
+		t_templet_elemnet_controll_type.controller_type_id,
+		t_templet_elemnet_controll_type.controller_name,
+		t_templet_elemnet_controll_type.create_dt
+	from
+		t_templet_elemnet_controll_type
+</select>
+<insert id="addMngTempletElemnetControllType" parameterType="manager.templet.model.MngTempletElemnetControllType" keyProperty="controller_type_id" useGeneratedKeys="true">
+	<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="controller_type_id" >
+       SELECT LAST_INSERT_ID()
+    </selectKey>
+	insert into t_templet_elemnet_controll_type
+	(
+		controller_name
+
+	)
+	values
+	(
+		#{controller_name}
+
+	)
+</insert>
+<update id="updateMngTempletElemnetControllType" parameterType="manager.templet.model.MngTempletElemnetControllType">
+	update t_templet_elemnet_controll_type
+		set
+			controller_type_id = #{controller_type_id},
+			controller_name = #{controller_name}
+			
+		where controller_type_id = #{controller_type_id}
+</update>
+<delete id="deleteMngTempletElemnetControllType" parameterType="manager.templet.model.MngTempletElemnetControllType">
+	delete from t_templet_elemnet_controll_type
+	where controller_type_id = #{controller_type_id}
+</delete>
+<select id="getelTypeList" parameterType="map" resultType="manager.templet.model.MngTempletElemnetControllType">
+	select
+		t_templet_elemnet_controll_type.controller_type_id,
+		t_templet_elemnet_controll_type.controller_name
+	from
+		t_templet_elemnet_controll_type
+	where
+	     1=1
+		<if test="search!=null and search!=''">
+		  and ( t_templet_elemnet_controll_type.controller_type_id like '%${search}%' or	t_templet_elemnet_controll_type.controller_name like '%${search}%')
+		</if>
+</select>
+</mapper>
